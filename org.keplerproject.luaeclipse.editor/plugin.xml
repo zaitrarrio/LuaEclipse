@@ -7,10 +7,10 @@
             class="org.keplerproject.luaeclipse.editor.LuaEditor"
             default="false"
             icon="img/lua-logo.gif"
-            id="com.anwrt.ldt.editor"
+            id="org.keplerproject.luaeclipse.editor"
             name="Lua Editor">
          <contentTypeBinding
-               contentTypeId="com.anwrt.ldt.content-type">
+               contentTypeId="org.keplerproject.luaeclipse.content-type">
          </contentTypeBinding>
       </editor>
    </extension>

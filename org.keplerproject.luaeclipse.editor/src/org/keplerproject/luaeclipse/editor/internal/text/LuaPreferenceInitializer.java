@@ -61,7 +61,7 @@ public class LuaPreferenceInitializer extends AbstractPreferenceInitializer {
 				+ PreferenceConstants.EDITOR_BOLD_SUFFIX, true);
 		store.setDefault(ILuaColorConstants.LUA_KEYWORD
 				+ PreferenceConstants.EDITOR_ITALIC_SUFFIX, false);
-
+		store.setDefault(PreferenceConstants.EDITOR_FOLDING_ENABLED, true);
 		store.setDefault(PreferenceConstants.EDITOR_TAB_WIDTH, 4);
 		store.setDefault(
 				PreferenceConstants.EDITOR_SYNC_OUTLINE_ON_CURSOR_MOVE, true);

@@ -32,8 +32,8 @@ import org.keplerproject.luaeclipse.editor.internal.text.LuaTextTools;
  */
 public class LuaEditor extends ScriptEditor {
 
-	public static final String EDITOR_ID = Activator.PLUGIN_ID + ".LuaEditor"; //$NON-NLS-1$
 	public static final String EDITOR_CONTEXT = "#LuaEditorContext";
+	public static final String EDITOR_ID = Activator.PLUGIN_ID + ".LuaEditor"; //$NON-NLS-1$
 	private IFoldingStructureProvider foldingStructureProvider = null;
 
 	/**
@@ -50,15 +50,6 @@ public class LuaEditor extends ScriptEditor {
 						ILuaPartitions.LUA_PARTITIONING);
 			}
 		}
-	}
-
-	/**
-	 * Initialize language specific and parent content.
-	 */
-	@Override
-	protected void initializeEditor() {
-		super.initializeEditor();
-		setEditorContextMenuId(EDITOR_CONTEXT);
 	}
 
 	/**
@@ -94,5 +85,14 @@ public class LuaEditor extends ScriptEditor {
 	@Override
 	public ScriptTextTools getTextTools() {
 		return Activator.getDefault().getTextTools();
+	}
+
+	/**
+	 * Initialize language specific and parent content.
+	 */
+	@Override
+	protected void initializeEditor() {
+		super.initializeEditor();
+		setEditorContextMenuId(EDITOR_CONTEXT);
 	}
 }
