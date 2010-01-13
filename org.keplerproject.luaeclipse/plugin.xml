@@ -17,7 +17,7 @@
             base-type="org.eclipse.core.runtime.text"
             describer="org.keplerproject.luaeclipse.core.LuaContentDescriber"
             file-extensions="lua"
-            id="com.anwrt.ldt.content-type"
+            id="org.keplerproject.luaeclipse.content-type"
             name="Lua Source File"
             priority="high">
       </content-type>

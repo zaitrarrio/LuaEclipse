@@ -5,23 +5,10 @@
          point="org.eclipse.dltk.core.buildParticipant">
       <buildParticipant
             class="org.eclipse.dltk.core.builder.ParserBuildParticipantFactory"
-            id="com.anwrt.ldt.parser"
+            id="org.keplerproject.luaeclipse.parser"
             name="Lua parser"
             nature="org.keplerproject.luaeclipse.nature">
       </buildParticipant>
-   </extension>
-   <extension
-         point="org.eclipse.dltk.core.sourceParsers">
-      <parserContribution
-            natureId="org.keplerproject.luaeclipse.nature">
-         <parser
-               class="org.keplerproject.luaeclipse.parser.LuaSourceParserFactory"
-               description="Metalua based Lua source parser"
-               id="com.anwrt.ldt.parser.sourceParser"
-               name="sourceParser.name"
-               priority="0">
-         </parser>
-      </parserContribution>
    </extension>
    <extension
          point="org.eclipse.dltk.core.sourceElementParsers">
@@ -30,6 +17,19 @@
             nature="org.keplerproject.luaeclipse.nature"
             priority="1">
       </parser>
+   </extension>
+   <extension
+         point="org.eclipse.dltk.core.sourceParsers">
+      <parserContribution
+            natureId="org.keplerproject.luaeclipse.nature">
+         <parser
+               class="org.keplerproject.luaeclipse.parser.LuaSourceParserFactory"
+               description="Metalua based Lua source parser"
+               id="org.keplerproject.luaeclipse.parser.sourceParser"
+               name="sourceParser.name"
+               priority="0">
+         </parser>
+      </parserContribution>
    </extension>
 
 </plugin>

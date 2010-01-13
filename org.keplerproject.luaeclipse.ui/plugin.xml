@@ -5,28 +5,28 @@
          point="org.eclipse.dltk.launching.interpreterInstallTypes">
       <interpreterInstallType
             class="org.keplerproject.luaeclipse.ui.internal.interpreter.LuaInterpreterInstallType"
-            id="com.anwrt.ldt.interpreterInstallType">
+            id="org.keplerproject.luaeclipse.interpreterInstallType">
       </interpreterInstallType>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
             class="org.keplerproject.luaeclipse.ui.interpreter.preferences.LuaInterpreterPreferencePage"
-            id="com.anwrt.ldt.ui.interpreter.preferences"
+            id="org.keplerproject.luaeclipse.ui.interpreter.preferences"
             name="Lua interpreters">
       </page>
    </extension>
    <extension
          point="org.eclipse.ui.newWizards">
       <category
-            id="com.anwrt.ldt.category"
+            id="org.keplerproject.luaeclipse.category"
             name="Lua">
       </category>
       <wizard
-            category="com.anwrt.ldt.category"
+            category="org.keplerproject.luaeclipse.category"
             class="org.eclipse.dltk.ui.wizards.GenericDLTKProjectWizard:org.keplerproject.luaeclipse.nature"
             icon="img/lua.gif"
-            id="com.anwrt.ldt.wizard"
+            id="org.keplerproject.luaeclipse.wizard"
             name="Lua project wizard"
             project="true">
       </wizard>

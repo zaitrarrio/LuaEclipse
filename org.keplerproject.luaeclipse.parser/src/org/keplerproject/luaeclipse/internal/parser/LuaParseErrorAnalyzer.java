@@ -58,11 +58,12 @@ public class LuaParseErrorAnalyzer {
 		return _codeToParse;
 	}
 
-	public int syntaxErrorOffset() {
-		if (_errorOffset == null) {
-			_errorOffset = extractIntFromErrorString(" char ", ':');
+	public int syntaxErrorColumn() {
+		if (_errorCol == null) {
+			 String tag = " column ";
+			_errorCol = extractIntFromErrorString(tag, ',', _errorString.indexOf(tag));
 		}
-		return _errorOffset;
+		return _errorCol;
 	}
 
 	public int syntaxErrorLine() {
@@ -72,11 +73,10 @@ public class LuaParseErrorAnalyzer {
 		return _errorLine;
 	}
 
-	public int syntaxErrorColumn() {
-		if (_errorCol == null) {
-			 String tag = " column ";
-			_errorCol = extractIntFromErrorString(tag, ',', _errorString.indexOf(tag));
+	public int syntaxErrorOffset() {
+		if (_errorOffset == null) {
+			_errorOffset = extractIntFromErrorString(" char ", ':');
 		}
-		return _errorCol;
+		return _errorOffset;
 	}
 }

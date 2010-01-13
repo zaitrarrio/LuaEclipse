@@ -22,7 +22,7 @@ public class LuaInterpreterPreferencePage extends
 		ScriptInterpreterPreferencePage {
 	
 	public static final String PAGE_ID =
-			"com.anwrt.ldt.interpreter.preferences";
+			"org.keplerproject.luaeclipse.interpreter.preferences";
 
 	@Override
 	public InterpretersBlock createInterpretersBlock() {

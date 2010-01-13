@@ -31,15 +31,15 @@ public class TestModuleDeclaration extends TestCase {
 		DummyReporter reporter = new DummyReporter();
 
 		// Local variable declaration
-		ModuleDeclaration start = parser.parse(null, "local var".toCharArray(),
+		ModuleDeclaration start = parser.parse("none".toCharArray(), "local var".toCharArray(),
 				reporter);
 
 		// Fuzzy state between two stables ones
-		ModuleDeclaration fuzzy = parser.parse(null,
+		ModuleDeclaration fuzzy = parser.parse("none".toCharArray(),
 				"local var=".toCharArray(), reporter);
 
 		// Assignment
-		ModuleDeclaration stable = parser.parse(null, "local var=1"
+		ModuleDeclaration stable = parser.parse("none".toCharArray(), "local var=1"
 				.toCharArray(), reporter);
 
 		// Check if faulty ASTs are ignored

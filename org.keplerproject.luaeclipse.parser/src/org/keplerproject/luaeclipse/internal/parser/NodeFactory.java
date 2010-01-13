@@ -67,11 +67,11 @@ import org.keplerproject.luaeclipse.parser.ast.statements.While;
 public class NodeFactory implements LuaExpressionConstants,
 		LuaStatementConstants {
 
+	/** Enables to waked Lua AST from parsed code. */
+	private MetaluaASTWalker lua;
+
 	/** Root of all the nodes produced by this instance of {@link NodeFactory}. */
 	private ModuleDeclaration root;
-
-	/** Enables to waked Lua AST from parsed code. */
-	private MetaluaASTWalker walker;
 
 	/**
 	 * Initialize factory with current Lua context, assumes that an AST named
@@ -82,7 +82,7 @@ public class NodeFactory implements LuaExpressionConstants,
 	 * @param int sourceLength the source's length
 	 */
 	protected NodeFactory(MetaluaASTWalker w, int sourceLength) {
-		this.walker = w;
+		this.lua = w;
 		this.root = new ModuleDeclaration(sourceLength);
 	}
 
@@ -122,7 +122,7 @@ public class NodeFactory implements LuaExpressionConstants,
 	 * @return True is code contains any syntax error, false else way
 	 */
 	public boolean errorDetected() {
-		return walker.hasSyntaxErrors();
+		return lua.hasSyntaxErrors();
 	}
 
 	/**
@@ -142,35 +142,31 @@ public class NodeFactory implements LuaExpressionConstants,
 		Expression expression, altExpression;
 
 		// Child node IDs will help for recursive node instantiation
-		List<Long> childNodes = walker.children(id);
+		List<Long> childNodes = lua.children(id);
 
 		// Define position in code
 		int childCount = childNodes.size();
-		int end = walker.getEndPosition(id);
-		int start = walker.getStartPosition(id);
-
-		// Check if gap of 2 characters in Lua string is allowed
-		assert (start - 1) <= (end + 1) : "Wrong code offsets for node: " + id
-				+ ". Begins at " + start + ", ends at " + end;
+		int end = lua.getEndPosition(id);
+		int start = lua.getStartPosition(id);
 
 		/*
 		 * Fetch root type
 		 */
 		ASTNode node = null;
-		int kindOfNode = walker.typeOfNode(id);
+		int kindOfNode = lua.typeOfNode(id);
 		switch (kindOfNode) {
 		/*
 		 * Numbers
 		 */
 		case LuaExpressionConstants.NUMBER_LITERAL:
-			int value = Integer.valueOf(walker.getValue(id));
+			int value = Integer.valueOf(lua.getValue(id));
 			node = new Number(start, end, value);
 			break;
 		/*
 		 * Strings
 		 */
 		case LuaExpressionConstants.STRING_LITERAL:
-			node = new String(start, end, walker.getValue(id));
+			node = new String(start, end, lua.getValue(id));
 			break;
 		/*
 		 * Tables
@@ -220,7 +216,7 @@ public class NodeFactory implements LuaExpressionConstants,
 			assert childCount > 1 : "Too many expressions "
 					+ "in binary operation: " + childCount;
 			// Determine king of expression
-			int kind = MetaluaASTWalker.opid(walker.getValue(id));
+			int kind = MetaluaASTWalker.opid(lua.getValue(id));
 
 			// Compute both sides of '='
 			left = (Expression) getNode(childNodes.get(0));
@@ -250,7 +246,7 @@ public class NodeFactory implements LuaExpressionConstants,
 		case LuaExpressionConstants.E_IDENTIFIER:
 			// TODO: Deal with multiple expressions
 			assert childCount == 0 : "Id has child nodes: " + childCount;
-			node = new Identifier(start, end, walker.getValue(id));
+			node = new Identifier(start, end, lua.getValue(id));
 			break;
 		/*
 		 * "Do" and Chunks statements
@@ -327,7 +323,7 @@ public class NodeFactory implements LuaExpressionConstants,
 
 			// Handle assignment at declaration
 			chunk = (Chunk) getNode(childNodes.get(0));
-			if (walker.nodeHasLineInfo(childNodes.get(1))) {
+			if (lua.nodeHasLineInfo(childNodes.get(1))) {
 				altChunk = (Chunk) getNode(childNodes.get(1));
 				node = new Local(start, end, chunk, altChunk);
 			} else {
@@ -344,7 +340,7 @@ public class NodeFactory implements LuaExpressionConstants,
 			 * part. Furthermore, "elseif" nodes could indefinitely follow an if
 			 * statement.
 			 */
-			assert childCount < 3 : "Not enough clauses for if statement: "
+			assert childCount > 1 : "Not enough clauses for if statement: "
 					+ childCount;
 
 			// Extract if components
@@ -465,7 +461,7 @@ public class NodeFactory implements LuaExpressionConstants,
 
 			// Handle assignment at declaration
 			chunk = (Chunk) getNode(childNodes.get(0));
-			if (walker.nodeHasLineInfo(childNodes.get(1))) {
+			if (lua.nodeHasLineInfo(childNodes.get(1))) {
 				altChunk = (Chunk) getNode(childNodes.get(1));
 				node = new LocalRec(start, end, chunk, altChunk);
 			} else {
@@ -507,6 +503,23 @@ public class NodeFactory implements LuaExpressionConstants,
 		// break;
 		}
 
+		/*
+		 * Check if gap of 2 characters in Lua string is allowed
+		 */
+		boolean correctRange = (start - 1) <= (end + 1);
+		//
+		// There is an exception for functions that can be declared as
+		//
+		// name = function ( var )
+		// 		someCode()
+		// end
+		//
+		// For DLTK the node containing "name" is in the "node" of teh function,
+		// in Lua it's not the case
+		//
+		correctRange = correctRange || (kindOfNode == S_BLOCK);
+		assert correctRange : "Wrong code offsets for node: " + id
+				+ ". Begins at " + start + ", ends at " + end;
 		return node;
 	}
 
@@ -520,12 +533,13 @@ public class NodeFactory implements LuaExpressionConstants,
 		root.addStatement((Statement) getNode(1));
 		return root;
 	}
-	
+
 	/**
 	 * Report syntax error analyzer if there is any
+	 * 
 	 * @return {@link LuaParseErrorAnalyzer}
 	 */
 	public LuaParseErrorAnalyzer analyser() {
-		return walker.analyzer();
+		return lua.analyzer();
 	}
 }

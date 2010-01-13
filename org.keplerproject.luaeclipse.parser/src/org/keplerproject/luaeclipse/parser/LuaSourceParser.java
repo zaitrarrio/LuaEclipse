@@ -23,6 +23,7 @@ import org.eclipse.dltk.ast.parser.AbstractSourceParser;
 import org.eclipse.dltk.compiler.problem.DefaultProblem;
 import org.eclipse.dltk.compiler.problem.IProblem;
 import org.eclipse.dltk.compiler.problem.IProblemReporter;
+import org.eclipse.dltk.compiler.problem.ProblemSeverities;
 import org.keplerproject.luaeclipse.internal.parser.LuaParseErrorAnalyzer;
 import org.keplerproject.luaeclipse.internal.parser.NodeFactory;
 
@@ -36,9 +37,6 @@ public class LuaSourceParser extends AbstractSourceParser {
 	 * AST cache, allow to keep previous AST in mind when syntax errors occurs
 	 */
 	private static ModuleDeclaration _cache = null;
-	
-	/** Name of the file in cache */
-	private static char[] _cachedFile = null; 
 
 	/**
 	 * Provide DLTK compliant AST
@@ -54,16 +52,16 @@ public class LuaSourceParser extends AbstractSourceParser {
 
 		// Analyze code
 		NodeFactory factory = new NodeFactory(new String(source));
+
 		/*
 		 * Keep older version of AST in case of syntax errors, when cache is
 		 * defined.
 		 */
-		if (_cache == null || ! _cachedFile.equals(fileName)) {
+		if ((_cache == null) || !factory.errorDetected()) {
 			_cache = factory.getRoot();
-			_cachedFile = fileName;
 		}
 
-		// Transfer problems if there is any
+		// Transfers problems if there is any
 		if (factory.errorDetected()) {
 			IProblem problem = buildProblem(fileName, factory.analyser());
 			reporter.reportProblem(problem);
@@ -72,15 +70,17 @@ public class LuaSourceParser extends AbstractSourceParser {
 	}
 
 	public IProblem buildProblem(char[] fileName, LuaParseErrorAnalyzer analyzer) {
-		int severity = 1, id = 1;
+		int col = analyzer.syntaxErrorColumn();
 		int offset = analyzer.syntaxErrorOffset();
 		int line = analyzer.syntaxErrorLine();
-		int column = analyzer.syntaxErrorColumn();
-		String[] args = { "" };
+		int id = 0;
+		int severity = ProblemSeverities.Error;
+		String[] args = {};
+		String error = analyzer.getErrorString();
+		String file = new String(fileName);
 
-		IProblem problem = new DefaultProblem(new String(fileName), analyzer
-				.getErrorString(), id, args, severity, offset, offset, line,
-				column);
+		IProblem problem = new DefaultProblem(file, error, id, args, severity,
+				offset, offset, line, col);
 		return problem;
 	}
 
