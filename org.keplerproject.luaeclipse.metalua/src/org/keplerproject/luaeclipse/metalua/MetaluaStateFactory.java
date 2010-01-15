@@ -80,7 +80,7 @@ public class MetaluaStateFactory {
 	 * 
 	 * @throws LuaException the lua exception
 	 */
-	protected static void raise(LuaState l) throws LuaException {
+	public static void raise(LuaState l) throws LuaException {
 
 		// Get message at top of stack
 		String msg = l.toString(-1);

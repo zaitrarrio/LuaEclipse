@@ -1,6 +1,6 @@
 
 --
--- Provides distincts IDs calls after calls
+-- Provides distinct IDs calls after calls
 -- @return int
 --
 local id = 0
@@ -10,10 +10,10 @@ function getID()
 end
 
 --
--- Assign an ID to every node in the ast
+-- Assign an ID to every node in the AST
 -- 
--- Assing an id to every table and sub-table of the given one,
--- exept the ones named "lineinfo"
+-- Assign an id to every table and sub-table of the given one,
+-- except the ones named "lineinfo"
 --
 -- @param ADT to index
 --
@@ -138,4 +138,3 @@ end
 function hasLineInfo( id )
   return type(idToNode[ id ].lineinfo) == "table"
 end
-

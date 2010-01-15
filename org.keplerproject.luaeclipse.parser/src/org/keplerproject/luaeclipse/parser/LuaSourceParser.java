@@ -18,6 +18,9 @@
  */
 package org.keplerproject.luaeclipse.parser;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 import org.eclipse.dltk.ast.parser.AbstractSourceParser;
 import org.eclipse.dltk.compiler.problem.DefaultProblem;
@@ -25,7 +28,9 @@ import org.eclipse.dltk.compiler.problem.IProblem;
 import org.eclipse.dltk.compiler.problem.IProblemReporter;
 import org.eclipse.dltk.compiler.problem.ProblemSeverities;
 import org.keplerproject.luaeclipse.internal.parser.LuaParseErrorAnalyzer;
+import org.keplerproject.luaeclipse.internal.parser.LuaParseErrorNotifier;
 import org.keplerproject.luaeclipse.internal.parser.NodeFactory;
+import org.keplerproject.luaeclipse.metalua.Metalua;
 
 /**
  * The Class LuaSourceParser provides a DLTK AST, when an error occur during
@@ -36,7 +41,10 @@ public class LuaSourceParser extends AbstractSourceParser {
 	/**
 	 * AST cache, allow to keep previous AST in mind when syntax errors occurs
 	 */
-	private static ModuleDeclaration _cache = null;
+	private static Map<String, ModuleDeclaration> _cache = null;
+	static {
+		_cache = new HashMap<String, ModuleDeclaration>();
+	}
 
 	/**
 	 * Provide DLTK compliant AST
@@ -47,33 +55,45 @@ public class LuaSourceParser extends AbstractSourceParser {
 	 *      org.eclipse.dltk.compiler.problem.IProblemReporter)
 	 */
 	@Override
-	public ModuleDeclaration parse(char[] fileName, char[] source,
+	public ModuleDeclaration parse(char[] file, char[] source,
 			IProblemReporter reporter) {
 
 		// Analyze code
 		NodeFactory factory = new NodeFactory(new String(source));
+		String fileName = new String(file);
 
-		/*
-		 * Keep older version of AST in case of syntax errors, when cache is
-		 * defined.
-		 */
-		if ((_cache == null) || !factory.errorDetected()) {
-			_cache = factory.getRoot();
-		}
-
-		// Transfers problems if there is any
+		// Search for problem
 		if (factory.errorDetected()) {
-			IProblem problem = buildProblem(fileName, factory.analyser());
+
+			// Report it
+			LuaParseErrorAnalyzer analyzer = factory.analyser();
+			IProblem problem = buildProblem(file, analyzer);
 			reporter.reportProblem(problem);
+
+			/*
+			 * Try partial procedure if there a no cache generate empty
+			 * AST,parse the code before error's offset
+			 */
+			if (!(analyzer instanceof LuaParseErrorNotifier)) {
+				String partial = new String(source);
+				partial = makeShortVersionToRun(partial);
+				factory = new NodeFactory(partial);
+			}
+			_cache.put(fileName, factory.getRoot());
+
+		} else {
+			// Cache current AST in order to use it in case of error
+			_cache.put(fileName, factory.getRoot());
 		}
-		return _cache;
+		return _cache.get(fileName);
 	}
 
-	public IProblem buildProblem(char[] fileName, LuaParseErrorAnalyzer analyzer) {
+	private IProblem buildProblem(char[] fileName,
+			LuaParseErrorAnalyzer analyzer) {
 		int col = analyzer.syntaxErrorColumn();
 		int offset = analyzer.syntaxErrorOffset();
 		int line = analyzer.syntaxErrorLine();
-		int id = 0;
+		int id = 1;
 		int severity = ProblemSeverities.Error;
 		String[] args = {};
 		String error = analyzer.getErrorString();
@@ -84,4 +104,19 @@ public class LuaSourceParser extends AbstractSourceParser {
 		return problem;
 	}
 
+	/** Shots code until it reaches runables state */
+	// TODO: Dangerous this code might run lua code
+	// TODO: Move me
+	private String makeShortVersionToRun(final String code) {
+		if (code.length() > 0) {
+			try {
+				Metalua.run(code);
+				return code;
+			} catch (Exception e) {
+				return makeShortVersionToRun(code.substring(0,
+						code.length() - 1));
+			}
+		}
+		return "do end";
+	}
 }

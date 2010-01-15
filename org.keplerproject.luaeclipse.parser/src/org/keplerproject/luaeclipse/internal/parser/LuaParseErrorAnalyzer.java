@@ -26,10 +26,8 @@ public class LuaParseErrorAnalyzer {
 
 	public LuaParseErrorAnalyzer(String code, String errorMessage) {
 		_codeToParse = code;
-		_errorCol = null;
-		_errorLine = null;
-		_errorOffset = null;
 		_errorString = errorMessage;
+		initPositions(null, null, null);
 	}
 
 	private Integer extractIntFromErrorString(final String startTag,
@@ -58,10 +56,17 @@ public class LuaParseErrorAnalyzer {
 		return _codeToParse;
 	}
 
+	protected void initPositions(Integer col, Integer line, Integer offset) {
+		_errorCol = col;
+		_errorLine = line;
+		_errorOffset = offset;
+	}
+
 	public int syntaxErrorColumn() {
 		if (_errorCol == null) {
-			 String tag = " column ";
-			_errorCol = extractIntFromErrorString(tag, ',', _errorString.indexOf(tag));
+			String tag = " column ";
+			_errorCol = extractIntFromErrorString(tag, ',', _errorString
+					.indexOf(tag));
 		}
 		return _errorCol;
 	}

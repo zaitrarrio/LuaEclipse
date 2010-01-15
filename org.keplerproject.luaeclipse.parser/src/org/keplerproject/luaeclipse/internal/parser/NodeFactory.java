@@ -244,7 +244,6 @@ public class NodeFactory implements LuaExpressionConstants,
 		 * Identifiers
 		 */
 		case LuaExpressionConstants.E_IDENTIFIER:
-			// TODO: Deal with multiple expressions
 			assert childCount == 0 : "Id has child nodes: " + childCount;
 			node = new Identifier(start, end, lua.getValue(id));
 			break;

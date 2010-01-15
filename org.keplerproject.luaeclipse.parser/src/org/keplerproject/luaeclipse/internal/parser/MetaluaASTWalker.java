@@ -25,9 +25,11 @@ import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.declarations.Declaration;
 import org.eclipse.dltk.compiler.problem.IProblem;
 import org.keplerproject.luaeclipse.metalua.Metalua;
+import org.keplerproject.luaeclipse.metalua.MetaluaStateFactory;
 import org.keplerproject.luaeclipse.parser.Activator;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 import org.keplerproject.luaeclipse.parser.ast.statements.LuaStatementConstants;
+import org.keplerproject.luajava.LuaException;
 import org.keplerproject.luajava.LuaState;
 
 /**
@@ -165,9 +167,9 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 			 * order to avoid any kind of trouble, let's define an empty AST as
 			 * we got an error
 			 */
-			// state.LdoString("ast = {}");
+			// An AST definition is needed by Lua tooling
+			state.LdoString("ast = {}");
 			_errorAnalyzer = new LuaParseErrorAnalyzer(source, error);
-			_errorAnalyzer.syntaxErrorOffset();
 			Activator.logWarning("Bind error:\n" + error);
 			break;
 		}
@@ -407,11 +409,17 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		// Retrieve current AST
 		state.getField(LuaState.LUA_GLOBALSINDEX, "ast");
 
-		// Index AST
-		state.call(1, 1);
-
-		// Remove procedure and parameter from Lua stack
-		state.pop(1);
+		// Analyze error if AST index fails
+		if ( state.pcall(1, 1, 0) == LuaState.LUA_ERRRUN) {
+			try {
+				MetaluaStateFactory.raise(state);
+			} catch (LuaException e) {
+				_errorAnalyzer = new LuaParseErrorNotifier(e.getMessage());
+			}
+		} else {
+			// Remove procedure and parameter from Lua stack
+			state.pop(1);
+		}
 
 		// Lua stack should be empty again
 		assert state.getTop() == 0 : "Lua stack should be empty at this point, "
@@ -512,9 +520,10 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	 * Retrieve kind of statement or expression from Lua AST.
 	 * 
 	 * @param id
-	 *            ID of node from the last AST 
+	 *            ID of node from the last AST
 	 * 
-	 * @return Kind of node as represented in {@linkplain LuaExpressionConstants}
+	 * @return Kind of node as represented in
+	 *         {@linkplain LuaExpressionConstants}
 	 */
 	public int typeOfNode(final long id) {
 		/*
