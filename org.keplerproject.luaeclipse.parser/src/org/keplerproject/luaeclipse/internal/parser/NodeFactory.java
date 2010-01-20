@@ -27,6 +27,7 @@ import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 import org.eclipse.dltk.ast.expressions.CallArgumentsList;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.statements.Statement;
+import org.keplerproject.luaeclipse.metalua.Metalua;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 import org.keplerproject.luaeclipse.parser.ast.expressions.BinaryExpression;
 import org.keplerproject.luaeclipse.parser.ast.expressions.Boolean;
@@ -114,6 +115,15 @@ public class NodeFactory implements LuaExpressionConstants,
 	 */
 	public NodeFactory(final File sourceFile) {
 		this(new MetaluaASTWalker(sourceFile));
+	}
+
+	/**
+	 * Report syntax error analyzer if there is any
+	 * 
+	 * @return {@link LuaParseErrorAnalyzer}
+	 */
+	public LuaParseErrorAnalyzer analyser() {
+		return lua.analyzer();
 	}
 
 	/**
@@ -510,7 +520,7 @@ public class NodeFactory implements LuaExpressionConstants,
 		// There is an exception for functions that can be declared as
 		//
 		// name = function ( var )
-		// 		someCode()
+		// someCode()
 		// end
 		//
 		// For DLTK the node containing "name" is in the "node" of teh function,
@@ -533,12 +543,17 @@ public class NodeFactory implements LuaExpressionConstants,
 		return root;
 	}
 
-	/**
-	 * Report syntax error analyzer if there is any
-	 * 
-	 * @return {@link LuaParseErrorAnalyzer}
-	 */
-	public LuaParseErrorAnalyzer analyser() {
-		return lua.analyzer();
+	/** Shorts code until it reaches a runnable state */
+	public static java.lang.String makeShortVersionToRun(
+			final java.lang.String code) {
+		if (code.length() > 0) {
+			if (Metalua.isValid(code)) {
+				return code;
+			} else {
+				java.lang.String shorter = code.substring(0, code.length() - 1);
+				return makeShortVersionToRun(shorter);
+			}
+		}
+		return "do end";
 	}
 }

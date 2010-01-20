@@ -30,7 +30,6 @@ import org.eclipse.dltk.compiler.problem.ProblemSeverities;
 import org.keplerproject.luaeclipse.internal.parser.LuaParseErrorAnalyzer;
 import org.keplerproject.luaeclipse.internal.parser.LuaParseErrorNotifier;
 import org.keplerproject.luaeclipse.internal.parser.NodeFactory;
-import org.keplerproject.luaeclipse.metalua.Metalua;
 
 /**
  * The Class LuaSourceParser provides a DLTK AST, when an error occur during
@@ -76,7 +75,7 @@ public class LuaSourceParser extends AbstractSourceParser {
 			 */
 			if (!(analyzer instanceof LuaParseErrorNotifier)) {
 				String partial = new String(source);
-				partial = makeShortVersionToRun(partial);
+				partial = NodeFactory.makeShortVersionToRun(partial);
 				factory = new NodeFactory(partial);
 			}
 			_cache.put(fileName, factory.getRoot());
@@ -104,19 +103,4 @@ public class LuaSourceParser extends AbstractSourceParser {
 		return problem;
 	}
 
-	/** Shots code until it reaches runables state */
-	// TODO: Dangerous this code might run lua code
-	// TODO: Move me
-	private String makeShortVersionToRun(final String code) {
-		if (code.length() > 0) {
-			try {
-				Metalua.run(code);
-				return code;
-			} catch (Exception e) {
-				return makeShortVersionToRun(code.substring(0,
-						code.length() - 1));
-			}
-		}
-		return "do end";
-	}
 }

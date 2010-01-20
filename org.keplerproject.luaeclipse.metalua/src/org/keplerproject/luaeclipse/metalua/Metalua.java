@@ -10,7 +10,6 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 /**
  * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
  * @date $Date: 2009-07-17 14:32:31 +0200 (ven., 17 juil. 2009) $
@@ -65,7 +64,8 @@ public class Metalua {
 			 * Locate plug-in root, it will be Metalua's include path
 			 */
 			Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
-			// Ensure to have source available on disk, not from jar or any kind of archive
+			// Ensure to have source available on disk, not from jar or any kind
+			// of archive
 			bundle.getEntry("/");
 
 			// Stop when plug-in's root can't be located
@@ -128,5 +128,29 @@ public class Metalua {
 			refreshState();
 			MetaluaStateFactory.raise(state);
 		}
+	}
+
+	/**
+	 * Indicate if code contains syntax errors
+	 * 
+	 * @param code to run
+	 * @return true is code is correct, otherwise false
+	 */
+	public static boolean isValid(final String code) {
+
+		// Try to load code without run it
+		boolean status;
+		switch (state.LloadString(code)) {
+		case 0:
+			status = true;
+			break;
+		default:
+			status = false;
+			break;
+		}
+
+		// Clear stack
+		state.pop(1);
+		return status;
 	}
 }
