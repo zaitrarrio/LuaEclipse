@@ -28,7 +28,6 @@ import org.eclipse.dltk.compiler.problem.IProblem;
 import org.eclipse.dltk.compiler.problem.IProblemReporter;
 import org.eclipse.dltk.compiler.problem.ProblemSeverities;
 import org.keplerproject.luaeclipse.internal.parser.LuaParseErrorAnalyzer;
-import org.keplerproject.luaeclipse.internal.parser.LuaParseErrorNotifier;
 import org.keplerproject.luaeclipse.internal.parser.NodeFactory;
 
 /**
@@ -60,6 +59,7 @@ public class LuaSourceParser extends AbstractSourceParser {
 		// Analyze code
 		NodeFactory factory = new NodeFactory(new String(source));
 		String fileName = new String(file);
+		ModuleDeclaration ast;
 
 		// Search for problem
 		if (factory.errorDetected()) {
@@ -69,22 +69,30 @@ public class LuaSourceParser extends AbstractSourceParser {
 			IProblem problem = buildProblem(file, analyzer);
 			reporter.reportProblem(problem);
 
+			// Fetch previous AST from cache
+			if (_cache.containsKey(fileName)) {
+				ast = _cache.get(fileName);
+			} else {
+				// When there is no AST cached, create an empty one
+				ast = new ModuleDeclaration(source.length);
+			}
 			/*
 			 * Try partial procedure if there a no cache generate empty
 			 * AST,parse the code before error's offset
 			 */
-			if (!(analyzer instanceof LuaParseErrorNotifier)) {
-				String partial = new String(source);
-				partial = NodeFactory.makeShortVersionToRun(partial);
-				factory = new NodeFactory(partial);
-			}
-			_cache.put(fileName, factory.getRoot());
+			// if (!(analyzer instanceof LuaParseErrorNotifier)) {
+			// String partial = new String(source);
+			// partial = NodeFactory.makeShortVersionToRun(partial);
+			// partial = NodeFactory.makeShortVersionToRun("do end");
+			// factory = new NodeFactory(partial);
+			// }
 
 		} else {
 			// Cache current AST in order to use it in case of error
-			_cache.put(fileName, factory.getRoot());
+			ast = factory.getRoot();
+			_cache.put(fileName, ast);
 		}
-		return _cache.get(fileName);
+		return ast;
 	}
 
 	private IProblem buildProblem(char[] fileName,

@@ -86,7 +86,7 @@ public class MetaluaStateFactory {
 		String msg = l.toString(-1);
 
 		// Clean stack
-		l.pop(-1);
+		l.pop(1);
 		throw new LuaException(msg);
 	}
 }

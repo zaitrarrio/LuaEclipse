@@ -10,12 +10,10 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 package org.keplerproject.luaeclipse.metalua.tests.internal.cases;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import junit.framework.TestCase;
 
@@ -25,7 +23,6 @@ import org.keplerproject.luaeclipse.metalua.Metalua;
 import org.keplerproject.luaeclipse.metalua.tests.Suite;
 import org.keplerproject.luajava.LuaException;
 import org.osgi.framework.Bundle;
-
 
 /**
  * Make sure that calls to Metalua work
@@ -82,28 +79,29 @@ public class TestMetalua extends TestCase {
 
 		boolean success = false;
 		String message = new String();
+		String fileLocation = null;
 
 		// Proofing valid file
 		try {
-			Metalua.runFile(path("/scripts/assignment.lua"));
+			fileLocation = path("/scripts/assignment.lua");
+			Metalua.runFile(fileLocation);
 			success = true;
 		} catch (LuaException e) {
 			message = e.getMessage();
 		} catch (IOException e) {
 			message = e.getMessage();
 		}
-		assertTrue("Single assignment from a file does not work: " + message,
-				success);
+		assertTrue("File location is not defined.", fileLocation != null);
+		assertTrue("Single assignment from '" + fileLocation
+				+ "' does not work: " + message, success);
 
 		// Proofing wrong file
-		success = false;
 		try {
-			Metalua.runFile(path("/scripts/john.doe"));
+			Metalua.runFile("/scripts/john.doe");
 			success = true;
 		} catch (LuaException e) {
 			message = e.getMessage();
-		} catch (IOException e) {
-			message = e.getMessage();
+			success = false;
 		}
 		assertFalse("Inexistant file call works.", success);
 	}
@@ -128,10 +126,12 @@ public class TestMetalua extends TestCase {
 	public void testRunMetaluaFile() {
 		boolean success = true;
 		String message = new String();
+		String fileLocation = null;
 
 		// Proofing valid file
 		try {
-			Metalua.runFile(path("/scripts/introspection.mlua"));
+			fileLocation = path("/scripts/introspection.mlua");
+			Metalua.runFile(fileLocation);
 		} catch (LuaException e) {
 			message = e.getMessage();
 			success = false;
@@ -139,19 +139,26 @@ public class TestMetalua extends TestCase {
 			message = e.getMessage();
 			success = false;
 		}
-		assertTrue("Code from a file does not work: " + message, success);
+		assertTrue("File location is not defined.", fileLocation != null);
+		assertTrue(
+				"Code from '" + fileLocation + "' does not work: " + message,
+				success);
 	}
 
 	/** Ensure access to portable file locations */
 	private String path(String uri) throws IOException {
 
 		// Stop when plug-in's root can't be located
-		try {
-			URL url = BUNDLE.getEntry(uri);
-			String path = FileLocator.toFileURL(url).getFile();
-			return new File(path).getPath();
-		} catch (NullPointerException e) {
-			throw new IOException(uri + " not found.");
-		}
+		// try {
+		// URL url = BUNDLE.getEntry(uri);
+		// String path = FileLocator.toFileURL(url).getFile();
+		// return new File(path).getPath();
+		// } catch (NullPointerException e) {
+		// throw new IOException(uri + " not found.");
+		// }
+		String sourcePath = FileLocator.getBundleFile(BUNDLE).getPath();
+		sourcePath += new File(BUNDLE.getEntry(uri).getFile());
+
+		return sourcePath;
 	}
 }

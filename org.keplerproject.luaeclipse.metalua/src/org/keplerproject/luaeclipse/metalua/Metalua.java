@@ -105,8 +105,8 @@ public class Metalua {
 	 */
 	public static void run(String code) throws LuaException {
 		if (state.LdoString(code) != 0) {
-			refreshState();
 			MetaluaStateFactory.raise(state);
+			refreshState();
 		}
 	}
 
@@ -124,16 +124,14 @@ public class Metalua {
 	 *             the lua exception
 	 */
 	public static void runFile(String fileURI) throws LuaException {
-		if (state.LdoFile(fileURI) != 0) {
-			refreshState();
-			MetaluaStateFactory.raise(state);
-		}
+		run("dofile([[" + fileURI + "]])");
 	}
 
 	/**
 	 * Indicate if code contains syntax errors
 	 * 
-	 * @param code to run
+	 * @param code
+	 *            to run
 	 * @return true is code is correct, otherwise false
 	 */
 	public static boolean isValid(final String code) {

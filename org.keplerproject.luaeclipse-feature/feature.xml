@@ -47,7 +47,7 @@
 
    <plugin
          id="org.keplerproject.luaeclipse.lua.linux"
-         os="win32"
+         os="linux"
          arch="x86"
          download-size="0"
          install-size="0"
