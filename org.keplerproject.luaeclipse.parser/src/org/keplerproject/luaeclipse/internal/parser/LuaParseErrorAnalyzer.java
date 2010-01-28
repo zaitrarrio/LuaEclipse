@@ -80,7 +80,8 @@ public class LuaParseErrorAnalyzer {
 
 	public int syntaxErrorOffset() {
 		if (_errorOffset == null) {
-			_errorOffset = extractIntFromErrorString(" char ", ':');
+			int shift = _errorString.indexOf('>');
+			_errorOffset = extractIntFromErrorString(" char ", ':', shift);
 		}
 		return _errorOffset;
 	}
