@@ -14,10 +14,12 @@ package org.keplerproject.luaeclipse.core;
 
 import org.eclipse.dltk.core.AbstractLanguageToolkit;
 import org.eclipse.dltk.core.IDLTKLanguageToolkit;
+import org.keplerproject.luaeclipse.Activator;
 
 /**
  * The Class LuaLanguageToolkit gather some Eclipse editor conventions.
- *@author Kevin KIN-FOO <kkin-foo@sierrawireless.com> 
+ * 
+ * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  */
 public class LuaLanguageToolkit extends AbstractLanguageToolkit {
 
@@ -44,8 +46,7 @@ public class LuaLanguageToolkit extends AbstractLanguageToolkit {
 	 */
 	@Override
 	public String getLanguageContentType() {
-		// TODO: Compose contet type from plug in ID
-		return "org.keplerproject.luaeclipse.content-type";
+		return Activator.PLUGIN_ID + ".content-type";
 	}
 
 	/**
@@ -61,6 +62,7 @@ public class LuaLanguageToolkit extends AbstractLanguageToolkit {
 
 	/**
 	 * Nature of current editor
+	 * 
 	 * @see org.eclipse.dltk.core.IDLTKLanguageToolkit#getNatureId()
 	 */
 	@Override
