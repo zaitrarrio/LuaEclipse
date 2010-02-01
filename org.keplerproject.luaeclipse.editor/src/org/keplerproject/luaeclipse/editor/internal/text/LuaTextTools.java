@@ -10,7 +10,6 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 package org.keplerproject.luaeclipse.editor.internal.text;
 
 import org.eclipse.dltk.ui.text.ScriptSourceViewerConfiguration;
@@ -20,13 +19,12 @@ import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.keplerproject.luaeclipse.editor.internal.partition.LuaPartitionScanner;
 
-
 public class LuaTextTools extends ScriptTextTools {
 
 	private final static String[] LEGAL_CONTENT_TYPES = new String[] {
 			ILuaPartitions.LUA_STRING, ILuaPartitions.LUA_COMMENT,
 			ILuaPartitions.LUA_SINGLE_QUOTE_STRING,
-			ILuaPartitions.LUA_MULTI_LINE_COMMENT };
+			ILuaPartitions.LUA_MULTI_LINE_COMMENT, ILuaPartitions.LUA_NUMBER };
 
 	private IPartitionTokenScanner fPartitionScanner;
 

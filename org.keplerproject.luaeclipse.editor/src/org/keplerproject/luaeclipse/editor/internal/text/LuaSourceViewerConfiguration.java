@@ -41,6 +41,7 @@ public class LuaSourceViewerConfiguration extends
 	private AbstractScriptScanner fSingleQuoteStringScanner;
 	private AbstractScriptScanner fCommentScanner;
 	private AbstractScriptScanner fMultilineCommentScanner;
+	private AbstractScriptScanner fNumberScanner;
 
 	public LuaSourceViewerConfiguration(IColorManager colorManager,
 			IPreferenceStore preferenceStore, ITextEditor editor,
@@ -111,6 +112,10 @@ public class LuaSourceViewerConfiguration extends
 		reconciler.setDamager(dr, ILuaPartitions.LUA_MULTI_LINE_COMMENT);
 		reconciler.setRepairer(dr, ILuaPartitions.LUA_MULTI_LINE_COMMENT);
 
+		dr = new DefaultDamagerRepairer(this.fNumberScanner);
+		reconciler.setDamager(dr, ILuaPartitions.LUA_NUMBER);
+		reconciler.setRepairer(dr, ILuaPartitions.LUA_NUMBER);
+
 		return reconciler;
 	}
 
@@ -135,6 +140,9 @@ public class LuaSourceViewerConfiguration extends
 		this.fCommentScanner = new SingleTokenScriptScanner(this
 				.getColorManager(), this.fPreferenceStore,
 				ILuaColorConstants.LUA_SINGLE_LINE_COMMENT);
+		this.fNumberScanner = new SingleTokenScriptScanner(this
+				.getColorManager(), this.fPreferenceStore,
+				ILuaColorConstants.LUA_NUMBER);
 	}
 
 	public void handlePropertyChangeEvent(PropertyChangeEvent event) {

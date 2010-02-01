@@ -10,7 +10,6 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 package org.keplerproject.luaeclipse.editor.internal.text;
 
 import java.util.ArrayList;
@@ -20,11 +19,14 @@ import org.eclipse.dltk.ui.text.AbstractScriptScanner;
 import org.eclipse.dltk.ui.text.IColorManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.rules.EndOfLineRule;
+import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWhitespaceDetector;
 import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.MultiLineRule;
+import org.eclipse.jface.text.rules.NumberRule;
+import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
@@ -39,7 +41,8 @@ public class LuaCodeScanner extends AbstractScriptScanner {
 			ILuaColorConstants.LUA_STRING,
 			ILuaColorConstants.LUA_SINGLE_LINE_COMMENT,
 			ILuaColorConstants.LUA_MULTI_LINE_COMMENT,
-			ILuaColorConstants.LUA_DEFAULT, ILuaColorConstants.LUA_KEYWORD };
+			ILuaColorConstants.LUA_NUMBER, ILuaColorConstants.LUA_DEFAULT,
+			ILuaColorConstants.LUA_KEYWORD };
 
 	public LuaCodeScanner(IColorManager manager, IPreferenceStore store) {
 		super(manager, store);
@@ -57,6 +60,7 @@ public class LuaCodeScanner extends AbstractScriptScanner {
 				.getToken(ILuaColorConstants.LUA_SINGLE_LINE_COMMENT);
 		IToken multiline = this
 				.getToken(ILuaColorConstants.LUA_MULTI_LINE_COMMENT);
+		IToken numbers = this.getToken(ILuaColorConstants.LUA_NUMBER);
 		IToken other = this.getToken(ILuaColorConstants.LUA_DEFAULT);
 
 		// Add rule for multi-line comments
@@ -74,6 +78,12 @@ public class LuaCodeScanner extends AbstractScriptScanner {
 			wordRule.addWord(fgKeywords[i], keyword);
 		}
 		rules.add(wordRule);
+
+		// Add number recognition
+		NumberRule numberRule = new LuaNumberRule(numbers);
+		rules.add(numberRule);
+
+		// Default case
 		this.setDefaultReturnToken(other);
 		return rules;
 	}
@@ -106,6 +116,44 @@ public class LuaCodeScanner extends AbstractScriptScanner {
 		 */
 		public boolean isWordStart(char character) {
 			return Character.isJavaIdentifierStart(character);
+		}
+	}
+
+	public class LuaNumberRule extends NumberRule {
+		public LuaNumberRule(IToken token) {
+			super(token);
+		}
+
+		public IToken evaluate(ICharacterScanner scanner) {
+			int c = scanner.read();
+			int p = c;
+			if (Character.isDigit((char) c) || c == '.' ) {
+				if (fColumn == UNDEFINED
+						|| (fColumn == scanner.getColumn() - 1)) {
+					do {
+						p = c;
+						c = scanner.read();
+					} while (Character.isDigit((char) c));
+
+					switch (c) {
+					default:
+						scanner.unread();
+					case '-':
+					case 'e':
+					case 'E':
+					case 'x':
+					case 'X':
+					}
+
+					if (p == '.') {
+						scanner.unread();
+						return Token.UNDEFINED;
+					}
+					return fToken;
+				}
+			}
+			scanner.unread();
+			return Token.UNDEFINED;
 		}
 	}
 
