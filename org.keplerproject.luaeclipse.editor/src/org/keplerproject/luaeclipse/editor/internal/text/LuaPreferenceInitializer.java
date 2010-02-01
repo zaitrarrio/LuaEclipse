@@ -10,7 +10,6 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 package org.keplerproject.luaeclipse.editor.internal.text;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
@@ -22,7 +21,6 @@ import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.keplerproject.luaeclipse.editor.Activator;
-
 
 public class LuaPreferenceInitializer extends AbstractPreferenceInitializer {
 
@@ -40,15 +38,15 @@ public class LuaPreferenceInitializer extends AbstractPreferenceInitializer {
 		PreferenceConverter.setDefault(store,
 				ILuaColorConstants.LUA_SINGLE_LINE_COMMENT,
 				new RGB(63, 127, 95));
-		PreferenceConverter.setDefault(store,
-				ILuaColorConstants.LUA_MULTI_LINE_COMMENT,
-				new RGB(63, 95, 191));
+		PreferenceConverter
+				.setDefault(store, ILuaColorConstants.LUA_MULTI_LINE_COMMENT,
+						new RGB(63, 95, 191));
 		PreferenceConverter.setDefault(store, ILuaColorConstants.LUA_KEYWORD,
 				new RGB(127, 0, 85));
 		PreferenceConverter.setDefault(store, ILuaColorConstants.LUA_STRING,
 				new RGB(42, 0, 255));
 		PreferenceConverter.setDefault(store, DLTKColorConstants.DLTK_NUMBER,
-				new RGB(60, 100, 80));
+				new RGB(185, 20, 20));
 
 		store.setDefault(ILuaColorConstants.LUA_SINGLE_LINE_COMMENT
 				+ PreferenceConstants.EDITOR_BOLD_SUFFIX, false);
