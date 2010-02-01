@@ -19,7 +19,7 @@
  */
 package org.keplerproject.luaeclipse.parser.ast.expressions;
 
-import org.eclipse.dltk.ast.expressions.Literal;
+import org.eclipse.dltk.ast.expressions.FloatNumericLiteral;
 import org.eclipse.dltk.utils.CorePrinter;
 import org.keplerproject.luaeclipse.internal.parser.Index;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
@@ -30,10 +30,8 @@ import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 /**
  * The Class Number.
  */
-public class Number extends Literal implements LuaExpressionConstants, Index {
+public class Number extends FloatNumericLiteral implements LuaExpressionConstants, Index {
 
-	/** Number's value. */
-	private Double fNumberValue;
 	private long id;
 
 	/**
@@ -47,18 +45,7 @@ public class Number extends Literal implements LuaExpressionConstants, Index {
 	 *            the value
 	 */
 	public Number(int start, int end, double value) {
-		super(start, end);
-		fNumberValue = value;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.dltk.ast.statements.Statement#getKind()
-	 */
-	@Override
-	public int getKind() {
-		return NUMBER_LITERAL;
+		super(start, end,value);
 	}
 
 	public long getID() {
@@ -75,18 +62,9 @@ public class Number extends Literal implements LuaExpressionConstants, Index {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.dltk.ast.expressions.Literal#getValue()
-	 */
-	public java.lang.String getValue() {
-		return this.toString();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.dltk.ast.expressions.Literal#toString()
 	 */
 	public java.lang.String toString() {
-		return fNumberValue.toString();
+		return getValue();
 	}
 }

@@ -133,8 +133,10 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		String parseFunction = "luastring_to_ast";
 
 		// Lua utils
-		assert state.getTop() == 0 : "Stack is unbalanced before AST generation.";
-
+		//assert state.getTop() == 0 : "Stack is unbalanced before AST generation.";
+if ( state.getTop() > 0){
+	state.setTop(0);
+}
 		// Retrieve function
 		state.getGlobal("mlc");
 		state.getField(-1, parseFunction);
