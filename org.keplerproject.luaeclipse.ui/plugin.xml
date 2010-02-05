@@ -27,7 +27,7 @@
             class="org.eclipse.dltk.ui.wizards.GenericDLTKProjectWizard:org.keplerproject.luaeclipse.nature"
             icon="img/lua.gif"
             id="org.keplerproject.luaeclipse.wizard"
-            name="Lua project wizard"
+            name="Lua Project"
             project="true">
       </wizard>
    </extension>
