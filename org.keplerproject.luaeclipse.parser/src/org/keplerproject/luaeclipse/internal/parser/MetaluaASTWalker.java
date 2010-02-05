@@ -88,10 +88,18 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 			String path = new File(FileLocator.toFileURL(url).getFile())
 					.getPath();
 
-			// Run file
+			/*
+			 * Generate a new instance of Lua, in order to avoid several files
+			 * using the same stack
+			 */
+			Metalua.refreshState();
 			state = Metalua.get();
+
+			// Run file
 			state.LdoFile(path);
 		} catch (IOException e) {
+			Activator.log(e);
+		} catch (LuaException e) {
 			Activator.log(e);
 		}
 		// Implement comparator in order to be able to sort child node IDs
@@ -133,10 +141,11 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		String parseFunction = "luastring_to_ast";
 
 		// Lua utils
-		//assert state.getTop() == 0 : "Stack is unbalanced before AST generation.";
-if ( state.getTop() > 0){
-	state.setTop(0);
-}
+		// assert state.getTop() == 0 :
+		// "Stack is unbalanced before AST generation.";
+		if (state.getTop() > 0) {
+			state.setTop(0);
+		}
 		// Retrieve function
 		state.getGlobal("mlc");
 		state.getField(-1, parseFunction);
@@ -412,7 +421,7 @@ if ( state.getTop() > 0){
 		state.getField(LuaState.LUA_GLOBALSINDEX, "ast");
 
 		// Analyze error if AST index fails
-		if ( state.pcall(1, 1, 0) == LuaState.LUA_ERRRUN) {
+		if (state.pcall(1, 1, 0) == LuaState.LUA_ERRRUN) {
 			try {
 				MetaluaStateFactory.raise(state);
 			} catch (LuaException e) {
