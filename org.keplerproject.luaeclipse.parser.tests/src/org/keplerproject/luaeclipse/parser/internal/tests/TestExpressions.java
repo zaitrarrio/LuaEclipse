@@ -10,7 +10,6 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 /**
  * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
  * @date $Date: 2009-07-23 12:07:30 +0200 (jeu., 23 juil. 2009) $
@@ -26,7 +25,6 @@ import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.compiler.problem.IProblemReporter;
 import org.keplerproject.luaeclipse.parser.LuaSourceParser;
 import org.keplerproject.luaeclipse.parser.internal.tests.utils.DummyReporter;
-
 
 /**
  * The Class TestExpressions, tests if {@linkplain LuaSourceParser} can handle
@@ -128,9 +126,17 @@ public class TestExpressions extends TestCase {
 	}
 
 	public void testInvoke() {
-		char[] source = "y(ii):w(ty).y".toCharArray();
+		char[] source = "module:method()".toCharArray();
 		module = new LuaSourceParser().parse(fileName, source, this.reporter);
-		assertFalse("Invocation is not handled.", module.isEmpty());
+		assertFalse("Simple invocation is not handled.", module.isEmpty());
+
+		source = "module:table(arg)".toCharArray();
+		module = new LuaSourceParser().parse(fileName, source, this.reporter);
+		assertFalse("Invocation with argument not handled.", module.isEmpty());
+
+		source = "y(ii):w(ty).y".toCharArray();
+		module = new LuaSourceParser().parse(fileName, source, this.reporter);
+		assertFalse("Imbricated invocation is not handled.", module.isEmpty());
 	}
 
 	/**
