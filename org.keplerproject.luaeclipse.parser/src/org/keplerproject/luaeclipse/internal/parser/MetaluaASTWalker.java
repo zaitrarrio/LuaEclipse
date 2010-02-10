@@ -24,6 +24,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.declarations.Declaration;
 import org.eclipse.dltk.compiler.problem.IProblem;
+import org.keplerproject.luaeclipse.internal.parser.error.LuaParseError;
+import org.keplerproject.luaeclipse.internal.parser.error.LuaParseErrorFactory;
 import org.keplerproject.luaeclipse.metalua.Metalua;
 import org.keplerproject.luaeclipse.metalua.MetaluaStateFactory;
 import org.keplerproject.luaeclipse.parser.Activator;
@@ -64,7 +66,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	private String source;
 
 	/** Indicates if Metalua had problem while parsing code. */
-	private LuaParseErrorAnalyzer _errorAnalyzer = null;
+	private LuaParseError _parseError = null;
 
 	/**
 	 * Instantiates a new Lua instance ready to parse.
@@ -128,64 +130,16 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	 *            the source
 	 */
 	public MetaluaASTWalker(final String source) {
-		/*
-		 * The aim here is to perform the following statement in Lua: ast =
-		 * mlc.luastring_to_ast('" + source + "')
-		 */
+		this();
 
 		// Bear source in mind
-		this();
 		this.source = source;
 
-		// Parsing function
-		String parseFunction = "luastring_to_ast";
-
-		// Lua utils
-		// assert state.getTop() == 0 :
-		// "Stack is unbalanced before AST generation.";
-		if (state.getTop() > 0) {
-			state.setTop(0);
+		// Detect syntax errors, parse code
+		if (this.parse()) {
+			// Index AST made when there are no errors
+			index();
 		}
-		// Retrieve function
-		state.getGlobal("mlc");
-		state.getField(-1, parseFunction);
-		state.remove(-2);
-		assert state.isFunction(-1) : "Unable to load parsing function: "
-				+ parseFunction;
-
-		// Provide parameter
-		state.pushString(this.source);
-
-		// Build Lua AST
-		switch (state.pcall(1, 1, 0)) {
-		case 0:
-			assert state.getTop() == 1 && state.isTable(-1) : "Lua AST generation failed.";
-
-			// So far, no syntax errors
-			_errorAnalyzer = null;
-
-			// Store result in global variable 'ast' in Lua side
-			state.setGlobal("ast");
-			assert state.getTop() == 0 : "Lua stack is unbalanced after AST generation";
-			break;
-		default:
-			// TODO: Store error
-			// Retrieve error from Lua stack
-			String error = state.toString(-1);
-			state.setTop(0);
-			/*
-			 * AST computation result is stored in the 'ast' global variable, in
-			 * order to avoid any kind of trouble, let's define an empty AST as
-			 * we got an error
-			 */
-			// An AST definition is needed by Lua tooling
-			state.LdoString("ast = {}");
-			_errorAnalyzer = new LuaParseErrorAnalyzer(source, error);
-			Activator.logWarning("Bind error:\n" + error);
-			break;
-		}
-		// Index AST made from sources
-		index();
 	}
 
 	/**
@@ -201,6 +155,14 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		String statement = "ast = mlc.luafile_to_ast('" + path.getPath() + "')";
 		state.LdoString(statement);
 		index();
+	}
+
+	/**
+	 * @return {@link IProblem} giving information on syntax error
+	 */
+	public LuaParseError analyzer() {
+		assert hasSyntaxErrors() : "No problems without syntax error";
+		return _parseError;
 	}
 
 	/**
@@ -374,32 +336,9 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		return value;
 	}
 
-	/**
-	 * Indicates if nodes has line info in Lua AST, most of the time chunks
-	 * don't.
-	 * 
-	 * @param id
-	 *            of the node to parse from the last parsed source code.
-	 * @return {@link Boolean}
-	 */
-	public boolean nodeHasLineInfo(final long id) {
-		boolean hasLineInfo;
-		assert state.getTop() == 0 : "Lua stack should be empty.";
-		state.getGlobal("hasLineInfo");
-		state.pushNumber((double) id);
-		state.call(1, 1);
-		assert state.isBoolean(-1) : "Boolean sould be on top of stack";
-		hasLineInfo = state.toBoolean(-1);
-		state.setTop(0);
-		return hasLineInfo;
-	}
-
-	/**
-	 * @return {@link IProblem} giving information on syntax error
-	 */
-	public LuaParseErrorAnalyzer analyzer() {
-		assert hasSyntaxErrors() : "No problems without syntax error";
-		return _errorAnalyzer;
+	/** Indicates if any error occurred. */
+	public boolean hasSyntaxErrors() {
+		return _parseError != null;
 	}
 
 	/**
@@ -425,7 +364,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 			try {
 				MetaluaStateFactory.raise(state);
 			} catch (LuaException e) {
-				_errorAnalyzer = new LuaParseErrorNotifier(e.getMessage());
+				_parseError = LuaParseErrorFactory.get(e.getMessage());
 			}
 		} else {
 			// Remove procedure and parameter from Lua stack
@@ -435,6 +374,26 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		// Lua stack should be empty again
 		assert state.getTop() == 0 : "Lua stack should be empty at this point, "
 				+ "instead stack size is " + state.getTop();
+	}
+
+	/**
+	 * Indicates if nodes has line info in Lua AST, most of the time chunks
+	 * don't.
+	 * 
+	 * @param id
+	 *            of the node to parse from the last parsed source code.
+	 * @return {@link Boolean}
+	 */
+	public boolean nodeHasLineInfo(final long id) {
+		boolean hasLineInfo;
+		assert state.getTop() == 0 : "Lua stack should be empty.";
+		state.getGlobal("hasLineInfo");
+		state.pushNumber((double) id);
+		state.call(1, 1);
+		assert state.isBoolean(-1) : "Boolean sould be on top of stack";
+		hasLineInfo = state.toBoolean(-1);
+		state.setTop(0);
+		return hasLineInfo;
 	}
 
 	/**
@@ -522,9 +481,50 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		return name;
 	}
 
-	/** Indicates if any error occurred. */
-	public boolean hasSyntaxErrors() {
-		return _errorAnalyzer != null;
+	/**
+	 * The aim here is to perform the following statement in Lua: ast =
+	 * mlc.luastring_to_ast('" + source + "')
+	 */
+	private boolean parse() {
+		// Parsing function
+		String parseFunction = "luastring_to_ast";
+
+		// Lua utils
+		assert state.getTop() == 0 : "Stack is unbalanced before AST generation.";
+		// if (state.getTop() > 0) {
+		// state.setTop(0);
+		// }
+		// Retrieve function
+		state.getGlobal("mlc");
+		state.getField(-1, parseFunction);
+		state.remove(-2);
+		assert state.isFunction(-1) : "Unable to load parsing function: "
+				+ parseFunction;
+
+		// Provide parameter
+		state.pushString(this.source);
+
+		// Build Lua AST
+		switch (state.pcall(1, 1, 0)) {
+		case 0:
+			assert state.getTop() == 1 && state.isTable(-1) : "Lua AST generation failed.";
+
+			// Store result in global variable 'ast' in Lua side
+			state.setGlobal("ast");
+			assert state.getTop() == 0 : "Lua stack is unbalanced after AST generation";
+			return true;
+		default:
+			// Retrieve error from Lua stack
+			String error = state.toString(-1);
+			
+			// Notify Error
+			_parseError = LuaParseErrorFactory.get(error);
+			
+			// Clean stack
+			state.pop(-1);
+			Activator.logWarning("Bind error:\n" + error);
+			return false;
+		}
 	}
 
 	/**
@@ -605,9 +605,9 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 			return LuaStatementConstants.D_FUNC_DEC;
 		} else if ("Dots".equals(typeName)) {
 			return LuaExpressionConstants.E_DOTS;
-		}// else if ("Invoke".equals(typeName)) {
-		// return LuaExpressionConstants.E_INVOKE;
-		// }
+		} else if ("Invoke".equals(typeName)) {
+			return LuaExpressionConstants.E_INVOKE;
+		}
 		// Typical blocks do not have tags
 		return LuaStatementConstants.S_BLOCK;
 	}

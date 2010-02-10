@@ -27,6 +27,8 @@ import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 import org.eclipse.dltk.ast.expressions.CallArgumentsList;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.statements.Statement;
+import org.keplerproject.luaeclipse.internal.parser.error.LuaParseError;
+import org.keplerproject.luaeclipse.internal.parser.error.LuaParseErrorAnalyzer;
 import org.keplerproject.luaeclipse.metalua.Metalua;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 import org.keplerproject.luaeclipse.parser.ast.expressions.BinaryExpression;
@@ -36,6 +38,7 @@ import org.keplerproject.luaeclipse.parser.ast.expressions.Dots;
 import org.keplerproject.luaeclipse.parser.ast.expressions.Function;
 import org.keplerproject.luaeclipse.parser.ast.expressions.Identifier;
 import org.keplerproject.luaeclipse.parser.ast.expressions.Index;
+import org.keplerproject.luaeclipse.parser.ast.expressions.Invoke;
 import org.keplerproject.luaeclipse.parser.ast.expressions.Nil;
 import org.keplerproject.luaeclipse.parser.ast.expressions.Number;
 import org.keplerproject.luaeclipse.parser.ast.expressions.Pair;
@@ -122,7 +125,7 @@ public class NodeFactory implements LuaExpressionConstants,
 	 * 
 	 * @return {@link LuaParseErrorAnalyzer}
 	 */
-	public LuaParseErrorAnalyzer analyser() {
+	public LuaParseError analyser() {
 		return lua.analyzer();
 	}
 
@@ -150,6 +153,7 @@ public class NodeFactory implements LuaExpressionConstants,
 		Statement left, right;
 		Chunk chunk, altChunk;
 		Expression expression, altExpression;
+		String string;
 
 		// Child node IDs will help for recursive node instantiation
 		List<Long> childNodes = lua.children(id);
@@ -487,29 +491,29 @@ public class NodeFactory implements LuaExpressionConstants,
 		/*
 		 * Invoke
 		 */
-		// case E_INVOKE:
-		// assert childCount > 1 : "No name defined for invocation.";
-		// expression = (Expression) getNode(childNodes.get(0));
-		// altExpression = (String) getNode(childNodes.get(1));
-		// if (childCount > 2) {
-		// CallArgumentsList args = new CallArgumentsList();
-		// for (int parameter = 2; parameter < childCount; parameter++) {
-		// Expression expr = (Expression) getNode(childNodes.get(parameter));
-		// args.addNode(expr);
-		//
-		// // Define parameter list position in code
-		// if (parameter == 2) {
-		// args.setStart(expr.matchStart());
-		// } else if (parameter == (childCount - 1)) {
-		// args.setEnd(expr.matchStart()
-		// + expr.matchLength());
-		// }
-		// }
-		// node = new Invoke(start, end, expression, altExpression, args);
-		// } else {
-		// node = new Invoke(start, end, expression, altExpression);
-		// }
-		// break;
+		case E_INVOKE:
+			assert childCount > 1 : "No name defined for invocation.";
+			expression = (Expression) getNode(childNodes.get(0));
+			string = (String) getNode(childNodes.get(1));
+			if (childCount > 2) {
+				CallArgumentsList args = new CallArgumentsList();
+				for (int parameter = 2; parameter < childCount; parameter++) {
+					Expression e = (Expression) getNode(childNodes
+							.get(parameter));
+					args.addNode(e);
+
+					// Define parameter list position in code
+					if (parameter == 2) {
+						args.setStart(e.matchStart());
+					} else if (parameter == (childCount - 1)) {
+						args.setEnd(e.matchStart() + e.matchLength());
+					}
+				}
+				node = new Invoke(start, end, expression, string, args);
+			} else {
+				node = new Invoke(start, end, expression, string);
+			}
+			break;
 		}
 
 		/*
@@ -529,17 +533,28 @@ public class NodeFactory implements LuaExpressionConstants,
 		correctRange = correctRange || (kindOfNode == S_BLOCK);
 		assert correctRange : "Wrong code offsets for node: " + id
 				+ ". Begins at " + start + ", ends at " + end;
+		// if (node instanceof
+		// org.keplerproject.luaeclipse.internal.parser.Index) {
+		// org.keplerproject.luaeclipse.internal.parser.Index index;
+		// index = (org.keplerproject.luaeclipse.internal.parser.Index) node;
+		// index.setID(id);
+		// }
 		return node;
 	}
 
 	/**
-	 * Gets the root of DLTK AST
+	 * Gets the root of DLTK AST, starts a top down parsing from the first AST
+	 * node.
 	 * 
 	 * @see ModuleDeclaration
 	 * @return ModuleDeclaration root of any DLTK compliant AST
 	 */
 	public ModuleDeclaration getRoot() {
-		root.addStatement((Statement) getNode(1));
+		// Proceed source parsing only when there are no errors
+		if (!errorDetected()) {
+			// Start top down parsing
+			root.addStatement((Statement) getNode(1));
+		}
 		return root;
 	}
 

@@ -27,8 +27,8 @@ import org.eclipse.dltk.compiler.problem.DefaultProblem;
 import org.eclipse.dltk.compiler.problem.IProblem;
 import org.eclipse.dltk.compiler.problem.IProblemReporter;
 import org.eclipse.dltk.compiler.problem.ProblemSeverities;
-import org.keplerproject.luaeclipse.internal.parser.LuaParseErrorAnalyzer;
 import org.keplerproject.luaeclipse.internal.parser.NodeFactory;
+import org.keplerproject.luaeclipse.internal.parser.error.LuaParseError;
 
 /**
  * The Class LuaSourceParser provides a DLTK AST, when an error occur during
@@ -65,7 +65,7 @@ public class LuaSourceParser extends AbstractSourceParser {
 		if (factory.errorDetected()) {
 
 			// Report it
-			LuaParseErrorAnalyzer analyzer = factory.analyser();
+			LuaParseError analyzer = factory.analyser();
 			IProblem problem = buildProblem(file, analyzer);
 			reporter.reportProblem(problem);
 
@@ -95,11 +95,10 @@ public class LuaSourceParser extends AbstractSourceParser {
 		return ast;
 	}
 
-	private IProblem buildProblem(char[] fileName,
-			LuaParseErrorAnalyzer analyzer) {
-		int col = analyzer.syntaxErrorColumn();
-		int offset = analyzer.syntaxErrorOffset();
-		int line = analyzer.syntaxErrorLine();
+	private IProblem buildProblem(char[] fileName, LuaParseError analyzer) {
+		int col = analyzer.getErrorColumn();
+		int offset = analyzer.getErrorOffset();
+		int line = analyzer.getErrorLine();
 		int id = 1;
 		int severity = ProblemSeverities.Error;
 		String[] args = {};

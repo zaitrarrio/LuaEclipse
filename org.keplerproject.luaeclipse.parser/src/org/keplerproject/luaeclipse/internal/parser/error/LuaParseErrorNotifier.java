@@ -4,6 +4,7 @@ public class LuaParseErrorNotifier extends LuaParseError {
 
 	public LuaParseErrorNotifier(String errorMessage) {
 		super(errorMessage);
+		initPositions();
 	}
 
 	@Override

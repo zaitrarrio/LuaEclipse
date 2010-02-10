@@ -20,6 +20,7 @@ public class LuaParseErrorAnalyzer extends LuaParseError {
 
 	public LuaParseErrorAnalyzer(String errorMessage) {
 		super(errorMessage);
+		initPositions();
 	}
 
 	private Integer extractIntFromErrorString(final String startTag,
