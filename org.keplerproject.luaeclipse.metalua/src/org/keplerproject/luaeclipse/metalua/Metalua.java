@@ -83,13 +83,12 @@ public class Metalua {
 				 * Remove folder name at the end of path in order to obtain
 				 * fragment location on disk. It is the real Metalua path.
 				 */
-				int folderNamePosition = sourcePath.lastIndexOf(folder);
-				sourcePath = sourcePath.substring(0, folderNamePosition);
+				sourcePath = new File(sourcePath).getParent() + File.separator;
 			} catch (IOException e) {
 				return new String();
 			}
 		}
-		return sourcePath + File.separator;
+		return sourcePath;
 	}
 
 	/**

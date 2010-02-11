@@ -145,6 +145,14 @@ public class TestMetalua extends TestCase {
 				success);
 	}
 
+	public void testSourcesPath() {
+		String path = Metalua.sourcesPath();
+		assertFalse("Metalua sources path is not definded.", path.isEmpty());
+		File directory = new File(path);
+		assertTrue("Metalua sources path does not redirect to directory.",
+				directory.isDirectory());
+	}
+
 	/** Ensure access to portable file locations */
 	private String path(String uri) throws IOException {
 
