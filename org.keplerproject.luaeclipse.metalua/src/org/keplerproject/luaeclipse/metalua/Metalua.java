@@ -20,6 +20,7 @@ package org.keplerproject.luaeclipse.metalua;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
@@ -61,16 +62,29 @@ public class Metalua {
 		// Define source path at first call
 		if (sourcePath == null) {
 			/**
-			 * Locate plug-in root, it will be Metalua's include path
+			 * Locate fragment root, it will be Metalua's include path
 			 */
+			// Retrieve parent bundle
 			Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
-			// Ensure to have source available on disk, not from jar or any kind
-			// of archive
-			bundle.getEntry("/");
 
-			// Stop when plug-in's root can't be located
+			// Stop when fragment's root can't be located
 			try {
-				sourcePath = FileLocator.getBundleFile(bundle).getPath();
+				/*
+				 * A folder called as below is available only from fragments, it
+				 * contains Metalua files.
+				 */
+				String folder = "metalua";
+
+				// Locate it on disk
+				URL ressource = bundle.getResource("/" + folder);
+				sourcePath = FileLocator.resolve(ressource).getPath();
+
+				/*
+				 * Remove folder name at the end of path in order to obtain
+				 * fragment location on disk. It is the real Metalua path.
+				 */
+				int folderNamePosition = sourcePath.lastIndexOf(folder);
+				sourcePath = sourcePath.substring(0, folderNamePosition);
 			} catch (IOException e) {
 				return new String();
 			}
