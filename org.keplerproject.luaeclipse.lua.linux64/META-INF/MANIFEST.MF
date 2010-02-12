@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Linux 64
+Bundle-Name: Luajava dynamic library compiled for Linux 64 bits
 Bundle-SymbolicName: org.keplerproject.luaeclipse.lua.linux64
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Kepler project

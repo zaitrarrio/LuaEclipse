@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Windows Fragment
+Bundle-Name: Luajava dynamic library compiled for Windows
 Bundle-SymbolicName: org.keplerproject.luaeclipse.lua.windows
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: ANWRT
