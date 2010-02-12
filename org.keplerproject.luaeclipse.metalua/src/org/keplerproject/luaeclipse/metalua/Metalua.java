@@ -48,6 +48,9 @@ public class Metalua {
 	public static LuaState get() {
 		return state;
 	}
+	public static LuaState newState() throws LuaException{
+		return MetaluaStateFactory.newLuaState();
+	}
 
 	/**
 	 * Retrieve error message from a LuaState.

@@ -93,8 +93,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 			 * Generate a new instance of Lua, in order to avoid several files
 			 * using the same stack
 			 */
-			Metalua.refreshState();
-			state = Metalua.get();
+			state = Metalua.newState();
 
 			// Run file
 			state.LdoFile(path);

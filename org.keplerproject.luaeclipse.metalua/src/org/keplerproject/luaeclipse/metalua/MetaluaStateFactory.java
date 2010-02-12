@@ -104,13 +104,14 @@ class MetaluaStateFactory {
 
 				// Locate it on disk
 				URL ressource = bundle.getResource("/" + folder);
-				sourcePath = FileLocator.resolve(ressource).getPath();
+				String _sourcePath = FileLocator.resolve(ressource).getPath();
 
 				/*
 				 * Remove folder name at the end of path in order to obtain
 				 * fragment location on disk. It is the real Metalua path.
 				 */
-				sourcePath = new File(sourcePath).getParent() + File.separator;
+				_sourcePath = new File(_sourcePath).getParent() + File.separator;
+				sourcePath = _sourcePath;
 			} catch (IOException e) {
 				return new String();
 			}
