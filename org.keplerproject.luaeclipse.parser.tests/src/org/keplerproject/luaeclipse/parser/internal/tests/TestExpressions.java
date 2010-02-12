@@ -101,6 +101,16 @@ public class TestExpressions extends TestCase {
 	}
 
 	/**
+	 * Empty source code
+	 */
+	public void testEmptySource() {
+
+		char[] source = "".toCharArray();
+		module = new LuaSourceParser().parse(fileName, source, this.reporter);
+		assertFalse("Empy source not handled.", module.isEmpty());
+	}
+
+	/**
 	 * Test function.
 	 */
 	public void testFunction() {

@@ -27,7 +27,6 @@ import org.eclipse.dltk.compiler.problem.IProblem;
 import org.keplerproject.luaeclipse.internal.parser.error.LuaParseError;
 import org.keplerproject.luaeclipse.internal.parser.error.LuaParseErrorFactory;
 import org.keplerproject.luaeclipse.metalua.Metalua;
-import org.keplerproject.luaeclipse.metalua.MetaluaStateFactory;
 import org.keplerproject.luaeclipse.parser.Activator;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 import org.keplerproject.luaeclipse.parser.ast.statements.LuaStatementConstants;
@@ -362,7 +361,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		// Analyze error if AST index fails
 		if (state.pcall(1, 1, 0) == LuaState.LUA_ERRRUN) {
 			try {
-				MetaluaStateFactory.raise(state);
+				Metalua.raise(state);
 			} catch (LuaException e) {
 				_parseError = LuaParseErrorFactory.get(e.getMessage());
 			}

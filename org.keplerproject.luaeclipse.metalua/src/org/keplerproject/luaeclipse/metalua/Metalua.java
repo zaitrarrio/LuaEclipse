@@ -18,15 +18,8 @@
  */
 package org.keplerproject.luaeclipse.metalua;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Platform;
 import org.keplerproject.luajava.LuaException;
 import org.keplerproject.luajava.LuaState;
-import org.osgi.framework.Bundle;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -44,7 +37,6 @@ public class Metalua {
 	 */
 	/** The state. */
 	private static LuaState state;
-	private static String sourcePath = null;
 	static {
 		try {
 			state = MetaluaStateFactory.newLuaState();
@@ -57,38 +49,23 @@ public class Metalua {
 		return state;
 	}
 
-	public static String sourcesPath() {
+	/**
+	 * Retrieve error message from a LuaState.
+	 * 
+	 * @param l
+	 *            the l
+	 * 
+	 * @throws LuaException
+	 *             the lua exception
+	 */
+	public static void raise(LuaState l) throws LuaException {
 
-		// Define source path at first call
-		if (sourcePath == null) {
-			/**
-			 * Locate fragment root, it will be Metalua's include path
-			 */
-			// Retrieve parent bundle
-			Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
+		// Get message at top of stack
+		String msg = l.toString(-1);
 
-			// Stop when fragment's root can't be located
-			try {
-				/*
-				 * A folder called as below is available only from fragments, it
-				 * contains Metalua files.
-				 */
-				String folder = "metalua";
-
-				// Locate it on disk
-				URL ressource = bundle.getResource("/" + folder);
-				sourcePath = FileLocator.resolve(ressource).getPath();
-
-				/*
-				 * Remove folder name at the end of path in order to obtain
-				 * fragment location on disk. It is the real Metalua path.
-				 */
-				sourcePath = new File(sourcePath).getParent() + File.separator;
-			} catch (IOException e) {
-				return new String();
-			}
-		}
-		return sourcePath;
+		// Clean stack
+		l.pop(1);
+		throw new LuaException(msg);
 	}
 
 	/**
@@ -118,7 +95,7 @@ public class Metalua {
 	 */
 	public static void run(String code) throws LuaException {
 		if (state.LdoString(code) != 0) {
-			MetaluaStateFactory.raise(state);
+			Metalua.raise(state);
 			refreshState();
 		}
 	}
@@ -163,5 +140,9 @@ public class Metalua {
 		// Clear stack
 		state.pop(1);
 		return status;
+	}
+
+	public static String path() {
+		return MetaluaStateFactory.sourcesPath();
 	}
 }
