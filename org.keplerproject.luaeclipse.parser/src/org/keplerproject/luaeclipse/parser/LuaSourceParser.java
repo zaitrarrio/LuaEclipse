@@ -9,13 +9,6 @@
  *      Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
-
-/**
- * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
- * @date $Date: 2009-07-29 17:56:04 +0200 (mer., 29 juil. 2009) $
- * $Author: kkinfoo $
- * $Id: LuaSourceParser.java 2190 2009-07-29 15:56:04Z kkinfoo $
- */
 package org.keplerproject.luaeclipse.parser;
 
 import java.util.HashMap;
@@ -31,21 +24,25 @@ import org.keplerproject.luaeclipse.internal.parser.NodeFactory;
 import org.keplerproject.luaeclipse.internal.parser.error.LuaParseError;
 
 /**
- * The Class LuaSourceParser provides a DLTK AST, when an error occur during
- * parsing it provide the previous version of AST.
+ * The Class LuaSourceParser provides a DLTK AST for Lua source code, when an
+ * error occur during parsing it provide the previous version of AST.
+ * 
+ * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  */
 public class LuaSourceParser extends AbstractSourceParser {
 
 	/**
-	 * AST cache, allow to keep previous AST in mind when syntax errors occurs
+	 * Sources cache, allow to keep previous version of source per file in mind.
+	 * When syntax errors occurs it's then possible to use previous version of
+	 * source, in order to obtain a consistent AST.
 	 */
-	private static Map<String, ModuleDeclaration> _cache = null;
+	private static Map<String, String> _cache = null;
 	static {
-		_cache = new HashMap<String, ModuleDeclaration>();
+		_cache = new HashMap<String, String>();
 	}
 
 	/**
-	 * Provide DLTK compliant AST
+	 * Provides DLTK compliant AST from Metalua analysis
 	 * 
 	 * @return {@link ModuleDeclaration}, in case of syntax errors, the previous
 	 *         valid AST is given
@@ -53,11 +50,12 @@ public class LuaSourceParser extends AbstractSourceParser {
 	 *      org.eclipse.dltk.compiler.problem.IProblemReporter)
 	 */
 	@Override
-	public synchronized ModuleDeclaration parse(char[] file, char[] source,
+	public ModuleDeclaration parse(char[] file, char[] source,
 			IProblemReporter reporter) {
 
 		// Analyze code
-		NodeFactory factory = new NodeFactory(new String(source));
+		String code = new String(source);
+		NodeFactory factory = new NodeFactory(code);
 		String fileName = new String(file);
 		ModuleDeclaration ast;
 
@@ -69,40 +67,38 @@ public class LuaSourceParser extends AbstractSourceParser {
 			IProblem problem = buildProblem(file, analyzer);
 			reporter.reportProblem(problem);
 
-			// Fetch previous AST from cache
+			// Fetch previous stable source from cache
 			if (_cache.containsKey(fileName)) {
-				ast = _cache.get(fileName);
+				factory = new NodeFactory(_cache.get(fileName));
+				ast = factory.getRoot();
 			} else {
-				// When there is no AST cached, create an empty one
+				// When there is no source code cached, start from scratch
 				ast = new ModuleDeclaration(source.length);
 			}
-			/*
-			 * Try partial procedure if there a no cache generate empty
-			 * AST,parse the code before error's offset
-			 */
-			// if (!(analyzer instanceof LuaParseErrorNotifier)) {
-			// String partial = new String(source);
-			// partial = NodeFactory.makeShortVersionToRun(partial);
-			// partial = NodeFactory.makeShortVersionToRun("do end");
-			// factory = new NodeFactory(partial);
-			// }
 
 		} else {
 			// Cache current AST in order to use it in case of error
+			_cache.put(fileName, code);
 			ast = factory.getRoot();
-			_cache.put(fileName, ast);
 		}
 		return ast;
 	}
 
+	/** Parses Lua error string and founds its position (offset, line, column) */
 	private IProblem buildProblem(char[] fileName, LuaParseError analyzer) {
 		int col = analyzer.getErrorColumn();
 		int offset = analyzer.getErrorOffset();
 		int line = analyzer.getErrorLine();
 		int id = 1;
-		int severity = ProblemSeverities.Error;
 		String[] args = {};
+
+		// Consider all problems as errors
+		int severity = ProblemSeverities.Error;
+
+		// Retrieve Lua error string
 		String error = analyzer.getErrorString();
+
+		// Convert file name
 		String file = new String(fileName);
 
 		IProblem problem = new DefaultProblem(file, error, id, args, severity,

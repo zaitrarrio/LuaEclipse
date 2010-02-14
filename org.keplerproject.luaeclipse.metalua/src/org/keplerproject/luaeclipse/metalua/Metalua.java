@@ -9,13 +9,6 @@
  *      Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
-
-/**
- * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
- * @date $Date: 2009-07-17 14:32:31 +0200 (ven., 17 juil. 2009) $
- * $Author: kkinfoo $
- * $Id: Metalua.java 2112 2009-07-17 12:32:31Z kkinfoo $
- */
 package org.keplerproject.luaeclipse.metalua;
 
 import org.keplerproject.luajava.LuaException;
@@ -28,7 +21,7 @@ import org.keplerproject.luajava.LuaState;
  * It works with an unique inner {@link LuaState} instance as loading Metalua
  * could be pretty time costly.
  * 
- * @author kkinfoo
+ * @author Kevin KIN-FOO <kkinfoo@anyware-tech.com>
  */
 public class Metalua {
 
@@ -48,7 +41,9 @@ public class Metalua {
 	public static LuaState get() {
 		return state;
 	}
-	public static LuaState newState() throws LuaException{
+
+	/** Provides a new LuaState with Metalua capabilities */
+	public synchronized static LuaState newState() throws LuaException {
 		return MetaluaStateFactory.newLuaState();
 	}
 
