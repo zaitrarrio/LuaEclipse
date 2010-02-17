@@ -4,7 +4,7 @@ Bundle-Name: Metalua
 Bundle-SymbolicName: org.keplerproject.luaeclipse.metalua;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.keplerproject.luaeclipse.metalua.Activator
-Bundle-Vendor: ANWRT
+Bundle-Vendor: Kepler Project
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.5.0",

@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Mac OS Fragment
+Bundle-Name: Luajava dynamic library compiled for Mac OSX
 Bundle-SymbolicName: org.keplerproject.luaeclipse.lua.macos
 Bundle-Version: 1.0.0.qualifier
-Bundle-Vendor: ANWRT
+Bundle-Vendor: Kepler Project
 Fragment-Host: org.keplerproject.luaeclipse.lua;bundle-version="1.0.0.qualifier"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-PlatformFilter: (osgi.os=macosx)

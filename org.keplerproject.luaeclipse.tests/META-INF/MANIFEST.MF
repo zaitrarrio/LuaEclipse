@@ -4,7 +4,7 @@ Bundle-Name: Tests
 Bundle-SymbolicName: org.keplerproject.luaeclipse.tests;singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Activator: org.keplerproject.luaeclipse.tests.Activator
-Bundle-Vendor: ANWRT
+Bundle-Vendor: Kepler Project
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.junit4;bundle-version="4.5.0",

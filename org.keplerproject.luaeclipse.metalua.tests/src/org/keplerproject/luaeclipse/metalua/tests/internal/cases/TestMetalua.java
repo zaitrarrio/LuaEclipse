@@ -156,14 +156,6 @@ public class TestMetalua extends TestCase {
 	/** Ensure access to portable file locations */
 	private String path(String uri) throws IOException {
 
-		// Stop when plug-in's root can't be located
-		// try {
-		// URL url = BUNDLE.getEntry(uri);
-		// String path = FileLocator.toFileURL(url).getFile();
-		// return new File(path).getPath();
-		// } catch (NullPointerException e) {
-		// throw new IOException(uri + " not found.");
-		// }
 		String sourcePath = FileLocator.getBundleFile(BUNDLE).getPath();
 		sourcePath += new File(BUNDLE.getEntry(uri).getFile());
 
