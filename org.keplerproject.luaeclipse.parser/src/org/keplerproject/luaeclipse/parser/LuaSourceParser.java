@@ -11,6 +11,7 @@
  *****************************************************************************/
 package org.keplerproject.luaeclipse.parser;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +32,8 @@ import org.keplerproject.luaeclipse.internal.parser.error.LuaParseError;
  */
 public class LuaSourceParser extends AbstractSourceParser {
 
+	public static Object mutex = new Object();
+
 	/**
 	 * Sources cache, allow to keep previous version of source per file in mind.
 	 * When syntax errors occurs it's then possible to use previous version of
@@ -38,7 +41,7 @@ public class LuaSourceParser extends AbstractSourceParser {
 	 */
 	private static Map<String, String> _cache = null;
 	static {
-		_cache = new HashMap<String, String>();
+		_cache = Collections.synchronizedMap(new HashMap<String, String>());
 	}
 
 	/**
@@ -50,14 +53,17 @@ public class LuaSourceParser extends AbstractSourceParser {
 	 *      org.eclipse.dltk.compiler.problem.IProblemReporter)
 	 */
 	@Override
-	public ModuleDeclaration parse(char[] file, char[] source,
+	public synchronized ModuleDeclaration parse(char[] file, char[] source,
 			IProblemReporter reporter) {
 
 		// Analyze code
-		String code = new String(source);
-		NodeFactory factory = new NodeFactory(code);
-		String fileName = new String(file);
 		ModuleDeclaration ast;
+		String code = new String(source);
+		NodeFactory factory = null;
+		String fileName = new String(file);
+		synchronized (mutex) {
+			factory = new NodeFactory(code);
+		}
 
 		// Search for problem
 		if (factory.errorDetected()) {
@@ -69,8 +75,10 @@ public class LuaSourceParser extends AbstractSourceParser {
 
 			// Fetch previous stable source from cache
 			if (_cache.containsKey(fileName)) {
-				factory = new NodeFactory(_cache.get(fileName));
-				ast = factory.getRoot();
+				synchronized (mutex) {
+					factory = new NodeFactory(_cache.get(fileName));
+					ast = factory.getRoot();
+				}
 			} else {
 				// When there is no source code cached, start from scratch
 				ast = new ModuleDeclaration(source.length);
@@ -79,12 +87,16 @@ public class LuaSourceParser extends AbstractSourceParser {
 		} else {
 			// Cache current AST in order to use it in case of error
 			_cache.put(fileName, code);
-			ast = factory.getRoot();
+			synchronized (mutex) {
+				ast = factory.getRoot();
+			}
 		}
 		return ast;
 	}
 
-	/** Parses Lua error string and founds its position (offset, line, column) */
+	/**
+	 * Parses Lua error string and founds its position: offset, line, column
+	 */
 	private IProblem buildProblem(char[] fileName, LuaParseError analyzer) {
 		int col = analyzer.getErrorColumn();
 		int offset = analyzer.getErrorOffset();

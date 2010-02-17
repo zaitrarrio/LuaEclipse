@@ -10,7 +10,6 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 /**
  * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
  * @date $Date: 2009-07-29 17:56:04 +0200 (mer., 29 juil. 2009) $
@@ -24,12 +23,12 @@ import org.eclipse.dltk.ast.declarations.Declaration;
 import org.eclipse.dltk.ast.declarations.FieldDeclaration;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.expressions.ExpressionConstants;
+import org.eclipse.dltk.core.DLTKCore;
 import org.keplerproject.luaeclipse.internal.parser.NameFinder;
 import org.keplerproject.luaeclipse.parser.ast.expressions.BinaryExpression;
 import org.keplerproject.luaeclipse.parser.ast.expressions.Function;
 import org.keplerproject.luaeclipse.parser.ast.expressions.Index;
 import org.keplerproject.luaeclipse.parser.ast.expressions.Table;
-
 
 // TODO: Auto-generated Javadoc
 /**
@@ -130,7 +129,9 @@ public class Set extends BinaryExpression {
 				field.setModifier(Declaration.AccGlobal);
 				castedRight.addStatement(field);
 				castedRight.addStatement(assignedValue);
-				System.out.println("attribute : " + varName);
+				if (DLTKCore.DEBUG) {
+					System.err.println("attribute : " + varName);
+				}
 			} else {
 				// Add casted if needed statement to chunk
 				castedRight.addStatement(assignedValue);
