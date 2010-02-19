@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.dltk.core.completionEngine">
+      <completionEngine
+            class="org.keplerproject.luaeclipse.internal.completion.LuaCompletionEngine"
+            nature="org.keplerproject.luaeclipse.nature"
+            priority="0">
+      </completionEngine>
+   </extension>
+   <extension
+         id="LuaTypeCompletionProposalComputer"
+         name="LuaEclipse code assistance"
+         point="org.eclipse.dltk.ui.scriptCompletionProposalComputer">
+      <scriptCompletionProposalComputer
+            activate="true"
+            categoryId="org.eclipse.dltk.ui.scriptTypeProposalCategory"
+            class="org.keplerproject.luaeclipse.internal.completion.LuaCompletionProposalComputer"
+            toolkitId="org.keplerproject.luaeclipse.nature">
+         <partition
+               type="__dftl_partition_content_type">
+         </partition>
+      </scriptCompletionProposalComputer>
+   </extension>
+
+</plugin>

@@ -25,6 +25,8 @@ import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
+import org.eclipse.jface.text.contentassist.ContentAssistant;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
@@ -32,6 +34,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.keplerproject.luaeclipse.completion.LuaCompletionProcessor;
 
 public class LuaSourceViewerConfiguration extends
 		ScriptSourceViewerConfiguration {
@@ -48,7 +51,12 @@ public class LuaSourceViewerConfiguration extends
 			String partitioning) {
 		super(colorManager, preferenceStore, editor, partitioning);
 	}
-
+	protected void alterContentAssistant(ContentAssistant assistant) {
+		IContentAssistProcessor scriptProcessor = new LuaCompletionProcessor(
+				getEditor(), assistant, IDocument.DEFAULT_CONTENT_TYPE);
+		assistant.setContentAssistProcessor(scriptProcessor,
+				IDocument.DEFAULT_CONTENT_TYPE);
+	}
 	public IAutoEditStrategy[] getAutoEditStrategies(
 			ISourceViewer sourceViewer, String contentType) {
 		return new IAutoEditStrategy[] { new DefaultIndentLineAutoEditStrategy() };
@@ -104,13 +112,13 @@ public class LuaSourceViewerConfiguration extends
 		reconciler.setDamager(dr, ILuaPartitions.LUA_SINGLE_QUOTE_STRING);
 		reconciler.setRepairer(dr, ILuaPartitions.LUA_SINGLE_QUOTE_STRING);
 
-		dr = new DefaultDamagerRepairer(this.fCommentScanner);
-		reconciler.setDamager(dr, ILuaPartitions.LUA_COMMENT);
-		reconciler.setRepairer(dr, ILuaPartitions.LUA_COMMENT);
-
 		dr = new DefaultDamagerRepairer(this.fMultilineCommentScanner);
 		reconciler.setDamager(dr, ILuaPartitions.LUA_MULTI_LINE_COMMENT);
 		reconciler.setRepairer(dr, ILuaPartitions.LUA_MULTI_LINE_COMMENT);
+
+		dr = new DefaultDamagerRepairer(this.fCommentScanner);
+		reconciler.setDamager(dr, ILuaPartitions.LUA_COMMENT);
+		reconciler.setRepairer(dr, ILuaPartitions.LUA_COMMENT);
 
 		dr = new DefaultDamagerRepairer(this.fNumberScanner);
 		reconciler.setDamager(dr, ILuaPartitions.LUA_NUMBER);
