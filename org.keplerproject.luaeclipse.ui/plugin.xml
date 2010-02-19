@@ -16,19 +16,4 @@
             name="Lua interpreters">
       </page>
    </extension>
-   <extension
-         point="org.eclipse.ui.newWizards">
-      <category
-            id="org.keplerproject.luaeclipse.category"
-            name="Lua">
-      </category>
-      <wizard
-            category="org.keplerproject.luaeclipse.category"
-            class="org.eclipse.dltk.ui.wizards.GenericDLTKProjectWizard:org.keplerproject.luaeclipse.nature"
-            icon="img/lua.gif"
-            id="org.keplerproject.luaeclipse.wizard"
-            name="Lua Project"
-            project="true">
-      </wizard>
-   </extension>
 </plugin>

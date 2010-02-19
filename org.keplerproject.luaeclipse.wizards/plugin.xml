@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.keplerproject.luaeclipse.category"
+            name="Lua">
+      </category>
+      <wizard
+            category="org.keplerproject.luaeclipse.category"
+            class="org.eclipse.dltk.ui.wizards.GenericDLTKProjectWizard:org.keplerproject.luaeclipse.nature"
+            icon="img/lua.gif"
+            id="org.keplerproject.luaeclipse.wizard"
+            name="LuaProject"
+            project="true">
+      </wizard>
+   </extension>
+
+</plugin>
