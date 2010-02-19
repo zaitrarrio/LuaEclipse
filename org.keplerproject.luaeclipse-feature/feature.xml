@@ -2,7 +2,7 @@
 <feature
       id="org.keplerproject.luaeclipse"
       label="LuaEclipse"
-      version="1.1.0.qualifier"
+      version="2.0.0.qualifier"
       provider-name="Kepler project">
 
    <description url="http://github.com/KINFOO/LuaEclipse/">
@@ -93,9 +93,15 @@ This Agreement is governed by the laws of the State of New York and the intellec
 
    <requires>
       <import plugin="org.eclipse.ui" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.resources" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="org.keplerproject.luaeclipse.lua"/>
+      <import plugin="org.eclipse.dltk.core" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.jface.text" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.editors" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.ide" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.dltk.ui" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.core.runtime" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.dltk.debug.ui" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.dltk.launching" version="2.0.0" match="compatible"/>
    </requires>
 
    <plugin
@@ -150,7 +156,7 @@ This Agreement is governed by the laws of the State of New York and the intellec
          id="org.keplerproject.luaeclipse.parser"
          download-size="0"
          install-size="0"
-         version="1.1.0.qualifier"/>
+         version="1.2.0.qualifier"/>
 
    <plugin
          id="org.keplerproject.luaeclipse.lua.linux64"
@@ -166,7 +172,7 @@ This Agreement is governed by the laws of the State of New York and the intellec
          id="org.keplerproject.luaeclipse.ui"
          download-size="0"
          install-size="0"
-         version="1.0.0.qualifier"
+         version="1.0.1.qualifier"
          unpack="false"/>
 
    <plugin
@@ -186,5 +192,19 @@ This Agreement is governed by the laws of the State of New York and the intellec
          install-size="0"
          version="1.0.0.qualifier"
          fragment="true"/>
+
+   <plugin
+         id="org.keplerproject.luaeclipse.completion"
+         download-size="0"
+         install-size="0"
+         version="1.0.0.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="org.keplerproject.luaeclipse.wizards"
+         download-size="0"
+         install-size="0"
+         version="1.0.0.qualifier"
+         unpack="false"/>
 
 </feature>
