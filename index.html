@@ -12,86 +12,34 @@
 <link rel="stylesheet" href="fancybox/jquery.fancybox-1.3.0.css" type="text/css" media="screen"/>
 <link rel="alternate" href="news.rss" title="LuaEclipse2 news" type="application/rss+xml" />
 <script type="text/javascript">
-	$(document).ready(function() {
-		$("a#outline").fancybox({
-			'titlePosition'	: 'over',
-			'transitionIn'	: 'elastic',
-			'transitionOut'	: 'elastic'
-		});
-		
-			/*
-			*   Examples - images
-			*
-
-			$("a#example1").fancybox({
-				'titleShow'     : false
-			});
-
-			$("a#example2").fancybox({
-				'titleShow'     : false,
-				'transitionIn'	: 'elastic',
-				'transitionOut'	: 'elastic'
-			});
-
-			$("a#example3").fancybox({
-			    'titleShow'     : false,
-				'transitionIn'	: 'none',
-				'transitionOut'	: 'none'
-			});
-
-			$("a#example4").fancybox();
-
-			$("a#example5").fancybox({
-				'titlePosition'  : 'inside'
-			});
-
-			$("a#example6").fancybox({
-				'titlePosition'  : 'over'
-			});
-
-			$("a[rel=example_group]").fancybox({
-				'transitionIn'		: 'none',
-				'transitionOut'		: 'none',
-				'titlePosition' 	: 'over',
-				'titleFormat'       : function(title, currentArray, currentIndex, currentOpts) {
-				    return '<span id="fancybox-title-over">Image ' +  (currentIndex + 1) + ' / ' + currentArray.length + '</span>';
-				}
-			});
-			
-			/*
-			*   Examples - various
-			*
-			
-			$("#various1").fancybox({
-				'titlePosition'		: 'inside',
-				'transitionIn'		: 'none',
-				'transitionOut'		: 'none'
-			});
-			
-			$("#various2").fancybox({
-				ajax : {
-				    type	: "POST",
-				    example	: 'myexample=test'
-				}
-			});
-	
-			$("#various3").fancybox({
-				'width'				: '75%',
-				'height'			: '75%',
-		        'autoScale'     	: false,
-		        'transitionIn'		: 'none',
-				'transitionOut'		: 'none',
-				'type'				: 'iframe'
-			});
-			
-			$("#various4").fancybox({
-			    'padding'           : 0,
-		        'autoScale'     	: false,
-		        'transitionIn'		: 'none',
-				'transitionOut'		: 'none'
-			});*/
-		});
-	</script>
+$(document).ready(function() {
+	$("a#assistance").fancybox({
+		'titlePosition'	: 'over',
+		'transitionIn'	: 'elastic',
+		'transitionOut'	: 'elastic'
+	});
+	$("a#folding").fancybox({
+		'titlePosition'	: 'over',
+		'transitionIn'	: 'elastic',
+		'transitionOut'	: 'elastic'
+	});
+	$("a#highlight").fancybox({
+		'titlePosition'	: 'over',
+		'transitionIn'	: 'elastic',
+		'transitionOut'	: 'elastic'
+	});
+	$("a#marker").fancybox({
+		'titlePosition'	: 'over',
+		'transitionIn'	: 'elastic',
+		'transitionOut'	: 'elastic'
+	});
+	$("a#outline").fancybox({
+		'titlePosition'	: 'over',
+		'transitionIn'	: 'elastic',
+		'transitionOut'	: 'elastic'
+	});
+});
+</script>
 <style type="text/css">
 *{
     border:none;
@@ -133,7 +81,17 @@ h2, h3 {
 #main {
   margin: auto;
   color: #717171;
-  width: 800px;
+  width: 1000px;
+}
+.wrap{
+	float:		left;
+	padding:	5px;
+	text-align:	center;
+	width:		300px;
+}
+.wrap:hover{
+	background: transparent url(img/wrap.png) no-repeat center top;
+	color:	#fff;
 }
 </style>
 </head>
@@ -141,7 +99,7 @@ h2, h3 {
 <h1>LuaEclipse 2</h1>
 <div id="resume">
 <h2>What is this project ?</h2>
-<div style="margin: auto; text-align: justify; width: 800px;">
+<div style="margin: auto; text-align: justify; width: 1000px;">
 LuaEclipse is a collection of plugins developed for the <span style="font-weight: bold;">Eclipse platform</span> that together make an IDE for the development of applications in the <span style="font-weight: bold;">Lua programming language</span>.
 In this environment it's possible to <span style="font-weight: bold;">edit</span> Lua scripts with <span style="font-weight: bold;">syntax highlight</span>, code completion, syntax errors, code and comment <span style="font-weight: bold;">folding</span>,
 script execution with a pre-configured interpreter, besides the tools
@@ -155,17 +113,40 @@ that new tools will be developed using the<span style="font-weight: bold;"> exte
 LuaEclipse 2 offers some interesting features that make coding in Lua
 easier.<br />
 
+<div class="wrap">
 <h3>Outline</h3>
-<a rel="features" id="outline" title="The Lua logo" href="img/luaLogo.gif"><img src="img/luaLogo.gif" alt=""/></a>
+<a rel="features" id="outline" title="The Lua logo" href="img/outline.png"><img src="img/s_outline.png" alt=""/></a>
+</div>
+
+<div class="wrap">
+<h3>Code assitance</h3>
+<a rel="features" id="outline" title="The Lua logo" href="img/completion.png"><img src="img/s_completion.png" alt=""/></a>
+</div>
+<div class="wrap">
 <h3>Code folding</h3>
+<a rel="features" id="folding" title="The Lua logo" href="img/folding.png"><img src="img/s_folding.png" alt=""/></a>
+</div>
+<hr style=" clear: both; "/>
+<div class="wrap">
 <h3>Syntax coloring</h3>
+<a rel="features" id="highlight" title="The Lua logo" href="img/highlight.png"><img src="img/s_highlight.png" alt=""/></a>
+</div>
+
+<div class="wrap">
+<h3>Error markers</h3>
+<a rel="features" id="marker" title="The Lua logo" href="img/error.png"><img src="img/s_error.png" alt=""/></a>
+</div>
+
+<hr style=" clear: both; "/>
 <h2>How can I install it?</h2>
 </div>
 <div id="footer">
 <span style="color: rgb(0, 0, 125);">blue</span>
 <span style="color: rgb(113, 113, 113);">grey </span>
 <span style="color: rgb(185, 20, 20);">red</span>
-<a href="http://validator.w3.org/check/referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" border="0" height="31" width="88" /></a> footnotes
+<a href="http://validator.w3.org/check?uri=http://kinfoo.github.com/LuaEclipse/&">
+<img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" border="0" height="31" width="88" />
+</a> footnotes
 </div>
 
 </body></html>
