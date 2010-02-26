@@ -20,17 +20,14 @@
 package org.keplerproject.luaeclipse.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.expressions.Expression;
-import org.eclipse.dltk.ast.references.SimpleReference;
-import org.keplerproject.luaeclipse.internal.parser.NameFinder;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
-import org.keplerproject.luaeclipse.parser.ast.statements.FunctionDeclaration;
 
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Pair.
  */
-public class Pair extends BinaryExpression {
+public class Pair extends Index {
 
     /**
      * Instantiates a new pair.
@@ -46,13 +43,5 @@ public class Pair extends BinaryExpression {
      */
     public Pair(int start, int end, Expression left, Expression right) {
 	super(start, end, left, LuaExpressionConstants.E_PAIR, right);
-	if (right instanceof Function) {
-	    SimpleReference ref = NameFinder.getReference((Expression) left);
-	    FunctionDeclaration declaration = new FunctionDeclaration(ref
-		    .getName(), ref.matchStart()-1, ref.matchStart()
-		    + ref.matchLength(), right.matchStart(), right.matchStart()
-		    + ref.matchLength());
-	    ((Function) right).addStatement(declaration);
-	}
     }
 }

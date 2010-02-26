@@ -10,7 +10,6 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 /**
  * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
  * @date $Date: 2009-07-29 17:56:04 +0200 (mer., 29 juil. 2009) $
@@ -23,16 +22,11 @@ import java.util.ArrayList;
 
 import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.declarations.Argument;
-import org.eclipse.dltk.ast.declarations.Declaration;
-import org.eclipse.dltk.ast.expressions.Expression;
-import org.eclipse.dltk.ast.references.SimpleReference;
 import org.eclipse.dltk.ast.statements.Block;
 import org.eclipse.dltk.utils.CorePrinter;
 import org.keplerproject.luaeclipse.internal.parser.Index;
-import org.keplerproject.luaeclipse.internal.parser.NameFinder;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 import org.keplerproject.luaeclipse.parser.ast.statements.Chunk;
-
 
 // TODO: Auto-generated Javadoc
 /**
@@ -43,6 +37,7 @@ public class Function extends Block implements Index {
     /** The parameters. */
     private ArrayList<Argument> arguments;
     private long id;
+    private Chunk chunk;
 
     /**
      * Instantiates a new function.
@@ -61,18 +56,27 @@ public class Function extends Block implements Index {
 	// Declare parameters as arguments
 	int argCount = parameters.getStatements().size();
 	this.arguments = new ArrayList<Argument>(argCount);
-	for (int k = 0; k < argCount; k++) {
-	    Expression expr = (Expression) parameters.getStatements().get(k);
-	    SimpleReference ref = NameFinder.getReference(expr);
-	    Argument arg = new Argument(ref, ref.matchStart(), ref.matchStart()
-		    + ref.matchStart(), expr, Declaration.AccFinal);
-	    arg.setModifiers(Declaration.D_ARGUMENT);
-	    this.arguments.add(arg);
-	}
+	chunk = parameters;
+	// for (int k = 0; k < argCount; k++) {
+	// Expression expr = (Expression) parameters.getStatements().get(k);
+	// SimpleReference ref = NameFinder.getReference(expr);
+	// Argument arg = new Argument(ref, ref.matchStart(), ref.matchStart()
+	// + ref.matchStart(), expr, Declaration.AccFinal);
+	// arg.setModifiers(Declaration.D_ARGUMENT);
+	// this.arguments.add(arg);
+	// }
+    }
+
+    public boolean addArgument(Argument arg) {
+	return arguments.add(arg);
     }
 
     public ArrayList<Argument> getArguments() {
 	return arguments;
+    }
+
+    public Chunk getArgumentChunk() {
+	return chunk;
     }
 
     /**
@@ -98,16 +102,16 @@ public class Function extends Block implements Index {
     }
 
     public void printNode(CorePrinter output) {
-    
-        // Arguments
-        output.indent();
-        output.indent();
-        for (Argument arg : getArguments()) {
-            arg.printNode(output);
-        }
-        output.dedent();
-        output.dedent();
-        super.printNode(output);
+
+	// Arguments
+	output.indent();
+	output.indent();
+	for (Argument arg : getArguments()) {
+	    arg.printNode(output);
+	}
+	output.dedent();
+	output.dedent();
+	super.printNode(output);
     }
 
     public void setID(long id) {
@@ -123,7 +127,10 @@ public class Function extends Block implements Index {
     public void traverse(ASTVisitor visitor) throws Exception {
 	if (visitor.visit(this)) {
 	    super.traverse(visitor);
-	    for (Argument arg : this.arguments) {
+	    if (getArgumentChunk() != null) {
+		getArgumentChunk().traverse(visitor);
+	    }
+	    for (Argument arg : getArguments()) {
 		arg.traverse(visitor);
 	    }
 	    visitor.endvisit(this);

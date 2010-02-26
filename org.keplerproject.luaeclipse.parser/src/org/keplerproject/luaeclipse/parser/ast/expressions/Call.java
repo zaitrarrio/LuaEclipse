@@ -19,7 +19,6 @@
  */
 package org.keplerproject.luaeclipse.parser.ast.expressions;
 
-import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.CallArgumentsList;
 import org.eclipse.dltk.ast.expressions.CallExpression;
 import org.eclipse.dltk.ast.expressions.Expression;
@@ -71,10 +70,10 @@ public class Call extends CallExpression implements LuaExpressionConstants {
 	 * org.eclipse.dltk.ast.statements.Statement#traverse(org.eclipse.dltk.ast
 	 * .ASTVisitor)
 	 */
-	public void traverse(ASTVisitor visitor) throws Exception {
-		if (visitor.visit(this)) {
-			super.traverse(visitor);
-			visitor.endvisit(this);
-		}
-	}
+//	public void traverse(ASTVisitor visitor) throws Exception {
+//		if (visitor.visit(this)) {
+//			super.traverse(visitor);
+//			visitor.endvisit(this);
+//		}
+//	}
 }

@@ -10,7 +10,6 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 /**
  * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
  * @date $Date: 2009-07-23 12:07:30 +0200 (jeu., 23 juil. 2009) $
@@ -19,23 +18,16 @@
  */
 package org.keplerproject.luaeclipse.parser.ast.expressions;
 
-import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
-
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Index.
  */
-public class Index extends Expression implements LeftHandSide,
-	LuaExpressionConstants, org.keplerproject.luaeclipse.internal.parser.Index {
-
-    /** The index. */
-    private Expression value;
-
-    /** The table. */
-    private Expression key;
+public class Index extends BinaryExpression implements LeftHandSide,
+	LuaExpressionConstants,
+	org.keplerproject.luaeclipse.internal.parser.Index {
 
     private long id;
 
@@ -52,10 +44,15 @@ public class Index extends Expression implements LeftHandSide,
      *            the index
      */
     public Index(int start, int end, Expression key, Expression value) {
-	super(start, end);
-	this.value = value;
-	this.key = key;
+	this(start, end, key, E_INDEX, value);
     }
+
+    protected Index(int start, int end, Expression key, int kind,
+	    Expression value) {
+	super(start, end, key, kind, value);
+    }
+
+
 
     /**
      * Gets the index.
@@ -63,17 +60,7 @@ public class Index extends Expression implements LeftHandSide,
      * @return the index
      */
     public Expression getValue() {
-	return value;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.dltk.ast.statements.Statement#getKind()
-     */
-    @Override
-    public int getKind() {
-	return E_INDEX;
+	return getRight();
     }
 
     public long getID() {
@@ -90,7 +77,7 @@ public class Index extends Expression implements LeftHandSide,
      * @return the table
      */
     public Expression getKey() {
-	return key;
+	return getLeft();
     }
 
     /*
@@ -110,11 +97,10 @@ public class Index extends Expression implements LeftHandSide,
      * org.eclipse.dltk.ast.statements.Statement#traverse(org.eclipse.dltk.ast
      * .ASTVisitor)
      */
-    public void traverse(ASTVisitor visitor) throws Exception {
-	if (visitor.visit(this)) {
-	    value.traverse(visitor);
-	    key.traverse(visitor);
-	    visitor.endvisit(this);
-	}
-    }
+//    public void traverse(ASTVisitor visitor) throws Exception {
+//	if (visitor.visit(this)) {
+//	    super.traverse(visitor);
+//	    visitor.endvisit(this);
+//	}
+//    }
 }

@@ -21,7 +21,6 @@ package org.keplerproject.luaeclipse.parser.ast.statements;
 
 import java.util.List;
 
-import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.statements.Block;
 import org.eclipse.dltk.ast.statements.Statement;
 import org.keplerproject.luaeclipse.internal.parser.Index;
@@ -38,9 +37,9 @@ public class Chunk extends Block implements Index {
 	/**
 	 * Instantiates a new chunk.
 	 */
-	public Chunk() {
-		super();
-	}
+//	public Chunk() {
+//		super();
+//	}
 
 	/**
 	 * Instantiates a new chunk.
@@ -76,8 +75,8 @@ public class Chunk extends Block implements Index {
 		this.id = id;
 	}
 
-	@Override
-	public void traverse(ASTVisitor visitor) throws Exception {
-		super.traverse(visitor);
-	}
+//	@Override
+//	public void traverse(ASTVisitor visitor) throws Exception {
+//		super.traverse(visitor);
+//	}
 }

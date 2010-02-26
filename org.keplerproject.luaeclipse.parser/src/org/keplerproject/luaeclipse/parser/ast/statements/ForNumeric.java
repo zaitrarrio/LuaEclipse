@@ -138,10 +138,10 @@ public class ForNumeric extends Block implements LuaStatementConstants, Index{
 	 */
 	public void traverse(ASTVisitor visitor) throws Exception {
 		if (visitor.visit(this)) {
+			super.traverse(visitor);
 			if (optionnal != null) {
 				optionnal.traverse(visitor);
 			}
-			super.traverse(visitor);
 			fromExpression.traverse(visitor);
 			toExpression.traverse(visitor);
 			variable.traverse(visitor);

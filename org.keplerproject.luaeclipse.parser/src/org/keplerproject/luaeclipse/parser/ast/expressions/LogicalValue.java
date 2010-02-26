@@ -19,7 +19,6 @@
  */
 package org.keplerproject.luaeclipse.parser.ast.expressions;
 
-import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.keplerproject.luaeclipse.internal.parser.Index;
 
@@ -70,9 +69,9 @@ public class LogicalValue extends Expression implements Index {
 	 * org.eclipse.dltk.ast.statements.Statement#traverse(org.eclipse.dltk.ast
 	 * .ASTVisitor)
 	 */
-	public void traverse(ASTVisitor visitor) throws Exception {
-		if (visitor.visit(this)) {
-			visitor.endvisit(this);
-		}
-	}
+//	public void traverse(ASTVisitor visitor) throws Exception {
+//		if (visitor.visit(this)) {
+//			visitor.endvisit(this);
+//		}
+//	}
 }

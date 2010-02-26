@@ -43,8 +43,7 @@ public class Invoke extends Call implements LuaExpressionConstants {
 	 *            the module
 	 */
 	public Invoke(int start, int end, Expression module, String string) {
-		super(start, end, module, new CallArgumentsList());
-		this.string = string;
+		this(start, end, module, string, new CallArgumentsList());
 	}
 
 	/**
