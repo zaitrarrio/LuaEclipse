@@ -56,7 +56,7 @@ public class Function extends Block implements Index {
 	// Declare parameters as arguments
 	int argCount = parameters.getStatements().size();
 	this.arguments = new ArrayList<Argument>(argCount);
-	chunk = parameters;
+	this.chunk = parameters;
 	// for (int k = 0; k < argCount; k++) {
 	// Expression expr = (Expression) parameters.getStatements().get(k);
 	// SimpleReference ref = NameFinder.getReference(expr);
@@ -127,11 +127,11 @@ public class Function extends Block implements Index {
     public void traverse(ASTVisitor visitor) throws Exception {
 	if (visitor.visit(this)) {
 	    super.traverse(visitor);
-	    if (getArgumentChunk() != null) {
-		getArgumentChunk().traverse(visitor);
-	    }
 	    for (Argument arg : getArguments()) {
 		arg.traverse(visitor);
+	    }
+	    if (getArgumentChunk() != null) {
+		getArgumentChunk().traverse(visitor);
 	    }
 	    visitor.endvisit(this);
 	}

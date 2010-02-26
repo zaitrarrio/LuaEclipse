@@ -78,6 +78,7 @@ public class SpyVisitor extends ASTVisitor {
 	    countType(node.getClass().getName());
 	} catch (Exception e) {
 	    _error = e.getMessage();
+	    throw e;
 	}
 	return true;
     }

@@ -26,6 +26,7 @@ import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.statements.Statement;
 import org.keplerproject.luaeclipse.internal.parser.Index;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
+import org.keplerproject.luaeclipse.parser.ast.statements.Chunk;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -74,6 +75,15 @@ public class Table extends Expression implements Index {
 	statements.add(statement);
     }
 
+    public Chunk getChunk() {
+	int start = 0, end = 0;
+	if (getStatements().size() > 0) {
+	    start = getStatements().get(0).matchStart();
+	    end = getStatements().get(getStatements().size() - 1).matchStart();
+	}
+	return new Chunk(start, end, getStatements());
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -82,6 +92,10 @@ public class Table extends Expression implements Index {
     @Override
     public int getKind() {
 	return LuaExpressionConstants.E_TABLE;
+    }
+
+    public List<Statement> getStatements() {
+	return statements;
     }
 
     /*
@@ -94,7 +108,7 @@ public class Table extends Expression implements Index {
     public void traverse(ASTVisitor pVisitor) throws Exception {
 	if (pVisitor.visit(this)) {
 	    super.traverse(pVisitor);
-	    for (Statement node : statements) {
+	    for (Statement node : getStatements()) {
 		node.traverse(pVisitor);
 	    }
 	    pVisitor.endvisit(this);
