@@ -10,10 +10,11 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 package org.keplerproject.luaeclipse.parser.internal.tests.utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,16 +31,18 @@ public class SpyVisitor extends ASTVisitor {
 
     private String _error;
     private int _nodesCount = 0;
-    private Map<String, Integer> _types;
+    private Map<String, Integer> _types = new HashMap<String, Integer>();
+    private List<Object> _countedObjects = new ArrayList<Object>();
 
     public void clear() {
+	_countedObjects = new ArrayList<Object>();
 	_nodesCount = 0;
 	_types = new HashMap<String, Integer>();
     }
 
     private void countType(String typeName) {
 	int count = _types.containsKey(typeName) ? _types.get(typeName) : 0;
-	_types.put(typeName, new Integer(count+1));
+	_types.put(typeName, new Integer(count + 1));
     }
 
     /**
@@ -72,10 +75,14 @@ public class SpyVisitor extends ASTVisitor {
     }
 
     public boolean visitGeneral(ASTNode node) throws Exception {
+
 	try {
-	    // Keep node's details in mind
-	    _nodesCount++;
-	    countType(node.getClass().getName());
+	    if (!_countedObjects.contains(node)) {
+		// Keep node's details in mind
+		countType(node.getClass().getName());
+		_countedObjects.add(node);
+		_nodesCount++;
+	    }
 	} catch (Exception e) {
 	    _error = e.getMessage();
 	    throw e;
@@ -88,6 +95,10 @@ public class SpyVisitor extends ASTVisitor {
     }
 
     public int typeCount(String type) {
-	return _types.get(type).intValue();
+	try {
+	    return _types.get(type).intValue();
+	} catch (Exception e) {
+	    return 0;
+	}
     }
 }

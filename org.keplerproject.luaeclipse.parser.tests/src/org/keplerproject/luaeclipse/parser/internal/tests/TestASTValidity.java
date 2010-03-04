@@ -79,42 +79,78 @@ public class TestASTValidity extends TestCase {
     public void testFor() {
 
 	// Regular numeric for
+	// `Fornum{ `Id "i", `Number 1, `Number 10, { } }
 	String code = "for i=1,10 do end";
-	String typeName = _EXPRESSION + ".Identifier";
 	assertTrue(code + "\n" + getError(), traverse(code));
-	assertEquals("For statement AST nodes count.", 8, visitor.nodesCount());
-	boolean assertion = visitor.hasVisitedType(typeName);
-	assertTrue("Unable to locate: " + typeName, assertion);
+
+	// Id: 1
+	String typeName = _EXPRESSION + ".Identifier";
+	int count = visitor.typeCount(typeName);
+	assertEquals("Wrong count of " + typeName, 1, count);
+
+	// Number: 2
+	typeName = _EXPRESSION + ".Number";
+	count = visitor.typeCount(typeName);
+	assertEquals("Wrong count of " + typeName, 2, count);
+
+	// Numeric For: 1
+	typeName = _STATEMENT + ".ForNumeric";
+	count = visitor.typeCount(typeName);
+	assertEquals("Wrong count of " + typeName, 1, count);
 
 	// Same with step indication
 	code = "for i=1,10,2 do end";
 	assertTrue(code + "\n" + getError(), traverse(code));
-	assertEquals("For statement with step AST nodes count.", 9, visitor
-		.nodesCount());
+
+	// Id: 1
+	typeName = _EXPRESSION + ".Identifier";
+	count = visitor.typeCount(typeName);
+	assertEquals("Wrong count of " + typeName, 1, count);
+
+	// Number: 3
+	typeName = _EXPRESSION + ".Number";
+	count = visitor.typeCount(typeName);
+	assertEquals("Wrong count of " + typeName, 3, count);
+
+	// Numeric For: 1
+	typeName = _STATEMENT + ".ForNumeric";
+	count = visitor.typeCount(typeName);
+	assertEquals("Wrong count of " + typeName, 1, count);
+
     }
 
     /**
-     * Indicates if a function declaration is considered only once in AST.
+     * Indicates if a function declaration is considered only once in AST, as a
+     * function and as a function declaration.
      */
     public void testFunction() {
 
 	// Check function declaration
-	String typeName = _DECLARATION + ".FunctionDeclaration";
 	String code = "m = function ()end";
+
+	// Function declaration: 1
+	String typeName = _DECLARATION + ".FunctionDeclaration";
 	assertTrue(code + "\n" + getError(), traverse(code));
 	assertTrue("Unable to find required type.", visitor
 		.hasVisitedType(typeName));
 	assertEquals("Wrong declaration count.", 1, visitor.typeCount(typeName));
+
+	// Function: 1
+	typeName = _EXPRESSION + ".Function";
+	assertTrue(code + "\n" + getError(), traverse(code));
+	assertTrue("Unable to find required type.", visitor
+		.hasVisitedType(typeName));
+	assertEquals("Wrong function count.", 1, visitor.typeCount(typeName));
     }
 
     /**
      * Check in pair function declaration {@code table = 'method', function
      * ()end} .
      */
-    public void testFunctionInPair() {
+    public void testFunctionInIndex() {
 
 	// Check function declaration
-	String code = "table['method'] = function ()end";
+	String code = "table['method']=function()end";
 	boolean traverseStatus = traverse(code);
 	assertTrue(code + "\n" + getError(), traverseStatus);
 
@@ -145,16 +181,69 @@ public class TestASTValidity extends TestCase {
 	typeCount = visitor.typeCount(typeName);
 	assertEquals("Wrong string count.", 1, typeCount);
 
-	// Function: 1
-	typeName = _EXPRESSION + ".Function";
-	typeCount = visitor.typeCount(typeName);
-	assertEquals("Wrong function count.", 1, typeCount);
-
+	// Function declaration: 1
 	typeName = _DECLARATION + ".FunctionDeclaration";
 	typeCount = visitor.typeCount(typeName);
 	assertEquals("Wrong declaration function count.", 1, typeCount);
 	assertTrue("Unable to find required type.", visitor
 		.hasVisitedType(typeName));
+
+	// Function: 1
+	typeName = _EXPRESSION + ".Function";
+	typeCount = visitor.typeCount(typeName);
+	assertEquals("Wrong function count.", 1, typeCount);
+    }
+
+    /**
+     * Check in pair function declaration {@code table = 'method', function
+     * ()end} .
+     */
+    public void testFunctionInPair() {
+
+	// Check function declaration
+	String code = "t ={method=function()end}";
+	boolean traverseStatus = traverse(code);
+	assertTrue(code + "\n" + getError(), traverseStatus);
+
+	// The AST for the code "t ={method=function()end}" is:
+	// `Set{ { `Id "t" },
+	// { `Table{ `Pair{ `String "method",
+	// `Function{ { }, { } } } } } }
+
+	/*
+	 * Count check
+	 */
+	// Set: 1
+	String typeName = _STATEMENT + ".Set";
+	int typeCount = visitor.typeCount(typeName);
+	assertEquals("Wrong assignement count.", 1, typeCount);
+
+	// Index: 1
+	typeName = _EXPRESSION + ".Pair";
+	typeCount = visitor.typeCount(typeName);
+	assertEquals("Wrong table count.", 1, typeCount);
+
+	// Id: 1
+	typeName = _EXPRESSION + ".Identifier";
+	typeCount = visitor.typeCount(typeName);
+	assertEquals("Wrong identifier count.", 1, typeCount);
+
+	// String: 1
+	typeName = _EXPRESSION + ".String";
+	typeCount = visitor.typeCount(typeName);
+	assertEquals("Wrong string count.", 1, typeCount);
+
+	// Function declaration: 1
+	typeName = _DECLARATION + ".FunctionDeclaration";
+	typeCount = visitor.typeCount(typeName);
+	assertEquals("Wrong declaration function count.", 1, typeCount);
+	assertTrue("Unable to find required type.", visitor
+		.hasVisitedType(typeName));
+
+	// Function: 1
+	typeName = _EXPRESSION + ".Function";
+	typeCount = visitor.typeCount(typeName);
+	assertEquals("Wrong function count.", 1, typeCount);
     }
 
     /**
@@ -162,12 +251,53 @@ public class TestASTValidity extends TestCase {
      * second=function() end return second end}
      */
     public void testImbricatedFuntionDeclarations() {
-	String code = "first=function() second=function() end return second end";
+	String code = "first=function() local second=function() end end";
 	String typeName = _DECLARATION + ".FunctionDeclaration";
 	assertTrue(code + "\n" + getError(), traverse(code));
 	assertTrue("Unable to find required type.", visitor
 		.hasVisitedType(typeName));
 	assertEquals("Wrong declaration count.", 2, visitor.typeCount(typeName));
+	// Function: 2
+	typeName = _EXPRESSION + ".Function";
+	assertEquals("Wrong function count.", 2, visitor.typeCount(typeName));
+    }
+
+    public void testLocalFunction() {
+	String code = "local f = function() end";
+	boolean traverseStatus = traverse(code);
+	assertTrue(code + "\n" + getError(), traverseStatus);
+
+	// Declaration : 1
+	String typeName = _DECLARATION + ".FunctionDeclaration";
+	int typeCount = visitor.typeCount(typeName);
+	assertEquals("Wrong declaration function count.", 1, typeCount);
+	assertTrue(code + "\n" + getError(), traverse(code));
+	assertTrue("Unable to find required type.", visitor
+		.hasVisitedType(typeName));
+	assertEquals("Wrong declaration count.", 1, visitor.typeCount(typeName));
+	// Function: 2
+	typeName = _EXPRESSION + ".Function";
+	typeCount = visitor.typeCount(typeName);
+	assertEquals("Wrong function count.", 1, typeCount);
+    }
+
+    public void testLocalRecursionFunction() {
+	String code = "local function f() end";
+	boolean traverseStatus = traverse(code);
+	assertTrue(code + "\n" + getError(), traverseStatus);
+
+	// Declaration : 1
+	String typeName = _DECLARATION + ".FunctionDeclaration";
+	int typeCount = visitor.typeCount(typeName);
+	assertEquals("Wrong declaration function count.", 1, typeCount);
+	assertTrue(code + "\n" + getError(), traverse(code));
+	assertTrue("Unable to find required type.", visitor
+		.hasVisitedType(typeName));
+	assertEquals("Wrong declaration count.", 1, visitor.typeCount(typeName));
+	// Function: 2
+	typeName = _EXPRESSION + ".Function";
+	typeCount = visitor.typeCount(typeName);
+	assertEquals("Wrong function count.", 1, typeCount);
     }
 
     /**
@@ -197,8 +327,8 @@ public class TestASTValidity extends TestCase {
 
     /** Check if several function declaration is handled. */
     public void testSeveralFunction() {
-	String typeName = _DECLARATION + ".FunctionDeclaration";
 	String code = "m = function () function l() end end";
+	String typeName = _DECLARATION + ".FunctionDeclaration";
 	assertTrue(code + "\n" + getError(), traverse(code));
 	assertTrue("Unable to find required type.", visitor
 		.hasVisitedType(typeName));
