@@ -11,17 +11,13 @@
  *****************************************************************************/
 package org.keplerproject.luaeclipse.parser.ast.expressions;
 
-import java.util.ArrayList;
-
 import org.eclipse.dltk.ast.ASTVisitor;
-import org.eclipse.dltk.ast.declarations.Declaration;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.utils.CorePrinter;
 import org.keplerproject.luaeclipse.internal.parser.Index;
 
-// TODO: Auto-generated Javadoc
 /**
- * Defines a two operands expression.
+ * Defines a two operand expression.
  * 
  * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  */
@@ -37,8 +33,6 @@ public class BinaryExpression extends Expression implements Index {
     protected int kind;
 
     protected long id;
-
-    private ArrayList<Declaration> declarations;
 
     /**
      * Defines a two operands expression.
@@ -59,52 +53,18 @@ public class BinaryExpression extends Expression implements Index {
     public BinaryExpression(int start, int end, Expression left, int kind,
 	    Expression right) {
 	super(start, end);
+	this.kind = kind;
+	this.left = left;
+	this.right = right;
 	if (left != null) {
 	    this.setStart(left.sourceStart());
 	    assert left instanceof Expression;
 	}
-
 	if (right != null) {
 	    this.setEnd(right.sourceEnd());
 	    assert right instanceof Expression;
 	}
-
-	this.declarations = new ArrayList<Declaration>();
-	this.kind = kind;
-	this.left = left;
-	this.right = right;
     }
-
-    public boolean addDeclaration(Declaration d) {
-	return this.declarations.add(d);
-    }
-
-    public boolean addDeclarations(Iterable<Declaration> declarations) {
-	boolean status = true;
-	for (Declaration d : declarations) {
-	    status = status && this.declarations.add(d);
-	}
-	return status;
-    }
-
-    public ArrayList<Declaration> getDeclarations() {
-	return this.declarations;
-    }
-
-    /**
-     * Instantiates a new binary expression.
-     * 
-     * @param left
-     *            the left
-     * @param kind
-     *            the kind
-     * @param right
-     *            the right
-     */
-    // TODO: remove
-    // public BinaryExpression(Chunk left, int kind, Chunk right) {
-    // this(0, 0, left, kind, right);
-    // }
 
     /**
      * Left parent of the expression.
@@ -175,12 +135,8 @@ public class BinaryExpression extends Expression implements Index {
 	    if (getLeft() != null) {
 		getLeft().traverse(visitor);
 	    }
-
 	    if (getRight() != null) {
 		getRight().traverse(visitor);
-	    }
-	    for (Declaration d : getDeclarations()) {
-		d.traverse(visitor);
 	    }
 	    visitor.endvisit(this);
 	}

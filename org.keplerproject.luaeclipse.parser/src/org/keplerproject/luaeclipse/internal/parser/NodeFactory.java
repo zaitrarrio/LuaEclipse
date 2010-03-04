@@ -9,29 +9,25 @@
  *      Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
-
-/**
- * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
- * @date $Date: 2009-07-29 17:56:04 +0200 (mer., 29 juil. 2009) $
- * $Author: kkinfoo $
- * $Id: NodeFactory.java 2190 2009-07-29 15:56:04Z kkinfoo $
- */
 package org.keplerproject.luaeclipse.internal.parser;
 
 import java.io.File;
 import java.util.List;
 
 import org.eclipse.dltk.ast.ASTNode;
+import org.eclipse.dltk.ast.declarations.Argument;
 import org.eclipse.dltk.ast.declarations.Declaration;
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 import org.eclipse.dltk.ast.expressions.CallArgumentsList;
 import org.eclipse.dltk.ast.expressions.Expression;
+import org.eclipse.dltk.ast.references.SimpleReference;
 import org.eclipse.dltk.ast.statements.Statement;
 import org.keplerproject.luaeclipse.internal.parser.error.LuaParseError;
 import org.keplerproject.luaeclipse.internal.parser.error.LuaParseErrorAnalyzer;
-import org.keplerproject.luaeclipse.metalua.Metalua;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
-import org.keplerproject.luaeclipse.parser.ast.declarations.DeclarationFetcher;
+import org.keplerproject.luaeclipse.parser.ast.declarations.FunctionDeclaration;
+import org.keplerproject.luaeclipse.parser.ast.declarations.LocalVariableDeclaration;
+import org.keplerproject.luaeclipse.parser.ast.declarations.TableDeclaration;
 import org.keplerproject.luaeclipse.parser.ast.expressions.BinaryExpression;
 import org.keplerproject.luaeclipse.parser.ast.expressions.Boolean;
 import org.keplerproject.luaeclipse.parser.ast.expressions.Call;
@@ -130,6 +126,96 @@ public class NodeFactory implements LuaExpressionConstants,
 	return lua.analyzer();
     }
 
+    private Chunk addDeclarations(Chunk ids, Chunk values, int mod) {
+	Chunk result = new Chunk(values.sourceStart(), values.sourceEnd());
+	for (int c = 0; c < values.getChilds().size(); c++) {
+	    Statement s = (Statement) values.getChilds().get(c);
+	    Expression ref = (Expression) ids.getChilds().get(c);
+	    SimpleReference name = NameFinder.getReference(ref);
+	    if (s instanceof Function) {
+		s = declareFunction(name, (Function) s, mod);
+	    } else if (s instanceof Table) {
+		s = declareTable(name, (Table) s, mod);
+	    }
+	    result.addStatement(s);
+	}
+	return result;
+    }
+
+    private Statement addDeclaration(Expression e, int mod) {
+	if (e instanceof Index) {
+	    Index index = (Index) e;
+	    Declaration declaration = null;
+	    SimpleReference ref = NameFinder.getReference(index.getLeft());
+	    if (index.getRight() instanceof Function) {
+		Function function = (Function) index.getRight();
+		declaration = declareFunction(ref, function, mod);
+	    } else if (index.getRight() instanceof Table) {
+		Table table = (Table) index.getRight();
+		declaration = declareTable(ref, table, mod);
+	    }
+	    /*
+	     * Wrap declaration in an expression
+	     */
+	    if (declaration != null) {
+		Chunk chunk = new Chunk(declaration.sourceStart(), declaration
+			.sourceEnd());
+		chunk.addStatement(declaration);
+		if (e instanceof Pair) {
+		    return new Pair(index.sourceStart(), index.sourceEnd(),
+			    index.getLeft(), chunk);
+		}
+		return new Index(index.sourceStart(), index.sourceEnd(), index
+			.getLeft(), chunk);
+	    }
+	}
+	return e;
+    }
+
+    private FunctionDeclaration declareFunction(SimpleReference name,
+	    Function f, int mod) {
+	FunctionDeclaration declaration = new FunctionDeclaration(name, f
+		.sourceStart(), f.sourceEnd());
+	declaration.setModifier(Declaration.D_METHOD);
+	declaration.setModifier(mod);
+	/*
+	 * Add arguments
+	 */
+	for (Object o : f.getArguments().getStatements()) {
+	    Expression e = (Expression) o;
+	    SimpleReference ref = NameFinder.getReference(e);
+	    Argument arg = new Argument(ref, e.sourceStart(), e.sourceEnd(),
+		    null, mod | Declaration.D_ARGUMENT);
+	    declaration.addArgument(arg);
+	}
+	// Store body
+	declaration.acceptBody(f, true);
+	return declaration;
+    }
+
+    private Statement declareLocale(SimpleReference name, Expression e, int mod) {
+	LocalVariableDeclaration local = new LocalVariableDeclaration(name, e
+		.sourceStart(), e.sourceEnd());
+	local.setModifier(Declaration.AccDefault);
+	local.setModifier(mod);
+	return local;
+    }
+
+    private TableDeclaration declareTable(SimpleReference name, Table t, int mod) {
+	Chunk body = new Chunk(t.sourceStart(), t.sourceEnd());
+	for (Object o : t.getChilds()) {
+	    Expression expr = (Expression) o;
+	    expr = (Expression) addDeclaration(expr, mod);
+	    body.addStatement(expr);
+	}
+	TableDeclaration dec = new TableDeclaration(name, t.sourceStart(), t
+		.sourceEnd());
+	dec.setModifier(Declaration.D_CLASS);
+	dec.setModifier(mod);
+	dec.setBody(body);
+	return dec;
+    }
+
     /**
      * Just indicates if there is any syntax error in parsed code
      * 
@@ -192,7 +278,9 @@ public class NodeFactory implements LuaExpressionConstants,
 
 	    // Fill with values
 	    for (Long child : childNodes) {
-		((Table) node).addStatement((Statement) getNode(child));
+		Statement s = addDeclaration((Expression) getNode(child),
+			Declaration.AccPublic);
+		((Table) node).addStatement(s);
 	    }
 	    break;
 	/*
@@ -250,9 +338,9 @@ public class NodeFactory implements LuaExpressionConstants,
 	    altChunk = (Chunk) getNode(childNodes.get(1));
 	    /*
 	     * In case of function assigned to variables, use variables names as
-	     * function name. Mainly useful for having valid value on outline. A
-	     * factory is needed to sort this before object instantiation.
+	     * function name. Mainly useful for having valid value on outline.
 	     */
+	    altChunk = addDeclarations(chunk, altChunk, Declaration.AccPublic);
 	    node = new Set(start, end, chunk, altChunk);
 	    break;
 	/*
@@ -339,6 +427,8 @@ public class NodeFactory implements LuaExpressionConstants,
 	    chunk = (Chunk) getNode(childNodes.get(0));
 	    if (lua.nodeHasLineInfo(childNodes.get(1))) {
 		altChunk = (Chunk) getNode(childNodes.get(1));
+		altChunk = addDeclarations(chunk, altChunk,
+			Declaration.AccPrivate);
 		node = new Local(start, end, chunk, altChunk);
 	    } else {
 		node = new Local(start, end, chunk);
@@ -477,6 +567,8 @@ public class NodeFactory implements LuaExpressionConstants,
 	    chunk = (Chunk) getNode(childNodes.get(0));
 	    if (lua.nodeHasLineInfo(childNodes.get(1))) {
 		altChunk = (Chunk) getNode(childNodes.get(1));
+		altChunk = addDeclarations(chunk, altChunk,
+			Declaration.AccPrivate);
 		node = new LocalRec(start, end, chunk, altChunk);
 	    } else {
 		// Average declaration
@@ -528,7 +620,7 @@ public class NodeFactory implements LuaExpressionConstants,
 	// someCode()
 	// end
 	//
-	// For DLTK the node containing "name" is in the "node" of teh function,
+	// For DLTK the node containing "name" is in the "node" of the function,
 	// in Lua it's not the case
 	//
 	correctRange = correctRange || (kindOfNode == S_BLOCK);
@@ -540,8 +632,7 @@ public class NodeFactory implements LuaExpressionConstants,
 	// index = (org.keplerproject.luaeclipse.internal.parser.Index) node;
 	// index.setID(id);
 	// }
-	DeclarationFetcher declarations = new DeclarationFetcher();
-	return declarations.register(node);
+	return node;
     }
 
     /**
@@ -555,22 +646,8 @@ public class NodeFactory implements LuaExpressionConstants,
 	// Proceed source parsing only when there are no errors
 	if (!errorDetected()) {
 	    // Start top down parsing
-	    root.addStatement((Statement) getNode(1));
+	    root.addStatement(getNode(1));
 	}
 	return root;
-    }
-
-    /** Shorts code until it reaches a runnable state */
-    public static java.lang.String makeShortVersionToRun(
-	    final java.lang.String code) {
-	if (code.length() > 0) {
-	    if (Metalua.isValid(code)) {
-		return code;
-	    } else {
-		java.lang.String shorter = code.substring(0, code.length() - 1);
-		return makeShortVersionToRun(shorter);
-	    }
-	}
-	return "do end";
     }
 }

@@ -9,16 +9,7 @@
  *      Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
-
-/**
- * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
- * @date $Date: 2009-07-29 17:56:04 +0200 (mer., 29 juil. 2009) $
- * $Author: kkinfoo $
- * $Id: Function.java 2190 2009-07-29 15:56:04Z kkinfoo $
- */
 package org.keplerproject.luaeclipse.parser.ast.expressions;
-
-import java.util.ArrayList;
 
 import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.declarations.Argument;
@@ -26,66 +17,50 @@ import org.eclipse.dltk.ast.statements.Block;
 import org.eclipse.dltk.utils.CorePrinter;
 import org.keplerproject.luaeclipse.internal.parser.Index;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
+import org.keplerproject.luaeclipse.parser.ast.declarations.FunctionDeclaration;
 import org.keplerproject.luaeclipse.parser.ast.statements.Chunk;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class Function.
+ * The Class Function represent a function node of an DLTK AST. This node is
+ * used to describe a function definition. Even so, is not interpreted by DLTK
+ * as a regular function declaration. Therefore this function node needs to be
+ * wrapped in a {@link FunctionDeclaration} in order to appear in DLTK tooling.
+ * 
+ * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  */
 public class Function extends Block implements Index {
 
-    /** The parameters. */
-    private ArrayList<Argument> arguments;
+    /** The parameters are in this raw chunk. */
+    private Chunk args;
     private long id;
-    private Chunk chunk;
 
     /**
      * Instantiates a new function.
      * 
      * @param start
-     *            the start
+     *            start offset of function's body
      * @param end
-     *            the end
+     *            end offset of function's body
      * @param parameters
-     *            the parameters
+     *            raw function's parameters in a {@link Chunk}
      * @param body
-     *            the body
+     *            function's body, must be a {@link Block}
      */
     public Function(int start, int end, Chunk parameters, Chunk body) {
 	super(start, end, body.getStatements());
-	// Declare parameters as arguments
-	int argCount = parameters.getStatements().size();
-	this.arguments = new ArrayList<Argument>(argCount);
-	this.chunk = parameters;
-	// for (int k = 0; k < argCount; k++) {
-	// Expression expr = (Expression) parameters.getStatements().get(k);
-	// SimpleReference ref = NameFinder.getReference(expr);
-	// Argument arg = new Argument(ref, ref.matchStart(), ref.matchStart()
-	// + ref.matchStart(), expr, Declaration.AccFinal);
-	// arg.setModifiers(Declaration.D_ARGUMENT);
-	// this.arguments.add(arg);
-	// }
-    }
-
-    public boolean addArgument(Argument arg) {
-	return arguments.add(arg);
-    }
-
-    public ArrayList<Argument> getArguments() {
-	return arguments;
-    }
-
-    public Chunk getArgumentChunk() {
-	return chunk;
+	this.args = parameters;
     }
 
     /**
-     * Gets the parameters.
+     * Function's raw arguments in a {@link Chunk}
      * 
-     * @return the parameters
-     * 
-     *         public Chunk getParameters() { return parameters; }
+     * @return {@link Chunk} contains function's arguments, they need to be
+     *         parsed and registered as {@link Argument} in a
+     *         {@link FunctionDeclaration}
      */
+    public Chunk getArguments() {
+	return args;
+    }
 
     /*
      * (non-Javadoc)
@@ -102,16 +77,11 @@ public class Function extends Block implements Index {
     }
 
     public void printNode(CorePrinter output) {
-
 	// Arguments
+	getArguments().printNode(output);
 	output.indent();
-	output.indent();
-	for (Argument arg : getArguments()) {
-	    arg.printNode(output);
-	}
-	output.dedent();
-	output.dedent();
 	super.printNode(output);
+	output.dedent();
     }
 
     public void setID(long id) {
@@ -127,12 +97,7 @@ public class Function extends Block implements Index {
     public void traverse(ASTVisitor visitor) throws Exception {
 	if (visitor.visit(this)) {
 	    super.traverse(visitor);
-	    for (Argument arg : getArguments()) {
-		arg.traverse(visitor);
-	    }
-	    if (getArgumentChunk() != null) {
-		getArgumentChunk().traverse(visitor);
-	    }
+	    getArguments().traverse(visitor);
 	    visitor.endvisit(this);
 	}
     }

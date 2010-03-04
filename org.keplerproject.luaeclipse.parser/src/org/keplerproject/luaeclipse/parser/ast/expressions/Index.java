@@ -9,21 +9,18 @@
  *      Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
-
-/**
- * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
- * @date $Date: 2009-07-23 12:07:30 +0200 (jeu., 23 juil. 2009) $
- * $Author: kkinfoo $
- * $Id: Index.java 2161 2009-07-23 10:07:30Z kkinfoo $
- */
 package org.keplerproject.luaeclipse.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class Index.
+ * The Class Index represents a couple of identifiers. As instance, in statement
+ * <code>table.field = nil</code> Metalua sees
+ * <code>`Set{ { `Index{ `Id "table", `String "field" } }, { `Nil } }</code>.
+ * So, the node <code>table.field</code> is represented by an index node.
+ * 
+ * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  */
 public class Index extends BinaryExpression implements LeftHandSide,
 	LuaExpressionConstants,
@@ -32,16 +29,16 @@ public class Index extends BinaryExpression implements LeftHandSide,
     private long id;
 
     /**
-     * Instantiates a new index.
+     * Instantiates a new index node
      * 
      * @param start
-     *            the start
+     *            start offset of couple
      * @param end
-     *            the end
+     *            end offset of couple
      * @param key
-     *            the table
+     *            identifier left side
      * @param value
-     *            the index
+     *            expression on right side
      */
     public Index(int start, int end, Expression key, Expression value) {
 	this(start, end, key, E_INDEX, value);
@@ -52,12 +49,10 @@ public class Index extends BinaryExpression implements LeftHandSide,
 	super(start, end, key, kind, value);
     }
 
-
-
     /**
-     * Gets the index.
+     * Just the right parent of this couple
      * 
-     * @return the index
+     * @return {@link Expression} on right side
      */
     public Expression getValue() {
 	return getRight();
@@ -72,9 +67,9 @@ public class Index extends BinaryExpression implements LeftHandSide,
     }
 
     /**
-     * Gets the table.
+     * Just the left parent of this couple
      * 
-     * @return the table
+     * @return {@link Expression} on left side
      */
     public Expression getKey() {
 	return getLeft();
@@ -89,18 +84,4 @@ public class Index extends BinaryExpression implements LeftHandSide,
     public boolean isLeftHandSide() {
 	return true;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.eclipse.dltk.ast.statements.Statement#traverse(org.eclipse.dltk.ast
-     * .ASTVisitor)
-     */
-//    public void traverse(ASTVisitor visitor) throws Exception {
-//	if (visitor.visit(this)) {
-//	    super.traverse(visitor);
-//	    visitor.endvisit(this);
-//	}
-//    }
 }
