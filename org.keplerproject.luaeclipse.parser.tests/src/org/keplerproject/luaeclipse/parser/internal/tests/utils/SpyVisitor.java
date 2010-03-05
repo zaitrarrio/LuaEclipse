@@ -9,7 +9,6 @@
  *      Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
-
 package org.keplerproject.luaeclipse.parser.internal.tests.utils;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ import org.eclipse.dltk.ast.ASTVisitor;
 /**
  * Just compute nodes types and count.
  * 
- * @author kkinfoo
+ * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  * 
  */
 public class SpyVisitor extends ASTVisitor {

@@ -176,7 +176,6 @@ public class NodeFactory implements LuaExpressionConstants,
 	    Function f, int mod) {
 	FunctionDeclaration declaration = new FunctionDeclaration(name, f
 		.sourceStart(), f.sourceEnd());
-	declaration.setModifier(Declaration.D_METHOD);
 	declaration.setModifier(mod);
 	/*
 	 * Add arguments
@@ -185,7 +184,7 @@ public class NodeFactory implements LuaExpressionConstants,
 	    Expression e = (Expression) o;
 	    SimpleReference ref = NameFinder.getReference(e);
 	    Argument arg = new Argument(ref, e.sourceStart(), e.sourceEnd(),
-		    null, mod | Declaration.D_ARGUMENT);
+		    null, mod);
 	    declaration.addArgument(arg);
 	}
 	// Store body
@@ -196,7 +195,6 @@ public class NodeFactory implements LuaExpressionConstants,
     private Statement declareLocale(SimpleReference name, Expression e, int mod) {
 	LocalVariableDeclaration local = new LocalVariableDeclaration(name, e
 		.sourceStart(), e.sourceEnd());
-	local.setModifier(Declaration.AccDefault);
 	local.setModifier(mod);
 	return local;
     }
@@ -210,7 +208,6 @@ public class NodeFactory implements LuaExpressionConstants,
 	}
 	TableDeclaration dec = new TableDeclaration(name, t.sourceStart(), t
 		.sourceEnd());
-	dec.setModifier(Declaration.D_CLASS);
 	dec.setModifier(mod);
 	dec.setBody(body);
 	return dec;
