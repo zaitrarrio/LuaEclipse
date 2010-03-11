@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.declarations.Declaration;
 import org.eclipse.dltk.compiler.problem.IProblem;
+import org.eclipse.dltk.core.DLTKCore;
 import org.keplerproject.luaeclipse.internal.parser.error.LuaParseError;
 import org.keplerproject.luaeclipse.internal.parser.error.LuaParseErrorFactory;
 import org.keplerproject.luaeclipse.metalua.Metalua;
@@ -536,7 +537,9 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 
 			// Clean stack
 			getState().pop(-1);
-			Activator.logWarning("Bind error:\n" + error);
+			if (DLTKCore.DEBUG) {
+			    	Activator.logWarning("Bind error:\n" + error);
+			}
 			return false;
 		}
 	}
