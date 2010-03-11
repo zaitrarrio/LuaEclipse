@@ -64,7 +64,6 @@ public class Activator extends AbstractUIPlugin {
 		return plugin;
 	}
 
-
 	public synchronized LuaTextTools getTextTools() {
 		if (fLuaTextTools == null) {
 			fLuaTextTools = new LuaTextTools(true);
