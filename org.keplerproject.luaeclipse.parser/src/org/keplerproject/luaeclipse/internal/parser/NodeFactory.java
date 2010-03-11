@@ -127,6 +127,11 @@ public class NodeFactory implements LuaExpressionConstants,
     }
 
     private Chunk addDeclarations(Chunk ids, Chunk values, int mod) {
+	return addDeclarations(ids, values, mod, false);
+    }
+
+    private Chunk addDeclarations(Chunk ids, Chunk values, int mod,
+	    boolean declareAsLocal) {
 	Chunk result = new Chunk(values.sourceStart(), values.sourceEnd());
 	for (int c = 0; c < values.getChilds().size(); c++) {
 	    Statement s = (Statement) values.getChilds().get(c);
@@ -136,6 +141,8 @@ public class NodeFactory implements LuaExpressionConstants,
 		s = declareFunction(name, (Function) s, mod);
 	    } else if (s instanceof Table) {
 		s = declareTable(name, (Table) s, mod);
+	    } else if (declareAsLocal) {
+		s = declareLocale(name, (Expression) s, mod);
 	    }
 	    result.addStatement(s);
 	}
@@ -222,6 +229,9 @@ public class NodeFactory implements LuaExpressionConstants,
 	return lua.hasSyntaxErrors();
     }
 
+    public Statement getNode(final long id) {
+	return getNode(id, Declaration.AccPublic);
+    }
     /**
      * Retrieve a node for the given ID from {@linkplain MetaluaASTWalker}
      * instance. This node comes with all its child nodes. In order to do so,
@@ -231,7 +241,7 @@ public class NodeFactory implements LuaExpressionConstants,
      * 
      * @return DLTK compliant node from Lua AST node for ID
      */
-    public Statement getNode(final long id) {
+    public Statement getNode(final long id, int modifier) {
 
 	// Used for binaries expressions
 	Statement left, right;
@@ -276,7 +286,7 @@ public class NodeFactory implements LuaExpressionConstants,
 	    // Fill with values
 	    for (Long child : childNodes) {
 		Statement s = addDeclaration((Expression) getNode(child),
-			Declaration.AccPublic);
+			modifier);
 		((Table) node).addStatement(s);
 	    }
 	    break;
@@ -284,8 +294,8 @@ public class NodeFactory implements LuaExpressionConstants,
 	 * Pairs
 	 */
 	case LuaExpressionConstants.E_PAIR:
-	    left = (Expression) getNode(childNodes.get(0));
-	    right = (Expression) getNode(childNodes.get(1));
+	    left = (Expression) getNode(childNodes.get(0),modifier);
+	    right = (Expression) getNode(childNodes.get(1),modifier);
 	    node = new Pair(start, end, (Expression) left, (Expression) right);
 	    break;
 	/*
@@ -319,8 +329,8 @@ public class NodeFactory implements LuaExpressionConstants,
 	    int kind = MetaluaASTWalker.opid(lua.getValue(id));
 
 	    // Compute both sides of '='
-	    left = (Expression) getNode(childNodes.get(0));
-	    right = (Expression) getNode(childNodes.get(1));
+	    left = (Expression) getNode(childNodes.get(0), modifier);
+	    right = (Expression) getNode(childNodes.get(1), modifier);
 	    node = new BinaryExpression(start, end, (Expression) left, kind,
 		    (Expression) right);
 	    break;
@@ -331,13 +341,13 @@ public class NodeFactory implements LuaExpressionConstants,
 	    // Deal with assignment
 	    assert childCount == 2 : "Invalid number of parameters "
 		    + "for a 'Set' instruction :" + childCount;
-	    chunk = (Chunk) getNode(childNodes.get(0));
-	    altChunk = (Chunk) getNode(childNodes.get(1));
+	    chunk = (Chunk) getNode(childNodes.get(0), modifier);
+	    altChunk = (Chunk) getNode(childNodes.get(1), modifier);
 	    /*
 	     * In case of function assigned to variables, use variables names as
 	     * function name. Mainly useful for having valid value on outline.
 	     */
-	    altChunk = addDeclarations(chunk, altChunk, Declaration.AccPublic);
+	    altChunk = addDeclarations(chunk, altChunk, modifier);
 	    node = new Set(start, end, chunk, altChunk);
 	    break;
 	/*
@@ -355,7 +365,7 @@ public class NodeFactory implements LuaExpressionConstants,
 	    chunk = (Chunk) node;
 	    // Inflate block
 	    for (Long childID : childNodes) {
-		chunk.addStatement(getNode(childID));
+		chunk.addStatement(getNode(childID, modifier));
 	    }
 	    break;
 	/*
@@ -421,11 +431,11 @@ public class NodeFactory implements LuaExpressionConstants,
 		    + "for local declaration: " + childCount;
 
 	    // Handle assignment at declaration
-	    chunk = (Chunk) getNode(childNodes.get(0));
+	    chunk = (Chunk) getNode(childNodes.get(0), Declaration.AccPrivate);
 	    if (lua.nodeHasLineInfo(childNodes.get(1))) {
-		altChunk = (Chunk) getNode(childNodes.get(1));
+		altChunk = (Chunk) getNode(childNodes.get(1), Declaration.AccPrivate);
 		altChunk = addDeclarations(chunk, altChunk,
-			Declaration.AccPrivate);
+			Declaration.AccPrivate, true);
 		node = new Local(start, end, chunk, altChunk);
 	    } else {
 		node = new Local(start, end, chunk);
@@ -549,8 +559,8 @@ public class NodeFactory implements LuaExpressionConstants,
 	    // Indexed array and value of index
 	    assert childCount == 2 : "Wrong parameter count for index: "
 		    + childCount;
-	    expression = (Expression) getNode(childNodes.get(0));
-	    altExpression = (Expression) getNode(childNodes.get(1));
+	    expression = (Expression) getNode(childNodes.get(0),modifier);
+	    altExpression = (Expression) getNode(childNodes.get(1),modifier);
 	    node = new Index(start, end, expression, altExpression);
 	    break;
 	/*
@@ -583,8 +593,8 @@ public class NodeFactory implements LuaExpressionConstants,
 	 */
 	case E_INVOKE:
 	    assert childCount > 1 : "No name defined for invocation.";
-	    expression = (Expression) getNode(childNodes.get(0));
-	    string = (String) getNode(childNodes.get(1));
+	    expression = (Expression) getNode(childNodes.get(0), modifier);
+	    string = (String) getNode(childNodes.get(1), modifier);
 	    if (childCount > 2) {
 		CallArgumentsList args = new CallArgumentsList();
 		for (int parameter = 2; parameter < childCount; parameter++) {
