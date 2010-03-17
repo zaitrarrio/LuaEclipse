@@ -94,14 +94,19 @@ This Agreement is governed by the laws of the State of New York and the intellec
    <requires>
       <import plugin="org.eclipse.ui" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.dltk.core" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.core.runtime" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jface.text" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.editors" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.ide" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.dltk.ui" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.core.runtime" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.dltk.debug.ui" version="2.0.0" match="compatible"/>
       <import plugin="org.eclipse.dltk.launching" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.dltk.core" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.dltk.ui" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.dltk.core" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.dltk.ui" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.ui" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.core.runtime" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.jface.text" version="3.5.0" match="compatible"/>
    </requires>
 
    <plugin
