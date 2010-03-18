@@ -6,3 +6,4 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Kepler project
 Fragment-Host: org.keplerproject.luaeclipse.metalua;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Eclipse-PlatformFilter: (osgi.arch=x86_64)
