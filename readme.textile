@@ -1,6 +1,6 @@
 h1(1). Lua Eclipse 2
 
-h2. Summury
+h2. Summary
 
 *LuaEclipse* is a collection of plugins developed for the *Eclipse platform* that together make an IDE for the development of applications in the *Lua programming language*. In this environment it's possible to edit Lua scripts with *syntax highlight*, *syntax errors*, *code and comment folding*, besides the tools that the eclipse platform provides. The main goal of the project is that new tools will be developed using the extension architecture that the Eclipse platform provides and that LuaEclipse has available for *extension of its capabilities*.
 
