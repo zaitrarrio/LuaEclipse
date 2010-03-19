@@ -190,7 +190,6 @@ This Agreement is governed by the laws of the State of New York and the intellec
 
    <plugin
          id="org.keplerproject.luaeclipse.metalua.64bits"
-         os="linux"
          arch="x86_64"
          download-size="0"
          install-size="0"
