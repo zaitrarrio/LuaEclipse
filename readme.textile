@@ -1,0 +1,29 @@
+h1(1). Lua Eclipse 2
+
+h2. Summury
+
+*LuaEclipse* is a collection of plugins developed for the *Eclipse platform* that together make an IDE for the development of applications in the *Lua programming language*. In this environment it's possible to edit Lua scripts with *syntax highlight*, *syntax errors*, *code and comment folding*, besides the tools that the eclipse platform provides. The main goal of the project is that new tools will be developed using the extension architecture that the Eclipse platform provides and that LuaEclipse has available for *extension of its capabilities*.
+
+The aim of this project is to facilitate Lua coding. For the moment, its just an editor going along with syntax highlight and outline. Code foldind and auto completion are on their way.
+
+h2. Installation prerequisites
+
+As I'm writing, *LuaEclipse 2* is available for both _Linux_ and _Windows_. _OSX_ version is delayed due to a swt bug for 32/64bits. Anyway, to run it you, need *Eclipse 3.5*. In order to install *LuaEclipse 2*, you do also need to add some update sites and download some archives beforehand.
+
+h3. Update site
+
+* *EMF XSD 2.5* : "http://download.eclipse.org/modeling/emf/updates/releases/":http://download.eclipse.org/modeling/emf/updates/releases/
+
+p. Open _Eclipse_ go to  __"Help >> Install new software"__ and __"Add"__ the previous link.
+
+h3. Archives to download
+
+* *DLTK 2* : "http://www.eclipse.org/downloads/download.php?file=/technology/dltk/downloads/drops/R2.0/S-2.0M5-201002011215/dltk-core-sdk-S-2.0M5-201002011215.zip":http://www.eclipse.org/downloads/download.php?file=/technology/dltk/downloads/drops/R2.0/S-2.0M5-201002011215/dltk-core-sdk-S-2.0M5-201002011215.zip
+* *LuaEclipse 2* : "http://github.com/downloads/KINFOO/LuaEclipse/LuaEclipse_stable_2.0.zip":http://github.com/downloads/KINFOO/LuaEclipse/LuaEclipse_stable_2.0.zip
+
+p. Unzip both of them on your file system, then open _Eclipse_ go to  __"Help >> Install new software"__ and __"Add"__ the folder just extracted from the archives as __"Local"__  ressources as "shown here":http://img714.imageshack.us/img714/3459/installdltk2.png. 
+
+h2. Installation
+
+p. Now you can install *LuaEclipse 2* as a regular _Eclipse_ component, using __'Help >> Install new software'__ . *Be careful*, you need to uncheck __"'Group items by category'":http://img402.imageshack.us/img402/7771/installation.png__ to see it.
+
