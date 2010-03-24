@@ -17,6 +17,8 @@ import java.util.Map;
 
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 import org.eclipse.dltk.ast.parser.AbstractSourceParser;
+import org.eclipse.dltk.ast.parser.IModuleDeclaration;
+import org.eclipse.dltk.compiler.env.IModuleSource;
 import org.eclipse.dltk.compiler.problem.DefaultProblem;
 import org.eclipse.dltk.compiler.problem.IProblem;
 import org.eclipse.dltk.compiler.problem.IProblemReporter;
@@ -44,16 +46,16 @@ public class LuaSourceParser extends AbstractSourceParser {
 	_cache = Collections.synchronizedMap(new HashMap<String, String>());
     }
 
-//    /**
-//     * @since 2.0
-//     */
-//    @Override
-//    public IModuleDeclaration parse(IModuleSource input,
-//	    IProblemReporter reporter) {
-//	char[] source = input.getContentsAsCharArray();
-//	String fileName = input.getFileName();
-//	return parse(fileName.toCharArray(), source, reporter);
-//    }
+    /**
+     * @since 2.0
+     */
+    @Override
+    public IModuleDeclaration parse(IModuleSource input,
+	    IProblemReporter reporter) {
+	char[] source = input.getContentsAsCharArray();
+	String fileName = input.getFileName();
+	return parse(fileName.toCharArray(), source, reporter);
+    }
 
     /**
      * Provides DLTK compliant AST from Metalua analysis
@@ -63,7 +65,6 @@ public class LuaSourceParser extends AbstractSourceParser {
      * @see org.eclipse.dltk.ast.parser.ISourceParser#parse(char[], char[],
      *      org.eclipse.dltk.compiler.problem.IProblemReporter)
      */
-    @Override
     public synchronized ModuleDeclaration parse(char[] file, char[] source,
 	    IProblemReporter reporter) {
 
