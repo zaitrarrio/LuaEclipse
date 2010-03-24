@@ -18,3 +18,5 @@ Require-Bundle: org.eclipse.ui,
  org.keplerproject.luaeclipse.completion;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Export-Package: org.keplerproject.luaeclipse.editor,
+ org.keplerproject.luaeclipse.editor.internal.text

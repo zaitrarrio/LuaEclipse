@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors.templates">
+      <contextType
+            class="org.keplerproject.luaeclipse.internal.templates.LuaUniversalTemplateContextType"
+            id="LuaUniversalTemplateContextType"
+            name="Lua Template content">
+      </contextType>
+       <include
+          file="templates/templates.xml"
+          translations="templates/templates.properties">
+       </include>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.keplerproject.luaeclipse.internal.templates.LuaTemplatePreferencePage"
+            id="org.keplerproject.luaeclipse.editor.Template"
+            name="Lua Templates">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.dltk.ui.language">
+      <language
+            class="org.keplerproject.luaeclipse.internal.templates.LuaTemplateUILanguageToolkit"
+            nature="org.keplerproject.luaeclipse.nature"
+            priority="1">
+      </language>
+   </extension>
+</plugin>
