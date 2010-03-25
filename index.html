@@ -13,27 +13,7 @@
 <link rel="alternate" href="news.rss" title="LuaEclipse2 news" type="application/rss+xml" />
 <script type="text/javascript">
 $(document).ready(function() {
-	$("a#assistance").fancybox({
-		'titlePosition'	: 'over',
-		'transitionIn'	: 'elastic',
-		'transitionOut'	: 'elastic'
-	});
-	$("a#folding").fancybox({
-		'titlePosition'	: 'over',
-		'transitionIn'	: 'elastic',
-		'transitionOut'	: 'elastic'
-	});
-	$("a#highlight").fancybox({
-		'titlePosition'	: 'over',
-		'transitionIn'	: 'elastic',
-		'transitionOut'	: 'elastic'
-	});
-	$("a#marker").fancybox({
-		'titlePosition'	: 'over',
-		'transitionIn'	: 'elastic',
-		'transitionOut'	: 'elastic'
-	});
-	$("a#outline").fancybox({
+	$("a.effect").fancybox({
 		'titlePosition'	: 'over',
 		'transitionIn'	: 'elastic',
 		'transitionOut'	: 'elastic'
@@ -67,7 +47,7 @@ h2, h3 {
 	font-weight:	bold;
 }
 #footer {
-  background:  rgb(185, 20, 20);/* none repeat scroll 0% 50%;*/
+  background:  rgb(185, 20, 20);
   color: #fff;
   text-align: center;
 }
@@ -91,13 +71,14 @@ h2, h3 {
 	width:		300px;
 }
 .wrap:hover{
-	background: transparent url(img/wrap.png) no-repeat center top;
-	color:	#fff;
+	background:	transparent url(img/wrap.png) no-repeat center top;
+	color:		#fff;
 }
 </style>
 </head>
 <body>
 <h1>LuaEclipse 2</h1>
+<a href="http://github.com/KINFOO/LuaEclipse"><img style="position: absolute; top: 348px; right: 0px; border: 0px;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
 <div id="resume">
 <h2>What is this project ?</h2>
 <div style="margin: auto; text-align: justify; width: 1000px;">
@@ -115,30 +96,31 @@ LuaEclipse 2 offers some interesting features that make coding in Lua
 easier.<br />
 <div class="wrap">
 <h3>Outline</h3>
-<a rel="features" id="outline" title="The Lua logo" href="img/outline.png"><img src="img/s_outline.png" alt=""/></a>
-</div>
-<div class="wrap">
-<h3>Code assitance</h3>
-<a rel="features" id="assistance" title="The Lua logo" href="img/completion.png"><img src="img/s_completion.png" alt=""/></a>
+<a rel="features" class="effect" title="Tired of scrolling?" href="img/outline.png"><img src="img/s_outline.png" alt=""/></a>
 </div>
 <div class="wrap">
 <h3>Code folding</h3>
-<a rel="features" id="folding" title="The Lua logo" href="img/folding.png"><img src="img/s_folding.png" alt=""/></a>
+<a rel="features" class="effect" title="File is to big, comments are too long? Here is a feature for you." href="img/folding.png"><img src="img/s_folding.png" alt=""/></a>
 </div>
-<hr style=" clear: both; "/>
 <div class="wrap">
 <h3>Syntax coloring</h3>
-<a rel="features" id="highlight" title="The Lua logo" href="img/highlight.png"><img src="img/s_highlight.png" alt=""/></a>
+<a rel="features" class="effect" title="Just for getting code nicer to write and to read, indeed." href="img/highlight.png"><img src="img/s_highlight.png" alt=""/></a>
 </div>
 <div class="wrap">
 <h3>Error markers</h3>
-<a rel="features" id="marker" title="The Lua logo" href="img/error.png"><img src="img/s_error.png" alt=""/></a>
+<a rel="features" class="effect" title="Where is my mistake? Let the editor show you." href="img/error.png"><img src="img/s_error.png" alt=""/></a>
+</div>
+<hr style=" clear: both; "/>
+<h2>Features to come</h2>
+<div class="wrap">
+<h3>Code assitance</h3>
+<a rel="features" class="effect" title="The editor can help you typing your code faster." href="img/completion.png"><img src="img/s_completion.png" alt=""/></a>
 </div>
 <hr style=" clear: both; "/>
 <h2>You're wondering if ...?</h2>
 <a href="http://wiki.github.com/KINFOO/LuaEclipse">Visit the wiki</a>
 <h2>How can I use it?</h2>
-<a href="http://wiki.github.com/KINFOO/LuaEclipse/install-luaeclipse-2">There is a page about it</a>
+<a href="http://wiki.github.com/KINFOO/LuaEclipse/install-luaeclipse-2">There is a page about it</a>.
 </div>
 </div>
 <div id="footer">
