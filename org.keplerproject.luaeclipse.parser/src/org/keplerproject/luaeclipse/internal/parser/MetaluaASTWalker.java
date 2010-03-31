@@ -298,7 +298,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	}
 
 	/** Last parsed source */
-	protected String getSource() {
+	public String getSource() {
 		return source;
 	}
 

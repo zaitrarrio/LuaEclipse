@@ -59,6 +59,19 @@ public class TestStatements extends TestCase {
 	}
 
 	/**
+	 * Test  assignments.
+	 */
+	public void testAssignments() {
+		char[] source = ("local i = 1").toCharArray();
+		module = new LuaSourceParser().parse(fileName, source, this.reporter);
+		assertFalse("Numeric assignement not handled.",	module.isEmpty());
+		
+		source = ("i = 1").toCharArray();
+		module = new LuaSourceParser().parse(fileName, source, this.reporter);
+		assertFalse("Numeric assignement not handled.",	module.isEmpty());
+	}
+
+	/**
 	 * Test break.
 	 */
 	public void testBreak() {
@@ -131,6 +144,16 @@ public class TestStatements extends TestCase {
 				.toCharArray();
 		module = new LuaSourceParser().parse(fileName, source, this.reporter);
 		assertFalse("`elseif statement is not recognized.", module.isEmpty());
+	}
+
+	public void testSeveralAssignments() {
+		char[] source = ("local i =1,function()end").toCharArray();
+		module = new LuaSourceParser().parse(fileName, source, this.reporter);
+		assertFalse("Assignement with leftovers not handled.",	module.isEmpty());
+		
+		source = ("local i, method=1,function()end").toCharArray();
+		module = new LuaSourceParser().parse(fileName, source, this.reporter);
+		assertFalse("Multiple assignement not handled.",	module.isEmpty());
 	}
 
 	/**
