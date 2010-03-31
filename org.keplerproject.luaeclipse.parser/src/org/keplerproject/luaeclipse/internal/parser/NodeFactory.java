@@ -24,6 +24,7 @@ import org.eclipse.dltk.ast.references.SimpleReference;
 import org.eclipse.dltk.ast.statements.Statement;
 import org.keplerproject.luaeclipse.internal.parser.error.LuaParseError;
 import org.keplerproject.luaeclipse.internal.parser.error.LuaParseErrorAnalyzer;
+import org.keplerproject.luaeclipse.parser.Activator;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 import org.keplerproject.luaeclipse.parser.ast.declarations.FunctionDeclaration;
 import org.keplerproject.luaeclipse.parser.ast.declarations.LocalVariableDeclaration;
@@ -132,8 +133,21 @@ public class NodeFactory implements LuaExpressionConstants,
 
     private Chunk addDeclarations(Chunk ids, Chunk values, int mod,
 	    boolean declareAsLocal) {
+	/*
+	 * Ensure to loop as less as possible to avoid out of range access
+	 */
+	int limit;
+	if (values.getChilds().size() <  ids.getChilds().size()){
+		limit = values.getChilds().size();
+	}else{
+		limit = ids.getChilds().size();
+	}
+	
+	/*
+	 * Declare variables
+	 */
 	Chunk result = new Chunk(values.sourceStart(), values.sourceEnd());
-	for (int c = 0; c < values.getChilds().size(); c++) {
+	for (int c = 0; c < limit; c++) {
 	    Statement s = (Statement) values.getChilds().get(c);
 	    Expression ref = (Expression) ids.getChilds().get(c);
 	    SimpleReference name = NameFinder.getReference(ref);
@@ -652,8 +666,14 @@ public class NodeFactory implements LuaExpressionConstants,
     public ModuleDeclaration getRoot() {
 	// Proceed source parsing only when there are no errors
 	if (!errorDetected()) {
-	    // Start top down parsing
-	    root.addStatement(getNode(1));
+		try{
+			// Start top down parsing
+			root.addStatement(getNode(1));
+		}catch (Throwable t) {
+			// Avoid any kind of crashing
+			Activator.log(t);
+			return new ModuleDeclaration(lua.getSource().length());
+		}
 	}
 	return root;
     }
