@@ -28,12 +28,12 @@ import org.osgi.framework.Bundle;
 
 public class LuaInterpreterInstallType extends AbstractInterpreterInstallType {
 	
-	private static final String[] INTERPRETER_NAMES = { "lua", "lua5.1" };
+	private static final String[] INTERPRETER_NAMES = { "lua5.1", "lua" };
 
 	@Override
 	protected IPath createPathFile(IDeployment deployment) throws IOException {
 		Bundle bundle = Activator.getDefault().getBundle();
-		return deployment.add(bundle, "scripts/path.lua");
+		return deployment.add(bundle, "script/path.lua");
 	}
 
 	@Override

@@ -1,4 +1,3 @@
-
 --
 -- Provides distinct IDs calls after calls
 -- @return int
@@ -31,7 +30,7 @@ function doIndex( adt )
     nodes = {}
     for k, v in ipairs( ast ) do
       if ( type(v) == "table" ) then
-	nodes[ #nodes + 1 ] = v
+		nodes[ #nodes + 1 ] = v
       end
     end
     return nodes

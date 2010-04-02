@@ -85,7 +85,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 
 			// Make sure that file is available on disk
 			URL url = Platform.getBundle(Activator.PLUGIN_ID).getEntry(
-					"/scripts/ast_to_table.mlua");
+					"/scripts/ast_to_table.lua");
 
 			// Retrieve absolute URI of file
 			String path = new File(FileLocator.toFileURL(url).getFile())
