@@ -22,12 +22,10 @@ import org.keplerproject.luaeclipse.ui.Activator;
 
 public class LuaUILanguageToolkit extends AbstractDLTKUILanguageToolkit {
 
-	@Override
 	public IDLTKLanguageToolkit getCoreToolkit() {
 		return LuaLanguageToolkit.getDefault();
 	}
 
-	@Override
 	public IPreferenceStore getPreferenceStore() {
 		return Activator.getDefault().getPreferenceStore();
 	}

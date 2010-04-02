@@ -77,7 +77,6 @@ public class LuaSourceViewerConfiguration extends
 			/**
 			 * Returns empty object
 			 */
-			@Override
 			public IInformationControl createInformationControl(Shell parent) {
 				return new HierarchyInformationControl(parent, 0, 0) {
 

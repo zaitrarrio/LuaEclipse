@@ -96,7 +96,7 @@ public class NameFinder {
 	    }
 
 	    // Compose name
-	    if (!argsList.isEmpty()) {
+	    if (argsList.length() > 0) {
 		argsList = argsList.substring(2);
 	    }
 	    name = call.getName() + '(' + argsList + ')';

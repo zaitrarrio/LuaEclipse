@@ -44,7 +44,6 @@ public class LuaLanguageToolkit extends AbstractLanguageToolkit {
 	 * @see org.eclipse.dltk.core.IDLTKLanguageToolkit#getLanguageContentType()
 	 * @return String
 	 */
-	@Override
 	public String getLanguageContentType() {
 		return Activator.PLUGIN_ID + ".content-type";
 	}
@@ -55,7 +54,6 @@ public class LuaLanguageToolkit extends AbstractLanguageToolkit {
 	 * @return String
 	 * @see org.eclipse.dltk.core.IDLTKLanguageToolkit#getLanguageName()
 	 */
-	@Override
 	public String getLanguageName() {
 		return "Lua";
 	}
@@ -65,7 +63,6 @@ public class LuaLanguageToolkit extends AbstractLanguageToolkit {
 	 * 
 	 * @see org.eclipse.dltk.core.IDLTKLanguageToolkit#getNatureId()
 	 */
-	@Override
 	public String getNatureId() {
 		return LuaNature.LUA_NATURE;
 	}

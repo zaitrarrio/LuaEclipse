@@ -142,12 +142,10 @@ public class BinaryExpression extends Expression implements Index {
 	}
     }
 
-    @Override
     public long getID() {
 	return id;
     }
 
-    @Override
     public void setID(long id) {
 	this.id = id;
     }

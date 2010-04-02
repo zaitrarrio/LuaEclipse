@@ -63,7 +63,6 @@ public class LuaSourceParser extends AbstractSourceParser {
      * @see org.eclipse.dltk.ast.parser.ISourceParser#parse(char[], char[],
      *      org.eclipse.dltk.compiler.problem.IProblemReporter)
      */
-    @Override
     public synchronized ModuleDeclaration parse(char[] file, char[] source,
 	    IProblemReporter reporter) {
 

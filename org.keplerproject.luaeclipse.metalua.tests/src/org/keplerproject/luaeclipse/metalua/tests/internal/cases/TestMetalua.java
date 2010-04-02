@@ -129,7 +129,7 @@ public class TestMetalua extends TestCase {
 
     public void testSourcesPath() {
 	String path = Metalua.path();
-	assertFalse("Metalua sources path is not definded.", path.isEmpty());
+	assertFalse("Metalua sources path is not definded.", path.length() == 0);
 	File directory = new File(path);
 	assertTrue("Metalua sources path does not redirect to directory.",
 		directory.isDirectory());

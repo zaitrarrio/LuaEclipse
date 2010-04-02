@@ -80,7 +80,6 @@ public class Index extends BinaryExpression implements LeftHandSide,
      * 
      * @see com.anwrt.ldt.parser.ast.expressions.LeftHandSide#isLeftHandSide()
      */
-    @Override
     public boolean isLeftHandSide() {
 	return true;
     }

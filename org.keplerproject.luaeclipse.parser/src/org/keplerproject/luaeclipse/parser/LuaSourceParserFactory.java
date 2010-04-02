@@ -26,7 +26,7 @@ public class LuaSourceParserFactory implements ISourceParserFactory {
     public LuaSourceParserFactory() {
     }
 
-    @Override
+
     public ISourceParser createSourceParser() {
 	return new LuaSourceParser();
     }

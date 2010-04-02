@@ -31,7 +31,6 @@ public class DummyReporter implements IProblemReporter {
 	/* (non-Javadoc)
 	 * @see org.eclipse.dltk.compiler.problem.IProblemReporter#reportProblem(org.eclipse.dltk.compiler.problem.IProblem)
 	 */
-	@Override
 	public void reportProblem(IProblem problem) {
 		// Do nothing
 	}
@@ -39,7 +38,6 @@ public class DummyReporter implements IProblemReporter {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
-	@Override
 	@SuppressWarnings("unchecked")
 	public Object getAdapter(Class adapter) {
 		// Empty Object

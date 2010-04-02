@@ -30,7 +30,6 @@ public class LuaInterpreterInstallType extends AbstractInterpreterInstallType {
 	
 	private static final String[] INTERPRETER_NAMES = { "lua", "lua5.1" };
 
-	@Override
 	protected IPath createPathFile(IDeployment deployment) throws IOException {
 		Bundle bundle = Activator.getDefault().getBundle();
 		return deployment.add(bundle, "scripts/path.lua");
@@ -56,12 +55,10 @@ public class LuaInterpreterInstallType extends AbstractInterpreterInstallType {
 		return INTERPRETER_NAMES;
 	}
 
-	@Override
 	public String getName() {
 		return "Lua";
 	}
 
-	@Override
 	public String getNatureId() {
 		return LuaNature.LUA_NATURE;
 	}

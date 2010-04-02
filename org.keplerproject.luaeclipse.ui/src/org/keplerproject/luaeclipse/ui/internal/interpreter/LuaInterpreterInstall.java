@@ -24,7 +24,6 @@ public class LuaInterpreterInstall extends AbstractInterpreterInstall {
 		super(type, id);
 	}
 
-	@Override
 	public String getNatureId() {
 		return LuaNature.LUA_NATURE;
 	}
