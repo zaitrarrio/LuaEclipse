@@ -21,6 +21,8 @@ package org.keplerproject.luaeclipse.parser.ast.expressions;
 import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.CallArgumentsList;
 import org.eclipse.dltk.ast.expressions.Expression;
+import org.eclipse.dltk.ast.references.Reference;
+import org.eclipse.dltk.ast.references.SimpleReference;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 
 // TODO: Auto-generated Javadoc
@@ -67,6 +69,15 @@ public class Invoke extends Call implements LuaExpressionConstants {
 	@Override
 	public int getKind() {
 		return E_INVOKE;
+	}
+
+	/**
+	 * Name of `Invocation node 
+	 * @return {@linkplain Reference}
+	 */
+	public Reference getReference() {
+		return new SimpleReference(string.sourceStart(), string.sourceEnd(),
+				string.getValue());
 	}
 
 	/*
