@@ -11,77 +11,130 @@
  *****************************************************************************/
 package org.keplerproject.luaeclipse.parser.ast.expressions;
 
+import org.eclipse.dltk.ast.ASTVisitor;
+import org.eclipse.dltk.ast.declarations.Declaration;
 import org.eclipse.dltk.ast.expressions.Expression;
+import org.eclipse.dltk.ast.expressions.Literal;
+import org.eclipse.dltk.ast.statements.Statement;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 
 /**
- * The Class Index represents a couple of identifiers. As instance, in statement
- * <code>table.field = nil</code> Metalua sees
+ * The Class Index represents a couple of {@linkplain Expression}s. As instance,
+ * in statement <code>table.field = nil</code> Metalua sees
  * <code>`Set{ { `Index{ `Id "table", `String "field" } }, { `Nil } }</code>.
  * So, the node <code>table.field</code> is represented by an index node.
  * 
  * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  */
-public class Index extends BinaryExpression implements LeftHandSide,
-	LuaExpressionConstants,
-	org.keplerproject.luaeclipse.internal.parser.Index {
+public class Index extends Identifier implements LeftHandSide,
+		LuaExpressionConstants,
+		org.keplerproject.luaeclipse.internal.parser.Index {
 
-    private long id;
+	private long id;
 
-    /**
-     * Instantiates a new index node
-     * 
-     * @param start
-     *            start offset of couple
-     * @param end
-     *            end offset of couple
-     * @param key
-     *            identifier left side
-     * @param value
-     *            expression on right side
-     */
-    public Index(int start, int end, Expression key, Expression value) {
-	this(start, end, key, E_INDEX, value);
-    }
+	/** Left side of index */
+	private Expression container;
 
-    protected Index(int start, int end, Expression key, int kind,
-	    Expression value) {
-	super(start, end, key, kind, value);
-    }
+	/**
+	 * Instantiates a new index node, start and end offsets are computed from
+	 * nodes provided at instantiation.
+	 * 
+	 * @param key
+	 *            {@linkplain Expression} on left side
+	 * @param value
+	 *            {@linkplain Declaration} on right side
+	 */
+	public Index(Expression key, Declaration value) {
+		this(key, (Statement) value);
+	}
 
-    /**
-     * Just the right parent of this couple
-     * 
-     * @return {@link Expression} on right side
-     */
-    public Expression getValue() {
-	return getRight();
-    }
+	/**
+	 * Instantiates a new index node, start and end offsets are computed from
+	 * nodes provided at instantiation.
+	 * 
+	 * @param key
+	 *            {@linkplain Expression} on left side
+	 * @param value
+	 *            {@linkplain Expression} on right side
+	 */
+	public Index(Expression key, Expression value) {
+		this(key, (Statement) value);
+	}
 
-    public long getID() {
-	return id;
-    }
+	/**
+	 * Instantiates a new index node, start and end offsets are computed from
+	 * nodes provided at instantiation. This method is for internal use, because
+	 * implementation is focus to use mainly {@linkplain Declaration} and final
+	 * {@linkplain Expression}s as {@linkplain Literal}s
+	 * 
+	 * @param key
+	 *            {@linkplain Expression} on left side
+	 * @param value
+	 *            {@linkplain Statement} on right side
+	 */
+	private Index(Expression key, Statement value) {
+		super(value.sourceStart(), value.sourceEnd(), statementToString(value));
+		this.container = key;
+	}
 
-    public void setID(long id) {
-	this.id = id;
-    }
+	/**
+	 * Depending in the type of statement, data about the name is not stored in
+	 * the same place. This method is for finding valid names in
+	 * {@linkplain Declaration}s and {@linkplain Literal}s. In case of other
+	 * types, default behavior is to use regular {@link #toString()}
+	 * 
+	 * @param statement
+	 *            {@linkplain Statement} node where we'll seek for a name
+	 * @return {@linkplain String} Logic name of the node
+	 */
+	private static java.lang.String statementToString(Statement statement) {
+		if (statement instanceof Declaration) {
+			return ((Declaration) statement).getName();
+		} else if (statement instanceof Literal) {
+			return ((Literal) statement).getValue();
+		}
+		return statement.toString();
+	}
 
-    /**
-     * Just the left parent of this couple
-     * 
-     * @return {@link Expression} on left side
-     */
-    public Expression getKey() {
-	return getLeft();
-    }
+	/**
+	 * As mentioned in header, an `Index is just a composition of
+	 * {@linkplain Expression}s. Left side of this expression can be useful to
+	 * link semantic of right side to another logic unit.
+	 * 
+	 * @return {@linkplain Expression}, left side of Index
+	 */
+	public Expression getContainer() {
+		return container;
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.anwrt.ldt.parser.ast.expressions.LeftHandSide#isLeftHandSide()
-     */
-    @Override
-    public boolean isLeftHandSide() {
-	return true;
-    }
+	public long getID() {
+		return id;
+	}
+
+	@Override
+	public int getKind() {
+		return E_INDEX;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.anwrt.ldt.parser.ast.expressions.LeftHandSide#isLeftHandSide()
+	 */
+	@Override
+	public boolean isLeftHandSide() {
+		return true;
+	}
+
+	public void setID(long id) {
+		this.id = id;
+	}
+
+	public void traverse(ASTVisitor visitor) throws Exception {
+		if (visitor.visit(this)) {
+			super.traverse(visitor);
+			this.container.traverse(visitor);
+			visitor.endvisit(this);
+		}
+	}
 }
