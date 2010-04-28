@@ -10,10 +10,9 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 package org.keplerproject.luaeclipse.internal.parser;
 
 public interface Index {
-	long getID();
-	void setID(long id);
+    long getID();
+    void setID(long id);
 }
