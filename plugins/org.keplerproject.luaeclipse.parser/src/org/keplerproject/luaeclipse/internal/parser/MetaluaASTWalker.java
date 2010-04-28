@@ -68,6 +68,12 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	/** Indicates if Metalua had problem while parsing code. */
 	private LuaParseError _parseError = null;
 
+	private DeclarationBinder binder;
+
+	private List<Long> linked;
+
+	private List<Long> free;
+
 	/**
 	 * Instantiates a new Lua instance ready to parse.
 	 * 
@@ -77,7 +83,8 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	 * those functions.
 	 */
 	private MetaluaASTWalker() {
-
+		free = null;
+		linked = null;
 		try {
 			/*
 			 * Define path to source file
@@ -134,6 +141,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 
 		// Bear source in mind
 		this.source = source;
+		this.binder = null;
 
 		// Detect syntax errors, parse code
 		if (this.parse()) {
@@ -237,12 +245,90 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 				&& getState().equals(node.getState());
 	}
 
+	private long functionAndIdToLong(String function, long id) {
+	
+		long value = 0;
+		int top = getState().getTop();
+		getState().getGlobal(function);
+		getState().pushNumber((double) id);
+		assert getState().isNumber(-1) : "Unable to load ID of node.";
+		assert getState().isFunction(-2) : "Unable to load function to compute end"
+				+ " position in source.";
+		switch (getState().pcall(1, 1, 0)) {
+		case 0:
+			if (getState().isNumber(-1)) {
+				value = (long) getState().toNumber(-1);
+			}
+		}
+		getState().pop(1);
+		assert getState().getTop() == top : "Lua stack should be balanced";
+		return value;
+	}
+
+	private List<Long> functionToTable(String function) {
+		List<Long> list = new ArrayList<Long>();
+		// Retrieve function
+		int top = getState().getTop();
+		getState().getGlobal(function);
+	
+		// Execute function
+		assert getState().isFunction(-1);
+		if (getState().pcall(0, 2, 0) == 0) {
+			/*
+			 * Check results
+			 */
+			assert getState().isTable(-2) && getState().isNumber(-1) : "Unexpected result from Lua declaration fetching.";
+	
+			/*
+			 * Register IDs of declarations
+			 */
+			int size = (int) getState().toNumber(-1);
+			getState().pop(1);
+			for (int k = 1; k <= size; k++) {
+				// Pushing on stack index of required field
+				getState().pushNumber((double) k);
+				// getState().pushInteger(k);
+	
+				// Push its value on top of stack
+				getState().getTable(-2);
+	
+				// Retrieving value from stack
+				long id = (long) getState().toNumber(-1);
+				list.add(id);
+				getState().pop(1);
+			}
+		}
+		getState().pop(1);
+		assert top == getState().getTop() : "Stack is unbalanced after fetching declarations.";
+		return list;
+	}
+
 	/**
 	 * Gives comparator used to sort out child nodes IDs, only useful in
 	 * {@link #equals(Object)}.
 	 */
 	protected Comparator<Long> getComparator() {
 		return comparator;
+	}
+
+	public List<Long> getDeclarationsIDs() {
+		if (this.linked == null) {
+			this.linked = functionToTable("getDeclarationsIDs");
+		}
+		return this.linked;
+	}
+
+	public List<Long> getDeclarationParentIDs() {
+		List<Long> list = new ArrayList<Long>();
+		List<Long> declarations = getDeclarationsIDs();
+		declarations.addAll(getGlobalDeclarationsIDs());
+		for (Long id : declarations) {
+			long parent = getParent(id);
+			if (parent > 0) {
+				list.add(getParent(id));
+			}
+		}
+		return list;
 	}
 
 	/**
@@ -254,23 +340,14 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	 *         source.
 	 */
 	public int getEndPosition(final long id) {
-		int position;
-		assert getState().getTop() == 0 : "Lua stack should be empty";
-		getState().getGlobal("getEnd");
-		getState().pushNumber((double) id);
-		assert getState().isNumber(-1) : "Unable to load ID of node.";
-		assert getState().isFunction(-2) : "Unable to load function to compute end"
-				+ " position in source.";
-		switch (getState().pcall(1, 1, 0)) {
-		case 0:
-			assert getState().isNumber(-1) : "Wrong type for end position in code";
-			position = (int) getState().toNumber(-1);
-			getState().setTop(0);
-			assert getState().getTop() == 0 : "Lua stack should be empty";
-			return position;
+		return (int)functionAndIdToLong("getEnd", id);
+	}
+
+	public List<Long> getGlobalDeclarationsIDs() {
+		if (this.free == null) {
+			this.free = functionToTable("getGlobalDeclarationsIDs");
 		}
-		getState().setTop(0);
-		return 0;
+		return this.free;
 	}
 
 	/**
@@ -282,29 +359,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	 *         code source.
 	 */
 	public int getStartPosition(final long id) {
-		int position;
-		assert getState().getTop() == 0 : "Lua stack should be empty";
-		getState().getGlobal("getStart");
-		getState().pushNumber((double) id);
-		if (getState().pcall(1, 1, 0) == 0) {
-			assert getState().isNumber(-1) : "Wrong type for start position in code";
-			position = (int) getState().toNumber(-1);
-			getState().setTop(0);
-			assert getState().getTop() == 0 : "Lua stack should be empty";
-			return position;
-		}
-		getState().setTop(0);
-		return 0;
-	}
-
-	/** Last parsed source */
-	public String getSource() {
-		return source;
-	}
-
-	/** Lua instance loaded with {@linkplain Metalua} used to parse source code */
-	protected synchronized LuaState getState() {
-		return _state;
+		return (int)functionAndIdToLong("getStart", id);
 	}
 
 	/**
@@ -338,6 +393,53 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		// Flush stack
 		getState().setTop(0);
 		return value;
+	}
+
+	/**
+	 * Node name.
+	 * 
+	 * @param id
+	 *            the id
+	 * 
+	 * @return the string
+	 */
+	public String nodeName(final long id) {
+		String name = null;
+
+		// Stack should be empty
+		assert getState().getTop() == 0 : MetaluaASTWalker.class.toString()
+				+ ": Lua stack should be empty";
+
+		// Retrieve Lua function
+		getState().getField(LuaState.LUA_GLOBALSINDEX, "getTag");
+
+		// Pass given ID as parameter
+		getState().pushNumber((double) id);
+
+		// Call function
+		switch (getState().pcall(1, 1, 0)) {
+		case 0:
+			name = getState().toString(-1);
+			break;
+		default:
+			// TODO: remove silent behavior
+			name = new String();
+			break;
+		}
+
+		// Flush stack
+		getState().setTop(0);
+		return name;
+	}
+
+	/** Last parsed source */
+	public String getSource() {
+		return source;
+	}
+
+	/** Lua instance loaded with {@linkplain Metalua} used to parse source code */
+	protected synchronized LuaState getState() {
+		return _state;
 	}
 
 	/** Indicates if any error occurred. */
@@ -451,52 +553,6 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	}
 
 	/**
-	 * Node name.
-	 * 
-	 * @param id
-	 *            the id
-	 * 
-	 * @return the string
-	 */
-	public String nodeName(final long id) {
-		String name = null;
-
-		// Stack should be empty
-		assert getState().getTop() == 0 : MetaluaASTWalker.class.toString()
-				+ ": Lua stack should be empty";
-
-		// Retrieve Lua function
-		getState().getField(LuaState.LUA_GLOBALSINDEX, "getTag");
-
-		// Pass given ID as parameter
-		getState().pushNumber((double) id);
-
-		// Call function
-		switch (getState().pcall(1, 1, 0)) {
-		case 0:
-			name = getState().toString(-1);
-			break;
-		default:
-			// TODO: remove silent behaviour
-			name = new String();
-			break;
-		}
-
-		/*
-		 * Convert type name in numeric value
-		 */
-		// if (getState().isString(-1)) {
-		// name = getState().toString(-1);
-		// } else {
-		// assert getState().isNil(-1);
-		// }
-
-		// Flush stack
-		getState().setTop(0);
-		return name;
-	}
-
-	/**
 	 * The aim here is to perform the following statement in Lua: ast =
 	 * mlc.luastring_to_ast('" + source + "')
 	 */
@@ -538,15 +594,16 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 			// Clean stack
 			getState().pop(-1);
 			if (DLTKCore.DEBUG) {
-			    	Activator.logWarning("Bind error:\n" + error);
+				Activator.logWarning("Bind error:\n" + error);
 			}
 			return false;
 		}
 	}
 
-	private synchronized final void setState (LuaState lua ){
+	private synchronized final void setState(LuaState lua) {
 		_state = lua;
 	}
+
 	/**
 	 * Retrieve kind of statement or expression from Lua AST.
 	 * 
@@ -571,7 +628,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 			} else if ("not".equals(value)) {
 				return LuaExpressionConstants.E_BNOT;
 			} else if ("len".equals(value)) {
-				return LuaExpressionConstants.E_BNOT;
+				return LuaExpressionConstants.E_LENGTH;
 			}
 
 			// So, it should be a binary operation
@@ -632,4 +689,17 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		return LuaStatementConstants.S_BLOCK;
 	}
 
+	public long getParent(long id) {
+		return functionAndIdToLong("getParent", id);
+	}
+
+	public DeclarationBinder getDeclarationBinder() {
+		if (this.binder == null) {
+			List<Long> declarations = getDeclarationsIDs();
+			List<Long> globals = getGlobalDeclarationsIDs();
+			List<Long> parents = getDeclarationParentIDs();
+			this.binder = new DeclarationBinder(declarations, globals, parents);
+		}
+		return this.binder;
+	}
 }
