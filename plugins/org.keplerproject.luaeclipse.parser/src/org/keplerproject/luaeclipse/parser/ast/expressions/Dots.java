@@ -10,7 +10,6 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 /**
  * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
  * @date $Date: 2009-06-18 16:46:07 +0200 (jeu., 18 juin 2009) $
@@ -23,42 +22,41 @@ import org.eclipse.dltk.ast.expressions.Expression;
 import org.keplerproject.luaeclipse.internal.parser.Index;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class Dots.
  */
 public class Dots extends Expression implements LuaExpressionConstants, Index {
 
-	private long id;
+    private long id;
 
-	/**
-	 * Instantiates a new dots.
-	 * 
-	 * @param start
-	 *            the start
-	 * @param end
-	 *            the end
-	 */
-	public Dots(int start, int end) {
-		super(start, end);
-	}
+    /**
+     * Instantiates a new dots.
+     * 
+     * @param start
+     *            the start
+     * @param end
+     *            the end
+     */
+    public Dots(int start, int end) {
+	super(start, end);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.dltk.ast.statements.Statement#getKind()
-	 */
-	@Override
-	public int getKind() {
-		return E_DOTS;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.dltk.ast.statements.Statement#getKind()
+     */
+    @Override
+    public int getKind() {
+	return E_DOTS;
+    }
 
-	public long getID() {
-		return id;
-	}
+    public long getID() {
+	return id;
+    }
 
-	public void setID(long id) {
-		this.id = id;
-	}
+    public void setID(long id) {
+	this.id = id;
+    }
 }

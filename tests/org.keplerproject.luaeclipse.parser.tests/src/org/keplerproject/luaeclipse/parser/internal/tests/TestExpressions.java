@@ -149,6 +149,17 @@ public class TestExpressions extends TestCase {
 		assertFalse("Imbricated invocation is not handled.", module.isEmpty());
 	}
 
+	public void testLength() {
+		char[] source = "var = #table".toCharArray();
+		module = new LuaSourceParser().parse(fileName, source, this.reporter);
+		assertFalse("Length operator not handled.", module.isEmpty());
+
+		source = "var = #{}".toCharArray();
+		module = new LuaSourceParser().parse(fileName, source, this.reporter);
+		assertFalse("Length operator not handled.", module.isEmpty());
+
+	}
+
 	/**
 	 * Test pair.
 	 */
@@ -191,8 +202,7 @@ public class TestExpressions extends TestCase {
 	 * Test string.
 	 */
 	public void testString() {
-
-		char[] source = ("string = 'string' " + "another =\"anotherOne\"")
+		char[] source = ("string, another = 'string', [[anotherOne]]")
 				.toCharArray();
 		module = new LuaSourceParser().parse(fileName, source, this.reporter);
 		assertFalse("String is not recognized.", module.isEmpty());

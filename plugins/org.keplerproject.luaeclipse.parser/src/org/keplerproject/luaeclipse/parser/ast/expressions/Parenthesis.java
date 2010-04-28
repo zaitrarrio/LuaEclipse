@@ -10,7 +10,6 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 /**
  * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
  * @date $Date: 2009-06-15 17:55:03 +0200 (lun., 15 juin 2009) $
@@ -22,22 +21,24 @@ package org.keplerproject.luaeclipse.parser.ast.expressions;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class Parenthesis.
  */
 public class Parenthesis extends UnaryExpression {
 
-	/**
-	 * Instantiates a new parenthesis.
-	 * 
-	 * @param start the start
-	 * @param end the end
-	 * @param e the e
-	 */
-	public Parenthesis(int start, int end, Expression e) {
-		super(start, end, LuaExpressionConstants.E_PAREN, e);
-	}
+    /**
+     * Instantiates a new parenthesis.
+     * 
+     * @param start
+     *            the start
+     * @param end
+     *            the end
+     * @param e
+     *            the e
+     */
+    public Parenthesis(int start, int end, Expression e) {
+	super(start, end, LuaExpressionConstants.E_PAREN, e);
+    }
 
 }

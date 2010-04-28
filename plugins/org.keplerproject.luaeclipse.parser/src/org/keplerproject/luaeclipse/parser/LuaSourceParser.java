@@ -100,7 +100,7 @@ public class LuaSourceParser extends AbstractSourceParser {
 	    // Cache current AST in order to use it in case of error
 	    _cache.put(fileName, code);
 	    synchronized (mutex) {
-	    	ast = factory.getRoot();
+		ast = factory.getRoot();
 	    }
 	}
 	return ast;

@@ -20,38 +20,38 @@ import org.eclipse.dltk.ast.references.SimpleReference;
  * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  */
 public class FunctionDeclaration extends MethodDeclaration {
-    /**
-     * Initialize a function declaration node
-     * 
-     * @param name
-     *            name of the expression which this function is assigned to
-     * @param nameStart
-     *            offset of start of table's start expression
-     * @param nameEnd
-     *            offset of end of table's start expression
-     * @param start
-     *            start offset of function body
-     * @param end
-     *            end offset of function body
-     */
-    public FunctionDeclaration(String name, int nameStart, int nameEnd,
-	    int start, int end) {
-	super(name, nameStart, nameEnd, start, end);
-    }
+	/**
+	 * Initialize a function declaration node
+	 * 
+	 * @param name
+	 *            name of the expression which this function is assigned to
+	 * @param nameStart
+	 *            offset of start of table's start expression
+	 * @param nameEnd
+	 *            offset of end of table's start expression
+	 * @param start
+	 *            start offset of function body
+	 * @param end
+	 *            end offset of function body
+	 */
+	public FunctionDeclaration(String name, int nameStart, int nameEnd,
+			int start, int end) {
+		super(name, nameStart, nameEnd, start, end);
+	}
 
-    /**
-     * Initialize a function declaration node
-     * 
-     * @param name
-     *            reference to the expression which this function is assigned to
-     * @param start
-     *            start offset of function body
-     * @param end
-     *            end offset of function body
-     */
+	/**
+	 * Initialize a function declaration node
+	 * 
+	 * @param name
+	 *            reference to the expression which this function is assigned to
+	 * @param start
+	 *            start offset of function body
+	 * @param end
+	 *            end offset of function body
+	 */
 
-    public FunctionDeclaration(SimpleReference name, int start, int end) {
-	this(name.getName(), name.sourceStart(), name.sourceEnd(), start, end);
-    }
+	public FunctionDeclaration(SimpleReference name, int start, int end) {
+		this(name.getName(), name.sourceStart(), name.sourceEnd(), start, end);
+	}
 
 }

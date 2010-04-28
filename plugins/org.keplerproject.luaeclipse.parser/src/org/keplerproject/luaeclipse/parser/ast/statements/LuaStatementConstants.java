@@ -10,7 +10,6 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 /**
  * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
  * @date $Date: 2009-06-18 16:46:07 +0200 (jeu., 18 juin 2009) $
@@ -26,9 +25,9 @@ import org.eclipse.dltk.ast.statements.StatementConstants;
  * The Interface LuaStatementConstants.
  */
 public interface LuaStatementConstants extends StatementConstants {
-	/*
-	 * Statements
-	 */
-	/** The value for function declaration */
-	public static int D_FUNC_DEC= 37000;
+    /*
+     * Statements
+     */
+    /** The value for function declaration */
+    public static int D_FUNC_DEC = 37000;
 }

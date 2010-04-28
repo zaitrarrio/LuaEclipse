@@ -15,12 +15,12 @@ package org.keplerproject.luaeclipse.internal.parser.error;
  * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  */
 public class LuaParseErrorFactory {
-	public static LuaParseError get(final String source) {
-		try {
-			return new LuaParseErrorAnalyzer(source);
-		} catch (Exception e) {
-			return new LuaParseErrorNotifier(source);
-		}
-
+    public static LuaParseError get(final String source) {
+	try {
+	    return new LuaParseErrorAnalyzer(source);
+	} catch (Exception e) {
+	    return new LuaParseErrorNotifier(source);
 	}
+
+    }
 }

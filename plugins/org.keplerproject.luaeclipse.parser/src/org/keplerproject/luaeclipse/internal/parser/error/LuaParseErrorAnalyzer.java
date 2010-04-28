@@ -18,41 +18,41 @@ package org.keplerproject.luaeclipse.internal.parser.error;
  */
 public class LuaParseErrorAnalyzer extends LuaParseError {
 
-	public LuaParseErrorAnalyzer(String errorMessage) {
-		super(errorMessage);
-		initPositions();
-	}
+    public LuaParseErrorAnalyzer(String errorMessage) {
+	super(errorMessage);
+	initPositions();
+    }
 
-	private Integer extractIntFromErrorString(final String startTag,
-			final char endTag) {
-		return extractIntFromErrorString(startTag, endTag, 0);
+    private Integer extractIntFromErrorString(final String startTag,
+	    final char endTag) {
+	return extractIntFromErrorString(startTag, endTag, 0);
 
-	}
+    }
 
-	private Integer extractIntFromErrorString(final String startTag,
-			final char endTag, final int shift) {
-		String errorMessage = shift > 0 ? getErrorString().substring(shift)
-				: getErrorString();
+    private Integer extractIntFromErrorString(final String startTag,
+	    final char endTag, final int shift) {
+	String errorMessage = shift > 0 ? getErrorString().substring(shift)
+		: getErrorString();
 
-		int offsetStart = errorMessage.indexOf(startTag) + startTag.length();
-		int offsetEnd = errorMessage.indexOf(endTag);
-		String offset = errorMessage.substring(offsetStart, offsetEnd);
-		return Integer.parseInt(offset);
+	int offsetStart = errorMessage.indexOf(startTag) + startTag.length();
+	int offsetEnd = errorMessage.indexOf(endTag);
+	String offset = errorMessage.substring(offsetStart, offsetEnd);
+	return Integer.parseInt(offset);
 
-	}
+    }
 
-	@Override
-	protected void initPositions() {
-		// Error column
-		String tag = " column ";
-		int shift = getErrorString().indexOf(tag);
-		setErrorColumn(extractIntFromErrorString(tag, ',', shift));
-		
-		// Error line
-		setErrorLine(extractIntFromErrorString(" line ", ','));
+    @Override
+    protected void initPositions() {
+	// Error column
+	String tag = " column ";
+	int shift = getErrorString().indexOf(tag);
+	setErrorColumn(extractIntFromErrorString(tag, ',', shift));
 
-		// Offset
-		shift = getErrorString().indexOf('>');
-		setErrorOffset(extractIntFromErrorString(" char ", ':', shift));
-	}
+	// Error line
+	setErrorLine(extractIntFromErrorString(" line ", ','));
+
+	// Offset
+	shift = getErrorString().indexOf('>');
+	setErrorOffset(extractIntFromErrorString(" char ", ':', shift));
+    }
 }

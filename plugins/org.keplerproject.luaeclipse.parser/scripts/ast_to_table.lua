@@ -1,3 +1,31 @@
+
+--[[
+local oldreq=require
+local n=1
+function require(...)
+	local l=package.loaded[...]
+	if l then return l end
+	print(string.rep("| ",n), "BEGIN", ...)
+	n=n+1
+	local r = oldreq(...)
+	n=n-1
+	print(string.rep("| ",n), "END", ...)
+	return r	
+end
+local path = "/home/kkinfoo/dev/luaEclipse/LuaEclipseM6/plugins/org.keplerproject.luaeclipse.metalua.32bits/"
+package.path = path.."?.luac;"..path.."?.lua;"..package.path 
+]]
+--print (package.path)
+--local path = "?.luac;?.lua"
+--package.path = package.path ..path.."?.luac"..path.."?.lua"
+
+--for _, name in ipairs{'path','cpath','mpath'} do
+--	print('package.' .. name .. ' = ' .. (package[name] or 'nil'))
+--end 
+
+--package.path = "?.luac;?.lua;/usr/lib/lua/5.1/?.luac;/usr/lib/lua/5.1/?.lua;/home/kkinfoo/dev/luaEclipse/LuaEclipseM6/plugins/org.keplerproject.luaeclipse.metalua.32bits/?.luac;/home/kkinfoo/dev/luaEclipse/LuaEclipseM6/plugins/org.keplerproject.luaeclipse.metalua.32bits/?.lua"
+
+
 -------------------------------------------------------------------------------
 --  Copyright (c) 2009 KeplerProject, Sierra Wireless.
 --  All rights reserved. This program and the accompanying materials
@@ -9,6 +37,8 @@
 --       Kevin KIN-FOO <kkin-foo@sierrawireless.com>
 --           - initial API and implementation and initial documentation
 ---------------------------------------------------------------------------------
+require 'metalua.compiler'
+require 'metalua.walk.bindings'
 local function dump( var )
 	local function _dump( t, spaces )
 		if type(t) == 'table' then 
@@ -28,6 +58,9 @@ end
 --
 local idToNode = {}
 local nodeToId = {}
+local publicDeclarationsIDs = {}
+local localDeclarationsIDs = {}
+local parent = {}
 
 --
 -- Provides distinct IDs calls after calls
@@ -47,29 +80,45 @@ local function matchDeclaration( ast )
 	--	Checks if node is already indexed in internal hashmaps
 	--	@param node	table Node to localize in hashmaps
 	--
-	local function registrated( node )
-		assert(type(node) == 'table', "Node of 'table' type expected.")
+	local function registered( node )
+		assert(
+			type(node) == 'table',
+			"Node of 'table' type expected.'"..type(node).."' found"
+		)
 		return nodeToId[ node ] ~= nil
 	end
-	local function store( node, occurrences )
-		assert( type(occurrences) == 'table' )
-		local id = nodeToId[ node ]
-		idToNode[ id ]['occurrences'] = occurrences
-	end 
+	local function cacheDeclaration(hash, t)
+		assert( type(hash) == 'table' )
+		assert( type(t)    == 'table' )
+		for declaration, occurrences in pairs(t) do
+			if registered(declaration) then
+				local id = nodeToId[ declaration ]
+				table.insert(hash, id)
+			end
+		end
+	end
+	local function cacheGlobalDeclaration(hash, t)
+		assert( type(hash) == 'table' )
+		assert( type(t)    == 'table' )
+		for name, occurences in pairs( t ) do
+			for k, node in pairs( occurences ) do
+				if registered(node) then
+				--local id = nodeToId[ node ]
+					table.insert(hash, nodeToId[ node ])
+				end
+			end
+		end
+	end
 
 	-- Sort variables in source 
 	assert(
 		type(ast) == 'table',
 		"AST of 'table' type expected, "..type(ast).." found."
 	)
-	require 'metalua.walk.bindings'
-	local declared, leftovers = bindings( ast )
-	for declaration, occurrences in pairs(declared) do
-		if registrated(declaration) then
-			store(declaration, occurrences)
-			dump( occurrences )
-		end
-	end
+
+	local declareds, leftovers = bindings( ast )
+	cacheDeclaration(localDeclarationsIDs, declareds)
+	cacheGlobalDeclaration(publicDeclarationsIDs, leftovers)
 end
 
 --
@@ -98,11 +147,18 @@ function index( ast )
 
 		-- Index child nodes
 		for k,v in ipairs( childNodes(adt) )do
-	    	if ( type(v) == "table" ) then
+	    	if type(v) == "table" then
 	      		doIndex( v )
 	    	end
 		end
 	end
+  	local function rememberParents( id )
+  		assert( type(id) == 'number' )
+  		for k, child in pairs( children(id) ) do
+  			table.insert(parent, child, id)
+  			rememberParents(child)
+  		end
+  	end
 	--
 	-- Flush previous indexes to ensure consistance
 	--
@@ -114,13 +170,17 @@ function index( ast )
 	--
  	doIndex( ast )
 
+	
 	--
- 	-- Apprend declaration data on declaration nodes
+ 	-- Append declaration data on declaration nodes
 	--
-	matchDeclaration ( ast )
+	publicDeclarationsIDs = {}
+	localDeclarationsIDs = {}
+	matchDeclaration( ast )
+	if #idToNode > 0 then
+		rememberParents( 1 )
+	end
 end
-
-
 
 --
 -- Retrurn children of a node
@@ -217,26 +277,89 @@ function hasDeclarations( id )
 	return doesNodeExists and type(idToNode[ id ].occurrences) == 'table'
 end
 
-function getDeclarationsIDs( id )
+function hasUsage( id )
 	assert(type(id) == 'number', "Number expected '"..type(id).."' found.")
-	-- Return empty table where no declarations are available
+	local doesNodeExists = type(idToNode[ id ]) == 'table'
+	return hasDeclarations( id )and #(idToNode[ id ].occurrences) > 0
+end
+
+function getOccurrencies( id )
+	--
+	--	Find declarations assotiated with this ID
+	--
+	assert(type(id) == 'number', "Number expected '"..type(id).."' found.")
 	local ids = {}
+	
+	-- Fetch available declarations
 	if hasDeclarations(id) then
-		local declarations = idToNode[ id ].declarations
 		-- Search for nodes assotiated with declaration is hash map
-		dump(idToNode[ id ].occurrences)
+		local occur = idToNode[ id ].occurrences
+		assert( occur ~= nil )
+		for k, v in pairs( occur ) do
+			-- Register every occurence defnition in table
+			if type(v) == 'table' then
+				for k, occ in ipairs( v ) do
+					table.insert(ids, occ)
+				end
+			end
+		end
 	end
+	-- Return empty table where no declarations are available
 	return ids
 end
---[[ ---------------------------------------------------------------------------
-]]
-local path = ";/home/kkinfoo/dev/luaEclipse/LuaEclipseM6/plugins/org.keplerproject.luaeclipse.metalua.32bits/"
-package.path = package.path ..path.."?.lua"..path.."?.luac"
 
-require 'metalua.compiler'
-local ast = mlc.luastring_to_ast( " local yy , xx= {}, function()end xx()" )
-
-index( ast )
-for k=0, id do
-	getDeclarationsIDs( k )
+function getDeclarationsIDs ()
+	return localDeclarationsIDs,#localDeclarationsIDs
 end
+
+function getGlobalDeclarationsIDs ()
+	return publicDeclarationsIDs,#publicDeclarationsIDs
+end
+function getParent(id)
+	if type(parent[id]) == 'number' then
+		return parent[ id ]
+	end
+	return nil
+end
+--[[
+function getRelatedIDs ()
+	local function concatTable (main, t)
+		assert( type(main)	== 'table' )
+		assert( type(t)		== 'table' )
+		for k,v in pairs( t ) do
+			table.insert(main, v)
+		end
+		return main
+	end
+	local function extractChildrenFromID( ids )
+		assert( type(ids) == 'table' )
+		local child = {}
+		for k,id in pairs( ids ) do
+			local nodes = children(id)
+			for k, related in pairs(nodes) do
+				table.insert(child, related)
+			end
+		end
+		return child
+	end
+	local declared = getDeclarationsIDs()
+	local free = getGlobalDeclarationsIDs()
+	local ids = concatTable (declared, free)
+	ids = extractChildrenFromID( ids )
+	return ids,#ids
+end
+]]
+--[[ ---------------------------------------------------------------------------
+
+
+local path = "/home/kkinfoo/dev/luaEclipse/LuaEclipseM6/plugins/org.keplerproject.luaeclipse.metalua.32bits/"
+package.path = path.."?.luac;"..path.."?.lua;"..package.path 
+--print (package.path)
+local source = "tab = {} local var"--" local yy , xx = {}, function()end xx()"
+require 'metalua.compiler'
+local ast = mlc.luastring_to_ast( source )
+--table.print(ast)
+index( ast )
+print ( source )
+table.print(parent)
+]]

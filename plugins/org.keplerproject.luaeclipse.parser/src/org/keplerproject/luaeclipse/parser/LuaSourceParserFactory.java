@@ -10,7 +10,6 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 package org.keplerproject.luaeclipse.parser;
 
 import org.eclipse.dltk.ast.parser.ISourceParser;

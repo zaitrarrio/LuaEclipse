@@ -27,25 +27,25 @@ import org.keplerproject.luaeclipse.internal.parser.Index;
  */
 public class String extends StringLiteral implements Index {
 
-	private long id;
+    private long id;
 
-	/**
-	 * Instantiates a new string.
-	 * 
-	 * @param start
-	 *            the start
-	 * @param end
-	 *            the end
-	 */
-	public String(int start, int end, java.lang.String value) {
-		super(start, end, value);
-	}
+    /**
+     * Instantiates a new string.
+     * 
+     * @param start
+     *            the start
+     * @param end
+     *            the end
+     */
+    public String(int start, int end, java.lang.String value) {
+	super(start, end, value);
+    }
 
-	public long getID() {
-		return id;
-	}
+    public long getID() {
+	return id;
+    }
 
-	public void setID(long id) {
-		this.id = id;
-	}
+    public void setID(long id) {
+	this.id = id;
+    }
 }

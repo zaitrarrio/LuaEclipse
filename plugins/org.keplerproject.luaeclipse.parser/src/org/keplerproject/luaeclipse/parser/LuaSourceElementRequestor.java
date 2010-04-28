@@ -10,7 +10,6 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 /**
  * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
  * @date $Date$
@@ -28,8 +27,8 @@ import org.eclipse.dltk.compiler.SourceElementRequestVisitor;
  */
 public class LuaSourceElementRequestor extends SourceElementRequestVisitor {
 
-	public LuaSourceElementRequestor(ISourceElementRequestor requesor) {
-		super(requesor);
-	}
+    public LuaSourceElementRequestor(ISourceElementRequestor requesor) {
+	super(requesor);
+    }
 
 }

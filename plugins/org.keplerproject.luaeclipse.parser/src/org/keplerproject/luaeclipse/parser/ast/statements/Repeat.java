@@ -10,7 +10,6 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 /**
  * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
  * @date $Date: 2009-06-15 17:55:03 +0200 (lun., 15 juin 2009) $
@@ -27,22 +26,28 @@ import org.eclipse.dltk.ast.expressions.Expression;
  */
 public class Repeat extends While implements LuaStatementConstants {
 
-	/**
-	 * Instantiates a new repeat.
-	 * 
-	 * @param start the start
-	 * @param end the end
-	 * @param bloc the bloc
-	 * @param expr the expr
-	 */
-	public Repeat(int start, int end, Chunk bloc, Expression expr) {
-		super(start, end, expr, bloc);
-	}
+    /**
+     * Instantiates a new repeat.
+     * 
+     * @param start
+     *            the start
+     * @param end
+     *            the end
+     * @param bloc
+     *            the bloc
+     * @param expr
+     *            the expr
+     */
+    public Repeat(int start, int end, Chunk bloc, Expression expr) {
+	super(start, end, expr, bloc);
+    }
 
-	/* (non-Javadoc)
-	 * @see com.anwrt.ldt.parser.ast.statements.While#getKind()
-	 */
-	public int getKind() {
-		return S_UNTIL;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.anwrt.ldt.parser.ast.statements.While#getKind()
+     */
+    public int getKind() {
+	return S_UNTIL;
+    }
 }

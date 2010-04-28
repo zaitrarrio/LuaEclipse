@@ -11,30 +11,34 @@
  *****************************************************************************/
 package org.keplerproject.luaeclipse.parser.ast.statements;
 
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class Break.
- * @author	Kevin KIN-FOO <kkin-foo@sierrawireless.com>
+ * 
+ * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  */
 public class Break extends SimpleStatement {
 
-	/**
-	 * Instantiates a new break.
-	 * 
-	 * @param start the start
-	 * @param end the end
-	 */
-	public Break(int start, int end) {
-		super(start, end, null);
-	}
+    /**
+     * Instantiates a new break.
+     * 
+     * @param start
+     *            the start
+     * @param end
+     *            the end
+     */
+    public Break(int start, int end) {
+	super(start, end, null);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.dltk.ast.statements.Statement#getKind()
-	 */
-	@Override
-	public int getKind() {
-		return LuaStatementConstants.S_BREAK;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.dltk.ast.statements.Statement#getKind()
+     */
+    @Override
+    public int getKind() {
+	return LuaStatementConstants.S_BREAK;
+    }
 
 }

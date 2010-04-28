@@ -58,6 +58,8 @@ public class TestDeclarations extends TestCase {
 	    assertNotNull("Visitor not initialised", visitor);
 	    return;
 	}
+	assertTrue("No declarations found.",visitor.getDeclarations(
+		FunctionDeclaration.class).size() > 0 );
 	Declaration declaration = visitor.getDeclarations(
 		FunctionDeclaration.class).get(0);
 	assertTrue("Function should be considered as public.", declaration
@@ -78,6 +80,8 @@ public class TestDeclarations extends TestCase {
 	    assertNotNull("Visitor not initialised", visitor);
 	    return;
 	}
+	assertTrue("No declarations found.",visitor.getDeclarations(
+		FunctionDeclaration.class).size() > 0 );
 	Declaration declaration = visitor.getDeclarations(
 		FunctionDeclaration.class).get(0);
 	assertFalse("Function should not be considered as public.", declaration
@@ -98,6 +102,8 @@ public class TestDeclarations extends TestCase {
 	    assertNotNull("Visitor not initialised", visitor);
 	    return;
 	}
+	assertTrue("No declarations found.",visitor.getDeclarations(
+		FunctionDeclaration.class).size() > 0 );
 	Declaration declaration = visitor.getDeclarations(
 		TableDeclaration.class).get(0);
 	assertFalse("Table should not be considered as public.", declaration

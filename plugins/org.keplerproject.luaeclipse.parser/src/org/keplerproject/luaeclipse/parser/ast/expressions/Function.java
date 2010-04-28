@@ -30,75 +30,75 @@ import org.keplerproject.luaeclipse.parser.ast.statements.Chunk;
  */
 public class Function extends Block implements Index {
 
-    /** The parameters are in this raw chunk. */
-    private Chunk args;
-    private long id;
+	/** The parameters are in this raw chunk. */
+	private Chunk args;
+	private long id;
 
-    /**
-     * Instantiates a new function.
-     * 
-     * @param start
-     *            start offset of function's body
-     * @param end
-     *            end offset of function's body
-     * @param parameters
-     *            raw function's parameters in a {@link Chunk}
-     * @param body
-     *            function's body, must be a {@link Block}
-     */
-    public Function(int start, int end, Chunk parameters, Chunk body) {
-	super(start, end, body.getStatements());
-	this.args = parameters;
-    }
-
-    /**
-     * Function's raw arguments in a {@link Chunk}
-     * 
-     * @return {@link Chunk} contains function's arguments, they need to be
-     *         parsed and registered as {@link Argument} in a
-     *         {@link FunctionDeclaration}
-     */
-    public Chunk getArguments() {
-	return args;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.dltk.ast.statements.Block#getKind()
-     */
-    @Override
-    public int getKind() {
-	return LuaExpressionConstants.E_FUNCTION;
-    }
-
-    public long getID() {
-	return id;
-    }
-
-    public void printNode(CorePrinter output) {
-	// Arguments
-	getArguments().printNode(output);
-	output.indent();
-	super.printNode(output);
-	output.dedent();
-    }
-
-    public void setID(long id) {
-	this.id = id;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @seeorg.eclipse.dltk.ast.statements.Block#traverse(org.eclipse.dltk.ast.
-     * ASTVisitor)
-     */
-    public void traverse(ASTVisitor visitor) throws Exception {
-	if (visitor.visit(this)) {
-	    super.traverse(visitor);
-	    getArguments().traverse(visitor);
-	    visitor.endvisit(this);
+	/**
+	 * Instantiates a new function.
+	 * 
+	 * @param start
+	 *            start offset of function's body
+	 * @param end
+	 *            end offset of function's body
+	 * @param parameters
+	 *            raw function's parameters in a {@link Chunk}
+	 * @param body
+	 *            function's body, must be a {@link Block}
+	 */
+	public Function(int start, int end, Chunk parameters, Chunk body) {
+		super(start, end, body.getStatements());
+		this.args = parameters;
 	}
-    }
+
+	/**
+	 * Function's raw arguments in a {@link Chunk}
+	 * 
+	 * @return {@link Chunk} contains function's arguments, they need to be
+	 *         parsed and registered as {@link Argument} in a
+	 *         {@link FunctionDeclaration}
+	 */
+	public Chunk getArguments() {
+		return args;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.dltk.ast.statements.Block#getKind()
+	 */
+	@Override
+	public int getKind() {
+		return LuaExpressionConstants.E_FUNCTION;
+	}
+
+	public long getID() {
+		return id;
+	}
+
+	public void printNode(CorePrinter output) {
+		// Arguments
+		getArguments().printNode(output);
+		output.indent();
+		super.printNode(output);
+		output.dedent();
+	}
+
+	public void setID(long id) {
+		this.id = id;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.dltk.ast.statements.Block#traverse(org.eclipse.dltk.ast.
+	 * ASTVisitor)
+	 */
+	public void traverse(ASTVisitor visitor) throws Exception {
+		if (visitor.visit(this)) {
+			super.traverse(visitor);
+			getArguments().traverse(visitor);
+			visitor.endvisit(this);
+		}
+	}
 }

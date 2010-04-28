@@ -22,36 +22,36 @@ import org.eclipse.dltk.ast.references.SimpleReference;
  */
 public class TableDeclaration extends TypeDeclaration {
 
-    /**
-     * Initialize a table declaration node
-     * 
-     * @param name
-     *            name of the expression which this table is assigned to
-     * @param nameStart
-     *            offset of start of table's start expression
-     * @param nameEnd
-     *            offset of end of table's start expression
-     * @param start
-     *            start offset of table body
-     * @param end
-     *            end offset of table body
-     */
-    public TableDeclaration(String name, int nameStart, int nameEnd, int start,
-	    int end) {
-	super(name, nameStart, nameEnd, start, end);
-    }
+	/**
+	 * Initialize a table declaration node
+	 * 
+	 * @param name
+	 *            name of the expression which this table is assigned to
+	 * @param nameStart
+	 *            offset of start of table's start expression
+	 * @param nameEnd
+	 *            offset of end of table's start expression
+	 * @param start
+	 *            start offset of table body
+	 * @param end
+	 *            end offset of table body
+	 */
+	public TableDeclaration(String name, int nameStart, int nameEnd, int start,
+			int end) {
+		super(name, nameStart, nameEnd, start, end);
+	}
 
-    /**
-     * Initialize a table declaration node
-     * 
-     * @param name
-     *            reference to the expression which this table is assigned to
-     * @param start
-     *            start offset of table body
-     * @param end
-     *            end offset of table body
-     */
-    public TableDeclaration(SimpleReference name, int start, int end) {
-	this(name.getName(), name.sourceStart(), name.sourceEnd(), start, end);
-    }
+	/**
+	 * Initialize a table declaration node
+	 * 
+	 * @param name
+	 *            reference to the expression which this table is assigned to
+	 * @param start
+	 *            start offset of table body
+	 * @param end
+	 *            end offset of table body
+	 */
+	public TableDeclaration(SimpleReference name, int start, int end) {
+		this(name.getName(), name.sourceStart(), name.sourceEnd(), start, end);
+	}
 }

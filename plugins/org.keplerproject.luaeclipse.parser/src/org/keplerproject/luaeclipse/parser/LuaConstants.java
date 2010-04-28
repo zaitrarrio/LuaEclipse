@@ -10,7 +10,6 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 package org.keplerproject.luaeclipse.parser;
 
 import org.eclipse.dltk.ast.Modifiers;
@@ -18,6 +17,7 @@ import org.eclipse.dltk.ast.Modifiers;
 public class LuaConstants {
     protected LuaConstants() {
     }
+
     public final static String LUA_PARTITIONING = "__lua_partitioning"; //$NON-NLS-1$
     public static final int LuaAttributeModifier = 2 << (Modifiers.USER_MODIFIER + 1);
     public static final int LuaAliasModifier = 2 << (Modifiers.USER_MODIFIER + 2);

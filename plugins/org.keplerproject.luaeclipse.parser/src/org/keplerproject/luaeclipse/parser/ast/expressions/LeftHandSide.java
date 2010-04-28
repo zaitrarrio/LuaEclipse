@@ -10,7 +10,6 @@
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
-
 /**
  * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
  * @date $Date: 2009-06-15 17:55:03 +0200 (lun., 15 juin 2009) $
@@ -24,11 +23,11 @@ package org.keplerproject.luaeclipse.parser.ast.expressions;
  * The Interface LeftHandSide.
  */
 public interface LeftHandSide {
-	
-	/**
-	 * Checks if is left hand side.
-	 * 
-	 * @return true, if is left hand side
-	 */
-	boolean isLeftHandSide();
+
+    /**
+     * Checks if is left hand side.
+     * 
+     * @return true, if is left hand side
+     */
+    boolean isLeftHandSide();
 }

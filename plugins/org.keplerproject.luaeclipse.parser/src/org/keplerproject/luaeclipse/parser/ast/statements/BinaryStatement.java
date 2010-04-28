@@ -18,18 +18,18 @@ import org.keplerproject.luaeclipse.parser.ast.expressions.BinaryExpression;
  */
 public class BinaryStatement extends BinaryExpression {
 
-    public BinaryStatement(int start, int end, Chunk left, int kind, Chunk right) {
-	super(start, end, left, kind, right);
-    }
+	public BinaryStatement(int start, int end, Chunk left, int kind, Chunk right) {
+		super(start, end, left, kind, right);
+	}
 
-    @Override
-    public Chunk getLeft() {
-	return (Chunk) super.getLeft();
-    }
+	@Override
+	public Chunk getLeft() {
+		return (Chunk) super.getLeft();
+	}
 
-    @Override
-    public Chunk getRight() {
-	return (Chunk) super.getRight();
-    }
+	@Override
+	public Chunk getRight() {
+		return (Chunk) super.getRight();
+	}
 
 }
