@@ -28,103 +28,101 @@ import org.keplerproject.luaeclipse.parser.internal.tests.utils.DummyReporter;
  */
 public class TestDeclarations extends TestCase {
 
-    /**
-     * Assert there are no duplication of declaration nodes
-     */
-    public void testFunctionDeclarationCount() {
-	DeclarationVisitor visitor = null;
-	try {
-	    visitor = parse("method = function() end");
-	} catch (Exception e) {
-	    assertNotNull("Visitor not initialised", visitor);
-	    return;
+	/**
+	 * Assert there are no duplication of declaration nodes
+	 */
+	public void testFunctionDeclarationCount() {
+		DeclarationVisitor visitor = null;
+		try {
+			visitor = parse("method = function() end");
+		} catch (Exception e) {
+			assertNotNull("Visitor not initialised", visitor);
+			return;
+		}
+		int declarationCount = visitor.getDeclarations().size();
+		int functionDeclarationCount = visitor.getDeclarations(
+				FunctionDeclaration.class).size();
+		assertTrue("Unable to retrieve declaration.", declarationCount > 0);
+		assertEquals("Some declarations are not function ones.",
+				functionDeclarationCount, declarationCount);
 	}
-	int declarationCount = visitor.getDeclarations().size();
-	int functionDeclarationCount = visitor.getDeclarations(
-		FunctionDeclaration.class).size();
-	assertTrue("Unable to retrieve declaration.", declarationCount > 0);
-	assertEquals("Some declarations are not function ones.",
-		functionDeclarationCount, declarationCount);
-    }
 
-    /**
-     * Check that modifiers are properly set
-     */
-    public void testPublicFunctionSetDeclarationModifiers() {
-	DeclarationVisitor visitor = null;
-	try {
-	    visitor = parse("method = function() end");
-	} catch (Exception e) {
-	    assertNotNull("Visitor not initialised", visitor);
-	    return;
+	/**
+	 * Check that modifiers are properly set
+	 */
+	public void testPublicFunctionSetDeclarationModifiers() {
+		DeclarationVisitor visitor = null;
+		try {
+			visitor = parse("method = function() end");
+		} catch (Exception e) {
+			assertNotNull("Visitor not initialised", visitor);
+			return;
+		}
+		assertTrue("No declarations found.", visitor.getDeclarations(
+				FunctionDeclaration.class).size() > 0);
+		Declaration declaration = visitor.getDeclarations(
+				FunctionDeclaration.class).get(0);
+		assertTrue("Function should be considered as public.", declaration
+				.isPublic());
+		assertFalse("Function should not be considered as private.",
+				declaration.isPrivate());
 	}
-	assertTrue("No declarations found.",visitor.getDeclarations(
-		FunctionDeclaration.class).size() > 0 );
-	Declaration declaration = visitor.getDeclarations(
-		FunctionDeclaration.class).get(0);
-	assertTrue("Function should be considered as public.", declaration
-		.isPublic());
-	assertFalse("Function should not be considered as private.",
-		declaration.isPrivate());
-    }
 
-    /**
-     * Check if status of function declaration in a local node is being
-     * considered properly
-     */
-    public void testLocalFunctionSetDeclarationModifiers() {
-	DeclarationVisitor visitor = null;
-	try {
-	    visitor = parse("local method = function() end");
-	} catch (Exception e) {
-	    assertNotNull("Visitor not initialised", visitor);
-	    return;
+	/**
+	 * Check if status of function declaration in a local node is being
+	 * considered properly
+	 */
+	public void testLocalFunctionSetDeclarationModifiers() {
+		DeclarationVisitor visitor = null;
+		try {
+			visitor = parse("local method = function() end");
+		} catch (Exception e) {
+			assertNotNull("Visitor not initialised", visitor);
+			return;
+		}
+		assertTrue("No declarations found.", visitor.getDeclarations(
+				FunctionDeclaration.class).size() > 0);
+		Declaration declaration = visitor.getDeclarations(
+				FunctionDeclaration.class).get(0);
+		assertFalse("Function should not be considered as public.", declaration
+				.isPublic());
+		assertTrue("Function should be considered as private.", declaration
+				.isPrivate());
 	}
-	assertTrue("No declarations found.",visitor.getDeclarations(
-		FunctionDeclaration.class).size() > 0 );
-	Declaration declaration = visitor.getDeclarations(
-		FunctionDeclaration.class).get(0);
-	assertFalse("Function should not be considered as public.", declaration
-		.isPublic());
-	assertTrue("Function should be considered as private.", declaration
-		.isPrivate());
-    }
 
-    /**
-     * Check if status of table in a local node is being considered properly
-     */
+	/**
+	 * Check if status of table in a local node is being considered properly
+	 */
 
-    public void testLocalTableDeclarationModifiers() {
-	DeclarationVisitor visitor = null;
-	try {
-	    visitor = parse("local t={}");
-	} catch (Exception e) {
-	    assertNotNull("Visitor not initialised", visitor);
-	    return;
+	public void testLocalTableDeclarationModifiers() {
+		DeclarationVisitor visitor = null;
+		try {
+			visitor = parse("local t={}");
+		} catch (Exception e) {
+			assertNotNull("Visitor not initialised", visitor);
+			return;
+		}
+		Declaration declaration = visitor.getDeclarations(
+				TableDeclaration.class).get(0);
+		assertFalse("Table should not be considered as public.", declaration
+				.isPublic());
+		assertTrue("Table should be considered as private.", declaration
+				.isPrivate());
 	}
-	assertTrue("No declarations found.",visitor.getDeclarations(
-		FunctionDeclaration.class).size() > 0 );
-	Declaration declaration = visitor.getDeclarations(
-		TableDeclaration.class).get(0);
-	assertFalse("Table should not be considered as public.", declaration
-		.isPublic());
-	assertTrue("Table should be considered as private.", declaration
-		.isPrivate());
-    }
 
-    /**
-     * Parses AST to extract declarations to test
-     */
-    private static DeclarationVisitor parse(String code) throws Exception {
-	// Parse code
-	DeclarationVisitor visitor = new DeclarationVisitor();
-	DummyReporter reporter = new DummyReporter();
-	LuaSourceParser parser = new LuaSourceParser();
+	/**
+	 * Parses AST to extract declarations to test
+	 */
+	private static DeclarationVisitor parse(String code) throws Exception {
+		// Parse code
+		DeclarationVisitor visitor = new DeclarationVisitor();
+		DummyReporter reporter = new DummyReporter();
+		LuaSourceParser parser = new LuaSourceParser();
 
-	// Extract declarations
-	ModuleDeclaration module = parser.parse("none".toCharArray(), code
-		.toCharArray(), reporter);
-	module.traverse(visitor);
-	return visitor;
-    }
+		// Extract declarations
+		ModuleDeclaration module = parser.parse("none".toCharArray(), code
+				.toCharArray(), reporter);
+		module.traverse(visitor);
+		return visitor;
+	}
 }
