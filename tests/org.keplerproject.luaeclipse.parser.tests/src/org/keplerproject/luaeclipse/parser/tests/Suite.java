@@ -9,13 +9,6 @@
  *      Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
-
-/**
- * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
- * @date $Date: 2009-07-23 12:07:30 +0200 (jeu., 23 juil. 2009) $
- * $Author: kkinfoo $
- * $Id: Suite.java 2161 2009-07-23 10:07:30Z kkinfoo $
- */
 package org.keplerproject.luaeclipse.parser.tests;
 
 import junit.framework.TestCase;
