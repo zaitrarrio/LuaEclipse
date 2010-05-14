@@ -5,10 +5,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.dltk.ast.declarations.Declaration;
-import org.eclipse.dltk.ast.references.SimpleReference;
+import org.eclipse.dltk.ast.expressions.Expression;
+import org.eclipse.dltk.ast.references.Reference;
 import org.eclipse.dltk.ast.statements.Statement;
+import org.keplerproject.luaeclipse.parser.ast.declarations.LocalVariableDeclaration;
 import org.keplerproject.luaeclipse.parser.ast.declarations.TableDeclaration;
+import org.keplerproject.luaeclipse.parser.ast.declarations.TableField;
 import org.keplerproject.luaeclipse.parser.ast.expressions.Identifier;
+import org.keplerproject.luaeclipse.parser.ast.expressions.Index;
 import org.keplerproject.luaeclipse.parser.ast.expressions.Pair;
 import org.keplerproject.luaeclipse.parser.ast.statements.BinaryStatement;
 import org.keplerproject.luaeclipse.parser.ast.statements.Chunk;
@@ -57,34 +61,62 @@ public class DeclarationBinder {
 		 */
 		for (int c = 0; c < limit; c++) {
 			Statement s = (Statement) values.getChilds().get(c);
+			Statement left = (Statement) ids.getChilds().get(c);
 			if (s instanceof Declaration) {
-				Identifier id = (Identifier) ids.getChilds().get(c);
+				Identifier id = (Identifier) left;
 				backPatchDeclarationName(id, (Declaration) s, mod);
+			} else if (declareAsLocal && left instanceof Identifier) {
+				Identifier id = (Identifier) left;
+				LocalVariableDeclaration local = new LocalVariableDeclaration(
+						id, id.sourceStart(), id.sourceEnd());
+				ids.addStatement(local);
+
+			}// TODO: avoid duplication
+			if (left instanceof Index) {
+				Index index = (Index) left;
+				Expression e = rootContainer(index);
+				e.getChilds();
 			}
 		}
 	}
 
-	private void matchTable(TableDeclaration table) {
+	private Expression rootContainer(Index index) {
+		if (index.getContainer() instanceof Index) {
+			return rootContainer(index);
+		}
+		return index.getContainer();
+	}
+
+	private Statement matchTable(TableDeclaration table) {
+		Chunk body = new Chunk(table.sourceStart(), table.sourceEnd());
 		for (Object o : table.getStatements()) {
 			if (o instanceof Pair) {
 				Pair pair = (Pair) o;
 				if (pair.getData() instanceof Declaration) {
 					Declaration dec = (Declaration) pair.getData();
 					backPatchDeclarationName(pair, dec);
+				} else {
+					int start = pair.getData().sourceStart();
+					int end = pair.sourceEnd();
+					TableField dec = new TableField(pair, start, end);
+					dec.setModifier(Declaration.AccPublic);
+					o = dec;
 				}
 			}
+			body.addStatement((Statement) o);
 		}
-
+		table.setBody(body);
+		return table;
 	}
 
-	private void backPatchDeclarationName(SimpleReference reference,
+	private void backPatchDeclarationName(Reference reference,
 			Declaration declaration) {
 		backPatchDeclarationName(reference, declaration, Declaration.AccPublic);
 	}
 
-	private void backPatchDeclarationName(SimpleReference reference,
+	private void backPatchDeclarationName(Reference reference,
 			Declaration declaration, int modifier) {
-		declaration.setName(reference.getName());
+		declaration.setName(reference.getStringRepresentation());
 		declaration.setNameEnd(reference.sourceEnd());
 		declaration.setNameStart(reference.sourceStart());
 		declaration.setModifier(modifier);
@@ -118,12 +150,12 @@ public class DeclarationBinder {
 	// return isDeclaration(id) || isParent(id);
 	// }
 
-	public void bind(Statement s, long id) {
+	public Statement bind(Statement s, long id) {
 		if (isParent(id)) {
-			System.out.println("[parent]" + s.getClass().getName());
+			// System.out.print(s.getClass().getName());
 		} else if (isDeclaration(id)) {
+			// System.out.print(s.getClass().getName());
 			rememberDeclaration(id, s);
-			System.out.println("[declaration]" + s.getClass().getName());
 			if (s instanceof BinaryStatement) {
 				int mod;
 				if (s instanceof Local) {
@@ -132,20 +164,21 @@ public class DeclarationBinder {
 					mod = Declaration.AccPublic;
 				}
 				BinaryStatement b = (BinaryStatement) s;
-				System.out.println(s.getClass().getName());
 				if (b.getRight() != null) {
 					matchDeclarations(b.getLeft(), b.getRight(), mod, true);
 				}
 			}
+			// System.out.println(s instanceof Identifier ? "["+((Identifier) s)
+			// .getName()+"]" : "");
 		} else if (s instanceof TableDeclaration) {
 			// Search for pairs
 			TableDeclaration table = (TableDeclaration) s;
-			matchTable(table);
+			return matchTable(table);
 		}
-		System.err.println("[regular]" + s.getClass().getName());
+		return s;
 	}
 
-	public void bind(Statement node, long id, List<Long> childNodes) {
+	public Statement bind(Statement node, long id, List<Long> childNodes) {
 		/*
 		 * Most of the time a Lua declarations are nameless. As instance, a
 		 * function can be assigned to a variable and the assigned to another
@@ -157,7 +190,6 @@ public class DeclarationBinder {
 		 */
 		for (Long child : childNodes) {
 			if (isParent(child)) {
-				System.out.println("[greatparent]" + node.getClass().getName());
 				if (node instanceof Set) {
 					Set set = (Set) node;
 					matchDeclarations(set.getLeft(), set.getRight(),
@@ -166,9 +198,11 @@ public class DeclarationBinder {
 					LocalRec rec = (LocalRec) node;
 					matchDeclarations(rec.getLeft(), rec.getRight(),
 							Declaration.AccPrivate);
+				} else {
+					System.out.println(node.getClass().getName());
 				}
 			}
 		}
-		bind(node, id);
+		return bind(node, id);
 	}
 }
