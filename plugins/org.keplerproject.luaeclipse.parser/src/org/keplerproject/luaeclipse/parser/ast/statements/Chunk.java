@@ -22,13 +22,13 @@ import java.util.List;
 
 import org.eclipse.dltk.ast.statements.Block;
 import org.eclipse.dltk.ast.statements.Statement;
-import org.keplerproject.luaeclipse.internal.parser.Index;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Chunk.
  */
-public class Chunk extends Block implements Index {
+public class Chunk extends Block implements IndexedNode {
 
     private long id;
 

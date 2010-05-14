@@ -16,6 +16,7 @@ import org.eclipse.dltk.ast.declarations.Declaration;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.expressions.Literal;
 import org.eclipse.dltk.ast.statements.Statement;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 
 /**
@@ -27,8 +28,7 @@ import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
  * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  */
 public class Index extends Identifier implements LeftHandSide,
-		LuaExpressionConstants,
-		org.keplerproject.luaeclipse.internal.parser.Index {
+		LuaExpressionConstants, IndexedNode {
 
 	private long id;
 

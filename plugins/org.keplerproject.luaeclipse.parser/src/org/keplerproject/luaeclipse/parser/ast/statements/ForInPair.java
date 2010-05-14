@@ -20,13 +20,13 @@ package org.keplerproject.luaeclipse.parser.ast.statements;
 
 import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.statements.Block;
-import org.keplerproject.luaeclipse.internal.parser.Index;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class ForInPair.
  */
-public class ForInPair extends Block implements Index {
+public class ForInPair extends Block implements IndexedNode {
 
     /** The identifiers. */
     private Chunk identifiers;

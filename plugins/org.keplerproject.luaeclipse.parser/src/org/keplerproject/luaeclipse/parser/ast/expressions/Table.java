@@ -24,7 +24,7 @@ import java.util.List;
 import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.statements.Statement;
-import org.keplerproject.luaeclipse.internal.parser.Index;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 import org.keplerproject.luaeclipse.parser.ast.statements.Chunk;
 
@@ -32,7 +32,7 @@ import org.keplerproject.luaeclipse.parser.ast.statements.Chunk;
 /**
  * The Class Table.
  */
-public class Table extends Expression implements Index {
+public class Table extends Expression implements IndexedNode {
 
     /** The statements. */
     List<Statement> statements;

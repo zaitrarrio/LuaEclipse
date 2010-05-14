@@ -20,7 +20,7 @@ package org.keplerproject.luaeclipse.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.expressions.FloatNumericLiteral;
 import org.eclipse.dltk.utils.CorePrinter;
-import org.keplerproject.luaeclipse.internal.parser.Index;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 
 // TODO: Auto-generated Javadoc
@@ -28,7 +28,7 @@ import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
  * The Class Number.
  */
 public class Number extends FloatNumericLiteral implements
-	LuaExpressionConstants, Index {
+	LuaExpressionConstants, IndexedNode {
 
     private long id;
 

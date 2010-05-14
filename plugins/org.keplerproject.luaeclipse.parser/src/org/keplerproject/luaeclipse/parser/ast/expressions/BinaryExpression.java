@@ -15,14 +15,14 @@ import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.statements.Statement;
 import org.eclipse.dltk.utils.CorePrinter;
-import org.keplerproject.luaeclipse.internal.parser.Index;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 
 /**
  * Defines a two operand expression.
  * 
  * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  */
-public class BinaryExpression extends Expression implements Index {
+public class BinaryExpression extends Expression implements IndexedNode {
 
 	/** Left parent of the expression. */
 	private Statement left;

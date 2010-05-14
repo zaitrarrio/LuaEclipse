@@ -19,13 +19,13 @@
 package org.keplerproject.luaeclipse.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.expressions.StringLiteral;
-import org.keplerproject.luaeclipse.internal.parser.Index;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class String.
  */
-public class String extends StringLiteral implements Index {
+public class String extends StringLiteral implements IndexedNode {
 
     private long id;
 

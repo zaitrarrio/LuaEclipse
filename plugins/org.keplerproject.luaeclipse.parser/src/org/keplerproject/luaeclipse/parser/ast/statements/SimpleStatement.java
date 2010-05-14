@@ -21,13 +21,13 @@ package org.keplerproject.luaeclipse.parser.ast.statements;
 import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.statements.Statement;
-import org.keplerproject.luaeclipse.internal.parser.Index;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class SimpleStatement.
  */
-public abstract class SimpleStatement extends Statement implements Index {
+public abstract class SimpleStatement extends Statement implements IndexedNode {
 
     /** The expression. */
     protected Expression fExpression;

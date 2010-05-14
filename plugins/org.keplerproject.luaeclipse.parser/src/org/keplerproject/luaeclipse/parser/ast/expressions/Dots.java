@@ -19,14 +19,14 @@
 package org.keplerproject.luaeclipse.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.expressions.Expression;
-import org.keplerproject.luaeclipse.internal.parser.Index;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Dots.
  */
-public class Dots extends Expression implements LuaExpressionConstants, Index {
+public class Dots extends Expression implements LuaExpressionConstants, IndexedNode {
 
     private long id;
 

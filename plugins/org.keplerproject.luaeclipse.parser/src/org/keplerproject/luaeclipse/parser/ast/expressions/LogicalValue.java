@@ -19,12 +19,12 @@
 package org.keplerproject.luaeclipse.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.expressions.Expression;
-import org.keplerproject.luaeclipse.internal.parser.Index;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 
 /**
  * The Class LogicalValue.
  */
-public class LogicalValue extends Expression implements Index {
+public class LogicalValue extends Expression implements IndexedNode {
 
     /** The kind. */
     private int kind;

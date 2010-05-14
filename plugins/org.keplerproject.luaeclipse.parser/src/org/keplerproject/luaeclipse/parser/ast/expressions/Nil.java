@@ -13,10 +13,10 @@
 package org.keplerproject.luaeclipse.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.expressions.NilLiteral;
-import org.keplerproject.luaeclipse.internal.parser.Index;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 
-public class Nil extends NilLiteral implements LuaExpressionConstants, Index {
+public class Nil extends NilLiteral implements LuaExpressionConstants, IndexedNode {
 
     private long id;
 

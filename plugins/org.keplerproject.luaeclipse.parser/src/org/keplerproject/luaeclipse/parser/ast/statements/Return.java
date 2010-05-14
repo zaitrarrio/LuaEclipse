@@ -24,13 +24,13 @@ import java.util.List;
 import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.statements.Statement;
-import org.keplerproject.luaeclipse.internal.parser.Index;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Return.
  */
-public class Return extends Statement implements Index {
+public class Return extends Statement implements IndexedNode {
 
     /** The expressions. */
     private List<Expression> expressions;

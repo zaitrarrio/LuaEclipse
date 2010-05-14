@@ -21,14 +21,14 @@ package org.keplerproject.luaeclipse.parser.ast.statements;
 import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.statements.Block;
-import org.keplerproject.luaeclipse.internal.parser.Index;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 import org.keplerproject.luaeclipse.parser.ast.expressions.Identifier;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class ForNumeric.
  */
-public class ForNumeric extends Block implements LuaStatementConstants, Index {
+public class ForNumeric extends Block implements LuaStatementConstants, IndexedNode {
 
     /** The optionnal. */
     private Expression optionnal;

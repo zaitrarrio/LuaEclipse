@@ -13,10 +13,10 @@
 package org.keplerproject.luaeclipse.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.expressions.BooleanLiteral;
-import org.keplerproject.luaeclipse.internal.parser.Index;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 
-public class Boolean extends BooleanLiteral implements Index,
+public class Boolean extends BooleanLiteral implements IndexedNode,
 	LuaExpressionConstants {
 
     private long id;

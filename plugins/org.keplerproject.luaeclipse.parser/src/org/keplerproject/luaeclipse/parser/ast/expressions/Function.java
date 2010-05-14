@@ -15,7 +15,7 @@ import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.declarations.Argument;
 import org.eclipse.dltk.ast.statements.Block;
 import org.eclipse.dltk.utils.CorePrinter;
-import org.keplerproject.luaeclipse.internal.parser.Index;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 import org.keplerproject.luaeclipse.parser.ast.declarations.FunctionDeclaration;
 import org.keplerproject.luaeclipse.parser.ast.statements.Chunk;
@@ -28,7 +28,7 @@ import org.keplerproject.luaeclipse.parser.ast.statements.Chunk;
  * 
  * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  */
-public class Function extends Block implements Index {
+public class Function extends Block implements IndexedNode {
 
 	/** The parameters are in this raw chunk. */
 	private Chunk args;

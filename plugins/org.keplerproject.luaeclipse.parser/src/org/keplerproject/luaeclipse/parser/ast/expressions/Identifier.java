@@ -20,7 +20,7 @@ package org.keplerproject.luaeclipse.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.references.SimpleReference;
 import org.eclipse.dltk.utils.CorePrinter;
-import org.keplerproject.luaeclipse.internal.parser.Index;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -28,7 +28,7 @@ import org.keplerproject.luaeclipse.internal.parser.Index;
  * 
  * @author kkinfoo
  */
-public class Identifier extends SimpleReference implements LeftHandSide, Index {
+public class Identifier extends SimpleReference implements LeftHandSide, IndexedNode {
 
 	private long id;
 

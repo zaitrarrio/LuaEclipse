@@ -21,14 +21,14 @@ package org.keplerproject.luaeclipse.parser.ast.statements;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.statements.StatementConstants;
 import org.eclipse.dltk.utils.CorePrinter;
-import org.keplerproject.luaeclipse.internal.parser.Index;
+import org.keplerproject.luaeclipse.internal.parser.IndexedNode;
 import org.keplerproject.luaeclipse.parser.ast.expressions.Identifier;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Local.
  */
-public class Local extends BinaryStatement implements StatementConstants, Index {
+public class Local extends BinaryStatement implements StatementConstants, IndexedNode {
 
 	/** The identifiers. */
 	// private Chunk identifiers;
