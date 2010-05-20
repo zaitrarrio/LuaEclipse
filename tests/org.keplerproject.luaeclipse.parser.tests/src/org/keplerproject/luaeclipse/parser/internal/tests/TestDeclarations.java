@@ -11,6 +11,8 @@
  *****************************************************************************/
 package org.keplerproject.luaeclipse.parser.internal.tests;
 
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.eclipse.dltk.ast.declarations.Declaration;
@@ -18,6 +20,7 @@ import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 import org.keplerproject.luaeclipse.parser.LuaSourceParser;
 import org.keplerproject.luaeclipse.parser.ast.declarations.FunctionDeclaration;
 import org.keplerproject.luaeclipse.parser.ast.declarations.TableDeclaration;
+import org.keplerproject.luaeclipse.parser.ast.declarations.TableField;
 import org.keplerproject.luaeclipse.parser.internal.tests.utils.DeclarationVisitor;
 import org.keplerproject.luaeclipse.parser.internal.tests.utils.DummyReporter;
 
@@ -108,6 +111,24 @@ public class TestDeclarations extends TestCase {
 				.isPublic());
 		assertTrue("Table should be considered as private.", declaration
 				.isPrivate());
+	}
+
+	/**
+	 * Check if table fields are considered properly
+	 */
+
+	public void testPublicTableFieldDeclaration() {
+		DeclarationVisitor visitor = null;
+		try {
+			visitor = parse("local t={field=nil}");
+		} catch (Exception e) {
+			assertNotNull("Visitor not initialised", visitor);
+			return;
+		}
+		// Retrieve fields from AST
+		List<Declaration> fields = visitor.getDeclarations(TableField.class);
+		assertTrue("No field declaration found.", fields.size() > 0);
+		assertEquals("Wrong field declaration count.", fields.size(), 1);
 	}
 
 	/**

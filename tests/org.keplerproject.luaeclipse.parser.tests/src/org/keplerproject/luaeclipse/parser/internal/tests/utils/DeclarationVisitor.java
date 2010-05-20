@@ -24,40 +24,40 @@ import org.eclipse.dltk.ast.declarations.Declaration;
  * 
  */
 public class DeclarationVisitor extends ASTVisitor {
-    private List<Declaration> declarations;
+	private List<Declaration> declarations;
 
-    public DeclarationVisitor() {
-	super();
-	this.declarations = new ArrayList<Declaration>();
-    }
-
-    private boolean addDeclration(Declaration d) {
-	return this.declarations.add(d);
-    }
-
-    public boolean visitGeneral(ASTNode node) throws Exception {
-
-	try {
-	    if (node instanceof Declaration) {
-		addDeclration((Declaration) node);
-	    }
-	} catch (Exception e) {
-	    throw e;
+	public DeclarationVisitor() {
+		super();
+		this.declarations = new ArrayList<Declaration>();
 	}
-	return true;
-    }
 
-    public List<Declaration> getDeclarations() {
-	return this.declarations;
-    }
-
-    public List<Declaration> getDeclarations(Class<? extends Declaration> c) {
-	List<Declaration> list = new ArrayList<Declaration>();
-	for (Declaration d : getDeclarations()) {
-	    if (d.getClass().equals(c)) {
-		list.add(d);
-	    }
+	private boolean addDeclration(Declaration d) {
+		return this.declarations.add(d);
 	}
-	return list;
-    }
+
+	public boolean visitGeneral(ASTNode node) throws Exception {
+
+		try {
+			if (node instanceof Declaration) {
+				addDeclration((Declaration) node);
+			}
+		} catch (Exception e) {
+			throw e;
+		}
+		return true;
+	}
+
+	public List<Declaration> getDeclarations() {
+		return this.declarations;
+	}
+
+	public List<Declaration> getDeclarations(Class<? extends Declaration> c) {
+		List<Declaration> list = new ArrayList<Declaration>();
+		for (Declaration d : getDeclarations()) {
+			if (d.getClass().equals(c)) {
+				list.add(d);
+			}
+		}
+		return list;
+	}
 }
