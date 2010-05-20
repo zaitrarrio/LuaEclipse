@@ -587,8 +587,7 @@ public class NodeFactory implements LuaExpressionConstants,
 		// index.setID(id);
 		// }
 		// Handle declarations
-		binder().bind(node, id, childNodes);
-		return node;
+		return binder().bind(node, id, childNodes);
 	}
 
 	/**
