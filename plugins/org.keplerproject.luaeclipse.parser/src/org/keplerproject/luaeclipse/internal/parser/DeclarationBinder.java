@@ -198,8 +198,6 @@ public class DeclarationBinder {
 					LocalRec rec = (LocalRec) node;
 					matchDeclarations(rec.getLeft(), rec.getRight(),
 							Declaration.AccPrivate);
-				} else {
-					System.out.println(node.getClass().getName());
 				}
 			}
 		}
