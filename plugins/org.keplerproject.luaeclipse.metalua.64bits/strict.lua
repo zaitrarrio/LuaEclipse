@@ -6,25 +6,18 @@
 -- anywhere or assigned to inside a function.
 --
 
-local getinfo, error, rawset, rawget = debug.getinfo, error, rawset, rawget
-
 local mt = getmetatable(_G)
 if mt == nil then
   mt = {}
   setmetatable(_G, mt)
 end
 
-__strict = true
+__STRICT = true
 mt.__declared = {}
 
-local function what ()
-  local d = getinfo(3, "S")
-  return d and d.what or "C"
-end
-
 mt.__newindex = function (t, n, v)
-  if __strict and not mt.__declared[n] then
-    local w = what()
+  if __STRICT and not mt.__declared[n] then
+    local w = debug.getinfo(2, "S").what
     if w ~= "main" and w ~= "C" then
       error("assign to undeclared variable '"..n.."'", 2)
     end
@@ -34,7 +27,7 @@ mt.__newindex = function (t, n, v)
 end
   
 mt.__index = function (t, n)
-  if __strict and not mt.__declared[n] and what() ~= "C" then
+  if not mt.__declared[n] and debug.getinfo(2, "S").what ~= "C" then
     error("variable '"..n.."' is not declared", 2)
   end
   return rawget(t, n)
