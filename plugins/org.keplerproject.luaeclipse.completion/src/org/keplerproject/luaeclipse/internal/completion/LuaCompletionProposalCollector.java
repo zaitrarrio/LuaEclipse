@@ -6,6 +6,7 @@ import org.eclipse.dltk.ui.text.completion.ScriptCompletionProposal;
 import org.eclipse.dltk.ui.text.completion.ScriptCompletionProposalCollector;
 import org.eclipse.dltk.ui.text.completion.ScriptOverrideCompletionProposal;
 import org.eclipse.swt.graphics.Image;
+import org.keplerproject.luaeclipse.core.LuaNature;
 
 public class LuaCompletionProposalCollector extends
 	ScriptCompletionProposalCollector {
@@ -47,5 +48,10 @@ public class LuaCompletionProposalCollector extends
     protected char[] getVarTrigger() {
 	return VAR_TRIGGER;
     }
+
+	@Override
+	protected String getNatureId() {
+		return LuaNature.LUA_NATURE;
+	}
 
 }

@@ -104,8 +104,8 @@ public class LuaCompletionEngine implements ICompletionEngine {
 		    break;
 		}
 	    }
-	    proposal.setName(name.toCharArray());
-	    proposal.setCompletion(name.toCharArray());
+	    proposal.setName(name);
+	    proposal.setCompletion(name);
 	    proposal.setReplaceRange(actualCompletionPosition - offset,
 		    actualCompletionPosition - offset);
 	    proposal.setRelevance(20);
