@@ -17,6 +17,13 @@
   </item>
 -->
 <item>
+    <title>Cross platform</title>
+    <description>Now LuaEclipse 2 is really cross platform. In addition of Linux and Windows, it's also available for all OSX architectures.</description>
+    <pubDate>TSun, 10 Apr 2011 23:44:00 +0000</pubDate>
+    <guid>http://github.com/KINFOO/LuaEclipse/commit/7b7c4455f5997a494c1fb1e26d23775c99aad85d</guid>
+    <link>http://github.com/KINFOO/LuaEclipse/commit/7b7c4455f5997a494c1fb1e26d23775c99aad85d</link>
+  </item>
+<item>
 <title>Function folding is available for LuaEclipse2</title>
 <description>Maybe I should start a blog to describe it :)</description>
 <pubDate>Tue, 26 Jan 2010 21:13:19 +0000</pubDate>
