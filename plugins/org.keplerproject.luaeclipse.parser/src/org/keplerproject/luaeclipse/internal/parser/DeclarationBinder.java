@@ -20,11 +20,27 @@ import org.keplerproject.luaeclipse.parser.ast.statements.Local;
 import org.keplerproject.luaeclipse.parser.ast.statements.LocalRec;
 import org.keplerproject.luaeclipse.parser.ast.statements.Set;
 
+/**
+ * Parsing in {@link NodeFactory} is top down, which means AST is recursively
+ * constructed from leaves to root. Some information is lost due to top down
+ * parsing. This class is for fetching this information back in order to
+ * initialize outline decorators.
+ * 
+ * @author Kevin KIN-FOO<kevinkinfoo@gmail.com>
+ * 
+ */
 public class DeclarationBinder {
+
+	/** Local declaration nodes IDs */
 	private List<Long> localsIDs;
 
+	/** Global declaration node IDs */
 	private List<Long> globalsIDs;
 
+	/**
+	 * IDs of parent nodes of declaration which allows dealing with both sides
+	 * of {@linkplain BinaryStatement}
+	 */
 	private List<Long> parentsIDs;
 	private Map<Long, Statement> declaration;
 
@@ -40,10 +56,31 @@ public class DeclarationBinder {
 		this.declaration.put(id, s);
 	}
 
+	/**
+	 * Just like {@link #matchDeclarations(Chunk, Chunk, int, boolean)} but for
+	 * global declarations.
+	 * 
+	 * @param ids
+	 * @param values
+	 * @param mod
+	 */
 	private void matchDeclarations(Chunk ids, Chunk values, int mod) {
 		matchDeclarations(ids, values, mod, false);
 	}
 
+	/**
+	 * In {@linkplain BinaryStatement} name declaration of right side with
+	 * identifiers of left side.
+	 * 
+	 * @param ids
+	 *            {@linkplain Chunk} gathering declaration identifiers
+	 * @param values
+	 *            {@linkplain Chunk} gathering values for
+	 * @param mod
+	 *            Integer combination allowing decorator selection
+	 * @param declareAsLocal
+	 *            true if matched declaration must appears as private statement
+	 */
 	private void matchDeclarations(Chunk ids, Chunk values, int mod,
 			boolean declareAsLocal) {
 		/*

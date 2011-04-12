@@ -178,7 +178,7 @@ public class NodeFactory implements LuaExpressionConstants,
 		// Define position in code
 		int childCount = childNodes.size();
 		int end = lua.getEndPosition(id);
-		int start = lua.getStartPosition(id) - 1;
+		int start = lua.getStartPosition(id);
 
 		/*
 		 * Fetch root type
