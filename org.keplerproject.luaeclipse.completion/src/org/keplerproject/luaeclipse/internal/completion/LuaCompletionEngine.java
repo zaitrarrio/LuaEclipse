@@ -15,7 +15,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dltk.codeassist.ICompletionEngine;
-import org.eclipse.dltk.compiler.env.ISourceModule;
+import org.eclipse.dltk.compiler.env.IModuleSource;
 import org.eclipse.dltk.core.CompletionProposal;
 import org.eclipse.dltk.core.CompletionRequestor;
 import org.eclipse.dltk.core.DLTKCore;
@@ -41,7 +41,7 @@ public class LuaCompletionEngine implements ICompletionEngine {
     private int offset;
 
     @Override
-    public void complete(ISourceModule module, int position, int k) {
+    public void complete(IModuleSource module, int position, int k) {
 	this.actualCompletionPosition = position;
 	this.offset = k;
 	String[] keywords = new String[] { "and", "break", "do", "else",
@@ -104,8 +104,8 @@ public class LuaCompletionEngine implements ICompletionEngine {
 		    break;
 		}
 	    }
-	    proposal.setName(name.toCharArray());
-	    proposal.setCompletion(name.toCharArray());
+	    proposal.setName(name);
+	    proposal.setCompletion(name);
 	    proposal.setReplaceRange(actualCompletionPosition - offset,
 		    actualCompletionPosition - offset);
 	    proposal.setRelevance(20);
@@ -115,9 +115,8 @@ public class LuaCompletionEngine implements ICompletionEngine {
 	}
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void setOptions(Map options) {
+    public void setOptions(@SuppressWarnings("rawtypes") Map options) {
     }
 
     @Override
