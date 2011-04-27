@@ -15,8 +15,9 @@ package org.keplerproject.luaeclipse.metalua.tests.internal.cases;
 import junit.framework.TestCase;
 
 import org.keplerproject.luaeclipse.metalua.Metalua;
-import org.keplerproject.luajava.LuaException;
-import org.keplerproject.luajava.LuaState;
+
+import com.naef.jnlua.LuaException;
+import com.naef.jnlua.LuaState;
 
 public class TestMetaluaStateFactory extends TestCase {
 

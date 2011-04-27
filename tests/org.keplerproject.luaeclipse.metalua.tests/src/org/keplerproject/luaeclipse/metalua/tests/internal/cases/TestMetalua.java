@@ -13,6 +13,7 @@
 package org.keplerproject.luaeclipse.metalua.tests.internal.cases;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import junit.framework.TestCase;
@@ -21,9 +22,10 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.keplerproject.luaeclipse.metalua.Metalua;
 import org.keplerproject.luaeclipse.metalua.tests.Suite;
-import org.keplerproject.luajava.LuaException;
-import org.keplerproject.luajava.LuaState;
 import org.osgi.framework.Bundle;
+
+import com.naef.jnlua.LuaException;
+import com.naef.jnlua.LuaState;
 
 /**
  * Make sure that calls to Metalua work
@@ -53,7 +55,8 @@ public class TestMetalua extends TestCase {
 	String message = new String();
 	try {
 	    LuaState s = Metalua.newState();
-	    error = s.LdoString("for") != 0;
+	   s.load("for", "badForStatement");
+	   s.call(0, 0);
 	} catch (LuaException e) {
 	    error = true;
 	    message = e.getMessage();
@@ -64,67 +67,69 @@ public class TestMetalua extends TestCase {
     /** Run from source */
     public void testRunLuaCode() {
 
-	boolean success = true;
-	String message = new String();
-
 	// Proofing valid code
-	success = state.LdoString("var = 1+1") == 0;
-	assertTrue("Single assignment does not work: " + message, success);
+	try{
+	state.load("var = 1+1", "regularAddition);" );
+	state.call(0, 0);
+	}catch(LuaException e){
+		fail(e.getMessage());
+	}
 
 	// Proofing wrong code
-	success = state.LdoString("var local = 'trashed'") == 0;
-	assertFalse("Wrong code is accepted", success);
+	try{
+		String invalidCode = "var local = 'trashed'"; //$NON-NLS-1$
+	state.load(invalidCode, "regularAssignment"); //$NON-NLS-1$
+	state.call(0, 0);
+		fail("Able to load invalid code: "+ invalidCode); //$NON-NLS-1$
+	}catch( LuaException e){
+	}
     }
 
     /** Run Lua source file */
     public void testRunLuaFile() {
 
-	boolean success = false;
-	String message = new String();
-	String fileLocation = null;
-
 	// Proofing valid file
-	try {
-	    fileLocation = path("/scripts/assignment.lua");
-	    success = state.LdoFile(fileLocation) == 0;
-	} catch (IOException e) {
-	    message = e.getMessage();
-	}
-	assertTrue("File location is not defined.", fileLocation != null);
-	assertTrue("Single assignment from '" + fileLocation
-		+ "' does not work: " + message, success);
+		try {
+			File file = new File(path("/scripts/assignment.lua"));
+			FileInputStream input = new FileInputStream(file);
+			state.load(input, "readingAssignmentFile");
+			state.call(0, 0);
+			input.close();
+		} catch (IOException e) {
+			fail(e.getMessage());
+		} catch (LuaException e) {
+			fail(e.getMessage());
+		}
 
 	// Proofing wrong file
-	success = state.LdoFile("/scripts/john.doe") == 0;
-	assertFalse("Inexistant file call works.", success);
+//	success = state.LdoFile("/scripts/john.doe") == 0;
+//	assertFalse("Inexistant file call works.", success);
     }
 
     /** Run from source */
     public void testRunMetaluaCode() {
 	// Proofing valid code
-	boolean success;
-	success = state.LdoString("ast = mlc.luastring_to_ast('var = 1 + 2')") == 0;
-	assertTrue("Single assignment does not work.", success);
+		try{
+			state.load("ast = mlc.luastring_to_ast('var = 1 + 2')", "metaluaCode"); //$NON-NLS-1$ $NON-NLS-2$
+			state.call(0,0);
+		}catch( LuaException e ){
+			fail(e.getMessage());
+		}
     }
 
     /** Run Metalua source file */
     public void testRunMetaluaFile() {
-	boolean success = true;
-	String message = new String();
-	String fileLocation = null;
-
 	// Proofing valid file
 	try {
-	    fileLocation = path("/scripts/introspection.mlua");
-	    success = state.LdoFile(fileLocation) == 0;
+	    File file = new File(path("/scripts/introspection.mlua")); //$NON-NLS-1$
+	    FileInputStream input = new FileInputStream( file );
+	    state.load(input, "metaluaFile"); //$NON-NLS-1$
+	    state.call(0, 0);
+	} catch (LuaException e) {
+		fail(e.getMessage());
 	} catch (IOException e) {
-	    message = e.getMessage();
-	    success = false;
+		fail(e.getMessage());
 	}
-	assertTrue("File location is not defined.", fileLocation != null);
-	assertTrue(
-		"Code from '" + fileLocation + "' does not work: " + message,
-		success);
     }
 
     public void testSourcesPath() {

@@ -12,6 +12,7 @@
 package org.keplerproject.luaeclipse.internal.parser;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -24,15 +25,15 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.declarations.Declaration;
 import org.eclipse.dltk.compiler.problem.IProblem;
-import org.eclipse.dltk.core.DLTKCore;
 import org.keplerproject.luaeclipse.internal.parser.error.LuaParseError;
 import org.keplerproject.luaeclipse.internal.parser.error.LuaParseErrorFactory;
 import org.keplerproject.luaeclipse.metalua.Metalua;
 import org.keplerproject.luaeclipse.parser.Activator;
 import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 import org.keplerproject.luaeclipse.parser.ast.statements.LuaStatementConstants;
-import org.keplerproject.luajava.LuaException;
-import org.keplerproject.luajava.LuaState;
+
+import com.naef.jnlua.LuaException;
+import com.naef.jnlua.LuaState;
 
 /**
  * All Lua tools for parsing Lua AST are available from here.
@@ -105,7 +106,9 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 			setState(Metalua.newState());
 
 			// Run file
-			getState().LdoFile(path);
+			FileInputStream input = new FileInputStream(new File(path));
+			getState().load(input, "parsingUtilities"); //$NON-NLS-1$
+			getState().call(0,0);
 		} catch (IOException e) {
 			Activator.log(e);
 		} catch (LuaException e) {
@@ -161,7 +164,8 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		this();
 		// TODO: Test me
 		String statement = "ast = mlc.luafile_to_ast('" + path.getPath() + "')";
-		getState().LdoString(statement);
+		getState().load(statement, "mlc.luafile_to_ast"); //$NON-NLS-1$
+		getState().call(0, 0);
 		index();
 	}
 
@@ -185,7 +189,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	public List<Long> children(final long id) {
 
 		// Work on empty stack
-		assert getState().getTop() == 0;
+		int top = getState().getTop();
 		List<Long> child = new ArrayList<Long>();
 
 		// Fetch Lua function
@@ -199,7 +203,8 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		 */
 		assert getState().isNumber(-1) : "Number parameter should be in stack.";
 		assert getState().isFunction(-2) : "Attemp to call a non Lua function.";
-		if (getState().pcall(1, 2, 0) == 0) {
+		try {
+			getState().call(1, 2);
 
 			// Check results
 			assert getState().isNumber(-1);
@@ -216,15 +221,17 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 				getState().pushNumber((double) k + 1);
 
 				// Store table value at this index
-				assert getState().getTop() == 2 : "Stack alea";
+				assert getState().getTop() == top + 2 : "Stack alea";
 				getState().getTable(-2);
 				Long nodeID = (long) getState().toNumber(-1);
 				child.add(nodeID);
 				getState().pop(1);
 			}
+		} catch (LuaException e) {
+			Activator.logError("Unable to compute child nodes identifier", e); //$NON-NLS-1$
 		}
 		// Flush stack
-		getState().setTop(0);
+		getState().pop(getState().getTop()-top);
 
 		/*
 		 * Sort list
@@ -246,7 +253,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	}
 
 	private long functionAndIdToLong(String function, long id) {
-	
+
 		long value = 0;
 		int top = getState().getTop();
 		getState().getGlobal(function);
@@ -254,13 +261,17 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		assert getState().isNumber(-1) : "Unable to load ID of node.";
 		assert getState().isFunction(-2) : "Unable to load function to compute end"
 				+ " position in source.";
-		switch (getState().pcall(1, 1, 0)) {
-		case 0:
+		try {
+			getState().call(1, 1);
 			if (getState().isNumber(-1)) {
 				value = (long) getState().toNumber(-1);
+				getState().pop(1);
 			}
+		} catch (LuaException e) {
+			Activator.logError("Unable to load node identifier", e);
+		} catch (IllegalArgumentException e) {
+			Activator.log(e);
 		}
-		getState().pop(1);
 		assert getState().getTop() == top : "Lua stack should be balanced";
 		return value;
 	}
@@ -270,15 +281,17 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		// Retrieve function
 		int top = getState().getTop();
 		getState().getGlobal(function);
-	
+
 		// Execute function
 		assert getState().isFunction(-1);
-		if (getState().pcall(0, 2, 0) == 0) {
+		try {
+			getState().call(0, 2);
+
 			/*
 			 * Check results
 			 */
 			assert getState().isTable(-2) && getState().isNumber(-1) : "Unexpected result from Lua declaration fetching.";
-	
+
 			/*
 			 * Register IDs of declarations
 			 */
@@ -288,15 +301,16 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 				// Pushing on stack index of required field
 				getState().pushNumber((double) k);
 				// getState().pushInteger(k);
-	
+
 				// Push its value on top of stack
 				getState().getTable(-2);
-	
+
 				// Retrieving value from stack
 				long id = (long) getState().toNumber(-1);
 				list.add(id);
 				getState().pop(1);
 			}
+		} catch (LuaException e) {
 		}
 		getState().pop(1);
 		assert top == getState().getTop() : "Stack is unbalanced after fetching declarations.";
@@ -340,7 +354,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	 *         source.
 	 */
 	public int getEndPosition(final long id) {
-		return (int)functionAndIdToLong("getEnd", id);
+		return (int) functionAndIdToLong("getEnd", id);
 	}
 
 	public List<Long> getGlobalDeclarationsIDs() {
@@ -359,7 +373,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	 *         code source.
 	 */
 	public int getStartPosition(final long id) {
-		return (int)functionAndIdToLong("getStart", id);
+		return (int) functionAndIdToLong("getStart", id);
 	}
 
 	/**
@@ -372,7 +386,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	 */
 	public String getValue(final long id) {
 		String value;
-		assert getState().getTop() == 0 : "Lua stack should be empty";
+		int top = getState().getTop();
 
 		// Retrieve Lua procedure
 		getState().getGlobal("getValue");
@@ -381,17 +395,18 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		getState().pushNumber((double) id);
 
 		// Call Lua function with 1 parameter and 1 result
-		if (getState().pcall(1, 1, 0) == 0) {
+		try {
+			getState().call(1, 1);
 			assert getState().getTop() == 1 && getState().isString(-1) : "A problem occured during value retrieval";
 
 			// Bear value in mind
 			value = getState().toString(-1);
-		} else {
+		} catch (LuaException e) {
 			// TODO: Remove silent behaviour
 			value = "none";
 		}
 		// Flush stack
-		getState().setTop(0);
+		getState().pop(getState().getTop() - top);
 		return value;
 	}
 
@@ -407,28 +422,25 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		String name = null;
 
 		// Stack should be empty
-		assert getState().getTop() == 0 : MetaluaASTWalker.class.toString()
-				+ ": Lua stack should be empty";
+		int top = getState().getTop();
 
 		// Retrieve Lua function
-		getState().getField(LuaState.LUA_GLOBALSINDEX, "getTag");
+		getState().getField(LuaState.GLOBALSINDEX, "getTag");
 
 		// Pass given ID as parameter
 		getState().pushNumber((double) id);
 
 		// Call function
-		switch (getState().pcall(1, 1, 0)) {
-		case 0:
+		try {
+			getState().call(1, 1);
 			name = getState().toString(-1);
-			break;
-		default:
+		} catch (LuaException e) {
 			// TODO: remove silent behavior
 			name = new String();
-			break;
 		}
 
 		// Flush stack
-		getState().setTop(0);
+		getState().pop(getState().getTop()-top);
 		return name;
 	}
 
@@ -460,21 +472,18 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 				+ "indexation, stack size: " + getState().getTop();
 
 		// Retrieve procedure index
-		getState().getField(LuaState.LUA_GLOBALSINDEX, "index");
+		getState().getField(LuaState.GLOBALSINDEX, "index");
 
 		// Retrieve current AST
-		getState().getField(LuaState.LUA_GLOBALSINDEX, "ast");
+		getState().getField(LuaState.GLOBALSINDEX, "ast");
 
 		// Analyze error if AST index fails
-		if (getState().pcall(1, 1, 0) == LuaState.LUA_ERRRUN) {
-			try {
-				Metalua.raise(getState());
-			} catch (LuaException e) {
-				_parseError = LuaParseErrorFactory.get(e.getMessage());
-			}
-		} else {
+		try {
+			getState().call(1, 1);
 			// Remove procedure and parameter from Lua stack
 			getState().pop(1);
+		} catch (LuaException e) {
+			_parseError = LuaParseErrorFactory.get(e.getMessage());
 		}
 
 		// Lua stack should be empty again
@@ -492,16 +501,17 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	 */
 	public boolean nodeHasLineInfo(final long id) {
 		boolean hasLineInfo;
-		assert getState().getTop() == 0 : "Lua stack should be empty.";
+		int top = getState().getTop();
 		getState().getGlobal("hasLineInfo");
 		getState().pushNumber((double) id);
-		if (getState().pcall(1, 1, 0) == 0) {
+		try {
+			getState().call(1, 1);
 			assert getState().isBoolean(-1) : "Boolean sould be on top of stack";
 			hasLineInfo = getState().toBoolean(-1);
-		} else {
+		} catch (Exception e) {
 			hasLineInfo = false;
 		}
-		getState().setTop(0);
+		getState().pop(getState().getTop()-top);
 		return hasLineInfo;
 	}
 
@@ -561,10 +571,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		String parseFunction = "luastring_to_ast";
 
 		// Lua utils
-		assert getState().getTop() == 0 : "Stack is unbalanced before AST generation.";
-		// if (getState().getTop() > 0) {
-		// getState().setTop(0);
-		// }
+		int top = getState().getTop();
 		// Retrieve function
 		getState().getGlobal("mlc");
 		getState().getField(-1, parseFunction);
@@ -576,26 +583,18 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		getState().pushString(this.source);
 
 		// Build Lua AST
-		switch (getState().pcall(1, 1, 0)) {
-		case 0:
+		try {
+			getState().call(1, 1);
 			assert getState().getTop() == 1 && getState().isTable(-1) : "Lua AST generation failed.";
 
 			// Store result in global variable 'ast' in Lua side
 			getState().setGlobal("ast");
-			assert getState().getTop() == 0 : "Lua stack is unbalanced after AST generation";
+			getState().pop(getState().getTop() - top);
 			return true;
-		default:
-			// Retrieve error from Lua stack
-			String error = getState().toString(-1);
-
+		} catch (LuaException e) {
 			// Notify Error
-			_parseError = LuaParseErrorFactory.get(error);
-
-			// Clean stack
-			getState().pop(-1);
-			if (DLTKCore.DEBUG) {
-				Activator.logWarning("Bind error:\n" + error);
-			}
+			_parseError = LuaParseErrorFactory.get(e.getMessage());
+			Activator.logError("Unable to build AST", e);
 			return false;
 		}
 	}

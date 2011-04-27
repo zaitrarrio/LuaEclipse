@@ -105,12 +105,16 @@ public class TestDeclarations extends TestCase {
 			assertNotNull("Visitor not initialised", visitor);
 			return;
 		}
+		try{
 		Declaration declaration = visitor.getDeclarations(
 				TableDeclaration.class).get(0);
 		assertFalse("Table should not be considered as public.", declaration
 				.isPublic());
 		assertTrue("Table should be considered as private.", declaration
 				.isPrivate());
+		}catch ( IndexOutOfBoundsException e ){
+			fail(e.getMessage());
+		}
 	}
 
 	/**

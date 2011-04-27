@@ -11,8 +11,9 @@
  *****************************************************************************/
 package org.keplerproject.luaeclipse.metalua;
 
-import org.keplerproject.luajava.LuaException;
-import org.keplerproject.luajava.LuaState;
+import com.naef.jnlua.LuaException;
+import com.naef.jnlua.LuaRuntimeException;
+import com.naef.jnlua.LuaState;
 
 /**
  * Enables to run Metalua code and source files quickly.
@@ -45,7 +46,7 @@ public class Metalua {
 
 	// Clean stack
 	l.pop(1);
-	throw new LuaException(msg);
+	throw new LuaRuntimeException(msg);
     }
 
     /**
@@ -58,25 +59,17 @@ public class Metalua {
     public static boolean isValid(final String code) {
 
 	// Try to load code without run it
-	boolean status;
 	LuaState state;
 	try {
 	    state = newState();
+	    state.load(code, "isCodeValid"); //$NON-NLS-1$
 	} catch (LuaException e) {
 	    return false;
-	}
-	switch (state.LloadString(code)) {
-	case 0:
-	    status = true;
-	    break;
-	default:
-	    status = false;
-	    break;
-	}
+	} 
 
 	// Clear stack
 	state.pop(1);
-	return status;
+	return true;
     }
 
     public static String path() {

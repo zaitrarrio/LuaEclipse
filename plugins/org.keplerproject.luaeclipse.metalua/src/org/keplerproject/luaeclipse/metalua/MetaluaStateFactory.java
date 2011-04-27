@@ -24,10 +24,10 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
-import org.keplerproject.luajava.LuaException;
-import org.keplerproject.luajava.LuaState;
-import org.keplerproject.luajava.LuaStateFactory;
 import org.osgi.framework.Bundle;
+
+import com.naef.jnlua.LuaException;
+import com.naef.jnlua.LuaState;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -58,7 +58,7 @@ class MetaluaStateFactory {
 		/*
 		 * Create a regular LuaState, then enable it to run Metalua
 		 */
-		LuaState l = LuaStateFactory.newLuaState();
+		LuaState l = new LuaState();
 
 		// Load default libraries, in order to modify PATH
 		l.openLibs();
@@ -72,11 +72,15 @@ class MetaluaStateFactory {
 		String require = "require 'metalua.compiler'";
 
 		// Detect problems
-		switch (l.LdoString(path) + l.LdoString(require)) {
-		default:
-			Metalua.raise(l);
-		case 0:
-		}
+		l.load(path, "pathLoading");
+		l.call(0, 0);
+		l.load(require, "requireContentFromPath");
+		l.call(0, 0);
+//		switch (l.LdoString(path) + l.LdoString(require)) {
+//		default:
+//			Metalua.raise(l);
+//		case 0:
+//		}
 
 		// State is ready
 		return l;
