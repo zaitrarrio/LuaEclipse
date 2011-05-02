@@ -14,9 +14,23 @@
 	</modules>
 
 	<properties>
-		<tycho-version>0.11.0</tycho-version>
-		<tycho-groupid>org.sonatype.tycho</tycho-groupid>
+		<tycho-version>0.13.0-SNAPSHOT</tycho-version>
+		<tycho-groupid>org.eclipse.tycho</tycho-groupid>
 	</properties>
+
+    <repositories>
+              <repository>
+                      <id>helios</id>
+                      <layout>p2</layout>
+                      <url>http://download.eclipse.org/releases/helios</url>
+              </repository>
+              <repository>
+                      <id>dltk</id>
+                      <layout>p2</layout>
+                      <url>http://download.eclipse.org/technology/dltk/updates</url>
+              </repository>
+      </repositories>
+
 
 	<build>
 		<plugins>
@@ -32,7 +46,7 @@
 				<version>${tycho-version}</version>
 				<configuration>
 					<resolver>p2</resolver>
-					<target>
+<!--					<target>
 						<artifact>
 							<groupId>org.keplerproject.luaeclipse</groupId>
 							<artifactId>target-platform</artifactId>
@@ -40,7 +54,7 @@
 							<classifier>luaeclipse2</classifier>
 						</artifact>
 					</target>
-					<ignoreTychoRepositories>true</ignoreTychoRepositories>
+-->					<ignoreTychoRepositories>true</ignoreTychoRepositories>
 					<environments>
 						<environment>
 							<os>win32</os>
@@ -52,18 +66,28 @@
 							<ws>gtk</ws>
 							<arch>x86</arch>
 						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
 					</environments>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
 
-	<pluginRepositories> 
-		<pluginRepository> 
-			<id>sonatype-staging</id> 
-  			<url>https://repository.sonatype.org/content/repositories/sonatype_org-002/</url>
-		</pluginRepository> 
-	</pluginRepositories> 
+	<pluginRepositories>
+		<pluginRepository>
+			<id>sonatype-staging</id>
+  			<url>https://repository.sonatype.org/content/repositories/forge</url>
+		</pluginRepository>
+	</pluginRepositories>
 
 </project>
 

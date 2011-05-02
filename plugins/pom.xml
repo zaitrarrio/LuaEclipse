@@ -12,14 +12,13 @@
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modules>
+    <module>com.naef.jnlua</module>
+    <module>com.naef.jnlua.linux</module>
+    <module>com.naef.jnlua.macosx</module>
+    <module>com.naef.jnlua.windows</module>
     <module>org.keplerproject.luaeclipse</module>
     <module>org.keplerproject.luaeclipse.completion</module>
     <module>org.keplerproject.luaeclipse.editor</module>
-    <module>org.keplerproject.luaeclipse.lua</module>
-    <module>org.keplerproject.luaeclipse.lua.linux</module>
-    <module>org.keplerproject.luaeclipse.lua.linux64</module>
-    <module>org.keplerproject.luaeclipse.lua.macos</module>
-    <module>org.keplerproject.luaeclipse.lua.windows</module>
     <module>org.keplerproject.luaeclipse.metalua</module>
     <module>org.keplerproject.luaeclipse.metalua.32bits</module>
     <module>org.keplerproject.luaeclipse.metalua.64bits</module>
@@ -28,14 +27,4 @@
     <module>org.keplerproject.luaeclipse.ui</module>
     <module>org.keplerproject.luaeclipse.wizards</module>
   </modules>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.sonatype.tycho</groupId>
-        <artifactId>tycho-maven-plugin</artifactId>
-        <version>0.11.0</version>
-        <extensions>true</extensions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

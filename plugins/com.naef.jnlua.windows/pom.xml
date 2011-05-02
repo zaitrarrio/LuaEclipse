@@ -7,8 +7,8 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<groupId>org.keplerproject.luaeclipse</groupId>
-	<artifactId>org.keplerproject.luaeclipse.metalua.32bits</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<artifactId>com.naef.jnlua.windows</artifactId>
+	<version>0.9.1-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 	<build>
 		<plugins>
@@ -18,11 +18,6 @@
 				<version>${tycho-version}</version>
 				<configuration>
 					<environments>
-						<environment>
-							<os>linux</os>
-							<ws>gtk</ws>
-							<arch>x86</arch>
-						</environment>
 						<environment>
 							<os>win32</os>
 							<ws>win32</ws>

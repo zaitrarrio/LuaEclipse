@@ -14,14 +14,18 @@
   <modules>
     <module>org.keplerproject.luaeclipse-feature</module>
   </modules>
+
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.sonatype.tycho</groupId>
-        <artifactId>tycho-maven-plugin</artifactId>
-        <version>0.11.0</version>
-        <extensions>true</extensions>
-      </plugin>
-    </plugins>
+      <plugins>
+          <plugin>
+              <groupId>org.eclipse.tycho</groupId>
+              <artifactId>tycho-packaging-plugin</artifactId>
+              <version>${tycho-version}</version>
+              <configuration>
+                  <deployableFeature>true</deployableFeature>
+              </configuration>
+          </plugin>
+      </plugins>
   </build>
+
 </project>
