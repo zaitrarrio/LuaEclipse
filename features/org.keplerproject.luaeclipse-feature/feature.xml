@@ -124,33 +124,6 @@ This Agreement is governed by the laws of the State of New York and the intellec
          unpack="false"/>
 
    <plugin
-         id="org.keplerproject.luaeclipse.lua"
-         download-size="0"
-         install-size="0"
-         version="1.0.0.qualifier"
-         unpack="false"/>
-
-   <plugin
-         id="org.keplerproject.luaeclipse.lua.linux"
-         os="linux"
-         arch="x86"
-         download-size="0"
-         install-size="0"
-         version="1.0.0.qualifier"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.keplerproject.luaeclipse.lua.windows"
-         os="win32"
-         arch="x86"
-         download-size="0"
-         install-size="0"
-         version="1.0.0.qualifier"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="org.keplerproject.luaeclipse.metalua"
          download-size="0"
          install-size="0"
@@ -162,16 +135,6 @@ This Agreement is governed by the laws of the State of New York and the intellec
          download-size="0"
          install-size="0"
          version="1.2.0.qualifier"/>
-
-   <plugin
-         id="org.keplerproject.luaeclipse.lua.linux64"
-         os="linux"
-         arch="x86_64"
-         download-size="0"
-         install-size="0"
-         version="1.0.0.qualifier"
-         fragment="true"
-         unpack="false"/>
 
    <plugin
          id="org.keplerproject.luaeclipse.ui"
@@ -215,6 +178,33 @@ This Agreement is governed by the laws of the State of New York and the intellec
          download-size="0"
          install-size="0"
          version="1.0.0.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="com.naef.jnlua"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.naef.jnlua.linux"
+         os="linux"
+         arch="x86"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.naef.jnlua.windows"
+         os="win32"
+         arch="x86"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
          unpack="false"/>
 
 </feature>
