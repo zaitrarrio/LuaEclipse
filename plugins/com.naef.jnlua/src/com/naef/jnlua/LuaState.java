@@ -144,13 +144,11 @@ public class LuaState {
 	 * coroutine. This field is modified exclusively on the JNI side and must
 	 * not be touched on the Java side.
 	 */
-	@SuppressWarnings("unused")
 	private long luaThread;
 
 	/**
 	 * Ensures proper finalization of this Lua state.
 	 */
-	@SuppressWarnings("unused")
 	private Object finalizeGuardian;
 
 	/**

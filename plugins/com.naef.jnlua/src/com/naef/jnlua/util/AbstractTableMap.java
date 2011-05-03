@@ -228,6 +228,7 @@ public abstract class AbstractTableMap<K> extends AbstractMap<K, Object>
 			}
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public boolean contains(Object object) {
 			checkKey(object);
@@ -241,6 +242,7 @@ public abstract class AbstractTableMap<K> extends AbstractMap<K, Object>
 			return containsKey(luaTableEntry.key);
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public boolean remove(Object object) {
 			if (!(object instanceof AbstractTableMap<?>.Entry)) {
@@ -356,6 +358,7 @@ public abstract class AbstractTableMap<K> extends AbstractMap<K, Object>
 		}
 
 		// -- Object methods
+		@SuppressWarnings("unchecked")
 		@Override
 		public boolean equals(Object obj) {
 			if (!(obj instanceof AbstractTableMap<?>.Entry)) {
