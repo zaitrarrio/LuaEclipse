@@ -27,7 +27,7 @@ import com.naef.jnlua.LuaState;
 public class ConcurrencyTest extends TestCase {
 
 	/** Quantity of thread to perform calls on LuaJava simultaneously */
-	private final static int THREAD_COUNT = 5;
+	private final static int THREAD_COUNT = 50;
 
 	/**
 	 * Internal definition of thread for the only purpose to perform a function
@@ -100,6 +100,7 @@ public class ConcurrencyTest extends TestCase {
 				thread.join();
 				count++;
 			} catch (InterruptedException e) {
+				fail(e.getMessage());
 			}
 		}
 		assertEquals("A thread encounter an error", count, THREAD_COUNT);
