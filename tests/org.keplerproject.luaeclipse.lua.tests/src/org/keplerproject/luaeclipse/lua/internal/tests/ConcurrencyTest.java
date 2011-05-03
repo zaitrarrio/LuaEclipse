@@ -15,13 +15,13 @@ package org.keplerproject.luaeclipse.lua.internal.tests;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.keplerproject.luajava.LuaState;
-import org.keplerproject.luajava.LuaStateFactory;
+
+import com.naef.jnlua.LuaState;
 
 /**
  * The aim here is to ensure that LuaJava is able to handle concurrent calls
  * from different {@link LuaState}.
- * 
+ *
  * @author Kevin KIN-FOO <kevinkinfoo@gmail.com>
  */
 public class ConcurrencyTest extends TestCase {
@@ -55,17 +55,18 @@ public class ConcurrencyTest extends TestCase {
 					+ "return fibo(n-1) + fibo(n-2) end";
 
 			// Load function
-			state.LdoString(code);
+			state.pushString(code);
+			state.call(0, 0);
 
 			// Retrieve function in Lua
-			state.getField(LuaState.LUA_GLOBALSINDEX, "fibo");
+			state.getField(LuaState.GLOBALSINDEX, "fibo");
 
 			// Pass an argument to the function
 			state.pushNumber(32);
 
 			// Call the Fibonacci serie
 			assert state.isNumber(-1) && state.isFunction(-2) : "Badly formed function call.";
-			state.pcall(1, 1, 0);
+			state.call(1, 1);
 
 			// Clean stack
 			state.pop(1);
@@ -84,7 +85,7 @@ public class ConcurrencyTest extends TestCase {
 		// Create several threads
 		Thread[] threads = new Thread[THREAD_COUNT];
 		for (int k = 0; k < THREAD_COUNT; k++) {
-			threads[k] = new LuaJavaUse(LuaStateFactory.newLuaState());
+			threads[k] = new LuaJavaUse(new LuaState());
 		}
 
 		// Activate all of them, they will start to use LuaJava randomly
