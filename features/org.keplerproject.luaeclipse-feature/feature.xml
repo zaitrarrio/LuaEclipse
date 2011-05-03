@@ -217,4 +217,12 @@ This Agreement is governed by the laws of the State of New York and the intellec
          fragment="true"
          unpack="false"/>
 
+   <plugin
+         id="com.naef.jnlua.linux64"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
 </feature>
