@@ -19,12 +19,12 @@ import junit.framework.TestSuite;
 public class Suite extends TestSuite {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.keplerproject.luaeclipse.lua.tests";
+	public static final String PLUGIN_ID = "org.keplerproject.luaeclipse.lua.tests"; //$NON-NLS-1$
 
 	/** Registers all tests to run */
 	public Suite() {
 		super();
-		setName("LuaJava");
+		setName("JNLua"); //$NON-NLS-1$
 		addTestSuite(ConcurrencyTest.class);
 	}
 }

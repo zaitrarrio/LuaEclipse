@@ -27,7 +27,7 @@ import org.keplerproject.luajava.LuaStateFactory;
 public class ConcurrencyTest extends TestCase {
 
 	/** Quantity of thread to perform calls on LuaJava simultaneously */
-	private final static int THREAD_COUNT = 2;
+	private final static int THREAD_COUNT = 5;
 
 	/**
 	 * Internal definition of thread for the only purpose to perform a function
