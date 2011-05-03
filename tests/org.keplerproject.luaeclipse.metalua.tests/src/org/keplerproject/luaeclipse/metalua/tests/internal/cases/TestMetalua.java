@@ -29,9 +29,9 @@ import com.naef.jnlua.LuaState;
 
 /**
  * Make sure that calls to Metalua work
- * 
+ *
  * @author kkinfoo
- * 
+ *
  */
 public class TestMetalua extends TestCase {
     private static Bundle BUNDLE;
