@@ -115,9 +115,8 @@ public class LuaCompletionEngine implements ICompletionEngine {
 	}
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void setOptions(Map options) {
+    public void setOptions(@SuppressWarnings("rawtypes") Map options) {
     }
 
     @Override

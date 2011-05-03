@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>aggregator</artifactId>
+		<groupId>org.keplerproject.luaeclipse</groupId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+  <groupId>org.keplerproject.luaeclipse</groupId>
+  <artifactId>plugins</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>com.naef.jnlua</module>
+    <module>com.naef.jnlua.linux</module>
+    <module>com.naef.jnlua.macosx</module>
+    <module>com.naef.jnlua.windows</module>
+    <module>org.keplerproject.luaeclipse</module>
+    <module>org.keplerproject.luaeclipse.completion</module>
+    <module>org.keplerproject.luaeclipse.editor</module>
+    <module>org.keplerproject.luaeclipse.metalua</module>
+    <module>org.keplerproject.luaeclipse.metalua.32bits</module>
+    <module>org.keplerproject.luaeclipse.metalua.64bits</module>
+    <module>org.keplerproject.luaeclipse.parser</module>
+    <module>org.keplerproject.luaeclipse.templates</module>
+    <module>org.keplerproject.luaeclipse.ui</module>
+    <module>org.keplerproject.luaeclipse.wizards</module>
+  </modules>
+</project>
