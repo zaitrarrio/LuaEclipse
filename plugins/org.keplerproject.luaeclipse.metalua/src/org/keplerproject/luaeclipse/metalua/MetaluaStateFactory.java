@@ -108,7 +108,7 @@ class MetaluaStateFactory {
 
 				// Locate it on disk
 				URL ressource = bundle.getResource("/" + folder);
-				String _sourcePath = FileLocator.resolve(ressource).getPath();
+				String _sourcePath = FileLocator.toFileURL(ressource).getPath();
 
 				/*
 				 * Remove folder name at the end of path in order to obtain
