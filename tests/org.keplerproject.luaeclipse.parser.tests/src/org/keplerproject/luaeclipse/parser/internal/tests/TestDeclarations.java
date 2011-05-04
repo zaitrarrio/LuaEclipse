@@ -102,8 +102,7 @@ public class TestDeclarations extends TestCase {
 		try {
 			visitor = parse("local t={}");
 		} catch (Exception e) {
-			assertNotNull("Visitor not initialised", visitor);
-			return;
+			fail("Visitor not initialised"); //$NON-NLS-1$
 		}
 		try{
 		Declaration declaration = visitor.getDeclarations(
@@ -126,8 +125,7 @@ public class TestDeclarations extends TestCase {
 		try {
 			visitor = parse("local t={field=nil}");
 		} catch (Exception e) {
-			assertNotNull("Visitor not initialised", visitor);
-			return;
+			fail("Visitor not initialised"); //$NON-NLS-1$
 		}
 		// Retrieve fields from AST
 		List<Declaration> fields = visitor.getDeclarations(TableField.class);

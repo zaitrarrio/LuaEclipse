@@ -27,17 +27,17 @@ import com.naef.jnlua.LuaState;
 public class ConcurrencyTest extends TestCase {
 
 	/** Quantity of thread to perform calls on LuaJava simultaneously */
-	private final static int THREAD_COUNT = 50;
+	private final static int THREAD_COUNT = 5;
 
 	/**
 	 * Internal definition of thread for the only purpose to perform a function
 	 * call using LuaJava
 	 */
-	private class LuaJavaUse extends Thread {
+	private class JNLuaUse extends Thread {
 
 		private LuaState state;
 
-		public LuaJavaUse(LuaState l) {
+		public JNLuaUse(LuaState l) {
 			state = l;
 		}
 
@@ -55,7 +55,7 @@ public class ConcurrencyTest extends TestCase {
 					+ "return fibo(n-1) + fibo(n-2) end";
 
 			// Load function
-			state.pushString(code);
+			state.load(code, "fibonacciFunction"); //$NON-NLS-1$
 			state.call(0, 0);
 
 			// Retrieve function in Lua
@@ -85,7 +85,7 @@ public class ConcurrencyTest extends TestCase {
 		// Create several threads
 		Thread[] threads = new Thread[THREAD_COUNT];
 		for (int k = 0; k < THREAD_COUNT; k++) {
-			threads[k] = new LuaJavaUse(new LuaState());
+			threads[k] = new JNLuaUse(new LuaState());
 		}
 
 		// Activate all of them, they will start to use LuaJava randomly
