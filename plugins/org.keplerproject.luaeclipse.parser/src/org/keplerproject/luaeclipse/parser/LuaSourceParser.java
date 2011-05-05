@@ -65,7 +65,7 @@ public class LuaSourceParser extends AbstractSourceParser {
 	 * @see org.eclipse.dltk.ast.parser.ISourceParser#parse(char[], char[],
 	 *      org.eclipse.dltk.compiler.problem.IProblemReporter)
 	 */
-	public synchronized ModuleDeclaration parse(char[] file, char[] source,
+	public ModuleDeclaration parse(char[] file, char[] source,
 			IProblemReporter reporter) {
 
 		// Analyze code
@@ -73,9 +73,7 @@ public class LuaSourceParser extends AbstractSourceParser {
 		String code = new String(source);
 		NodeFactory factory = null;
 		String fileName = new String(file);
-		synchronized (mutex) {
-			factory = new NodeFactory(code);
-		}
+		factory = new NodeFactory(code);
 
 		// Search for problem
 		if (factory.errorDetected()) {
@@ -87,10 +85,8 @@ public class LuaSourceParser extends AbstractSourceParser {
 
 			// Fetch previous stable source from cache
 			if (_cache.containsKey(fileName)) {
-				synchronized (mutex) {
-					factory = new NodeFactory(_cache.get(fileName));
-					ast = factory.getRoot();
-				}
+				factory = new NodeFactory(_cache.get(fileName));
+				ast = factory.getRoot();
 			} else {
 				// When there is no source code cached, start from scratch
 				ast = new ModuleDeclaration(source.length);
@@ -99,9 +95,7 @@ public class LuaSourceParser extends AbstractSourceParser {
 		} else {
 			// Cache current AST in order to use it in case of error
 			_cache.put(fileName, code);
-			synchronized (mutex) {
-				ast = factory.getRoot();
-			}
+			ast = factory.getRoot();
 		}
 		return ast;
 	}
