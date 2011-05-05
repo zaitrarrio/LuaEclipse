@@ -311,6 +311,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 				getState().pop(1);
 			}
 		} catch (LuaException e) {
+			Activator.logWarning("Unable to run function: "+function, e);
 		}
 		getState().pop(1);
 		assert top == getState().getTop() : "Stack is unbalanced after fetching declarations.";
@@ -402,8 +403,8 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 			// Bear value in mind
 			value = getState().toString(-1);
 		} catch (LuaException e) {
-			// TODO: Remove silent behaviour
-			value = "none";
+			value = new String();
+			Activator.logWarning("Unable to get value for node: "+id, e);
 		}
 		// Flush stack
 		getState().pop(getState().getTop() - top);
@@ -435,7 +436,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 			getState().call(1, 1);
 			name = getState().toString(-1);
 		} catch (LuaException e) {
-			// TODO: remove silent behavior
+			Activator.logWarning("Unable to get node name for id: " + id, e);
 			name = new String();
 		}
 

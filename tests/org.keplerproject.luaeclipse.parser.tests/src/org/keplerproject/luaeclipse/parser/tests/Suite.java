@@ -38,7 +38,6 @@ public class Suite extends TestSuite {
      * 
      */
     public Suite() {
-	super();
 	setName("Lua Source parser");
 	addTestSuite(TestASTValidity.class);
 	addTestSuite(TestDeclarations.class);
