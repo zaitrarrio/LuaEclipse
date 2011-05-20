@@ -1,61 +1,18 @@
-
---[[
-local oldreq=require
-local n=1
-function require(...)
-	local l=package.loaded[...]
-	if l then return l end
-	print(string.rep("| ",n), "BEGIN", ...)
-	n=n+1
-	local r = oldreq(...)
-	n=n-1
-	print(string.rep("| ",n), "END", ...)
-	return r	
-end
-local path = "/home/kkinfoo/dev/luaEclipse/LuaEclipseM6/plugins/org.keplerproject.luaeclipse.metalua.32bits/"
-package.path = path.."?.luac;"..path.."?.lua;"..package.path 
-]]
---print (package.path)
---local path = "?.luac;?.lua"
---package.path = package.path ..path.."?.luac"..path.."?.lua"
-
---for _, name in ipairs{'path','cpath','mpath'} do
---	print('package.' .. name .. ' = ' .. (package[name] or 'nil'))
---end 
-
---package.path = "?.luac;?.lua;/usr/lib/lua/5.1/?.luac;/usr/lib/lua/5.1/?.lua;/home/kkinfoo/dev/luaEclipse/LuaEclipseM6/plugins/org.keplerproject.luaeclipse.metalua.32bits/?.luac;/home/kkinfoo/dev/luaEclipse/LuaEclipseM6/plugins/org.keplerproject.luaeclipse.metalua.32bits/?.lua"
-
-
--------------------------------------------------------------------------------
---  Copyright (c) 2009 KeplerProject, Sierra Wireless.
+--#!/usr/bin/lua
+--------------------------------------------------------------------------------
+--  Copyright (c) 2009-2011 KeplerProject, Sierra Wireless.
 --  All rights reserved. This program and the accompanying materials
 --  are made available under the terms of the Eclipse Public License v1.0
 --  which accompanies this distribution, and is available at
 --  http://www.eclipse.org/legal/epl-v10.html
 -- 
 --  Contributors:
---       Kevin KIN-FOO <kkin-foo@sierrawireless.com>
+--       Kevin KIN-FOO <kkinfoo@sierrawireless.com>
 --           - initial API and implementation and initial documentation
----------------------------------------------------------------------------------
-require 'metalua.compiler'
-require 'metalua.walk.bindings'
-local function dump( var )
-	local function _dump( t, spaces )
-		if type(t) == 'table' then 
-			for k,v in pairs(t) do
-				_dump(k, spaces.."\t")
-				_dump(v, spaces.."\t")
-			end
-		else
-			print (spaces .. type(t)..'('..tostring(t)..')')
-		end
-	end
-	_dump(var, "")
-end
---
+--------------------------------------------------------------------------------
+
 -- Thoses are hashmaps to link nodes to their ID,
 -- in order to enable direct access, time efficient
---
 local idToNode = {}
 local nodeToId = {}
 local publicDeclarationsIDs = {}
@@ -73,11 +30,16 @@ local function getID()
 end
 
 --
+-- Assing name to "valuable" nodes, such as:
+-- * `Function
+-- * `Table
 --
+-- @param ast AST of "table" type
 --
 local function matchDeclaration( ast )
 	--
 	--	Checks if node is already indexed in internal hashmaps
+	--
 	--	@param node	table Node to localize in hashmaps
 	--
 	local function registered( node )
@@ -87,38 +49,229 @@ local function matchDeclaration( ast )
 		)
 		return nodeToId[ node ] ~= nil
 	end
+	--
+	-- Cache local declarations in a global table, indexed nodes are `Local
+	-- and `Localrec
+	--
 	local function cacheDeclaration(hash, t)
 		assert( type(hash) == 'table' )
 		assert( type(t)    == 'table' )
 		for declaration, occurrences in pairs(t) do
 			if registered(declaration) then
-				local id = nodeToId[ declaration ]
-				table.insert(hash, id)
+				table.insert(hash, nodeToId[ declaration ])
 			end
 		end
 	end
 	local function cacheGlobalDeclaration(hash, t)
+		local function isCall( node  )
+			if not node then return false end
+			if node.tag and node.tag =="Call" or node.tag == "Invoke" then
+				return true
+			end
+			return isCall(idToNode[parent[nodeToId[node]]])
+		end
 		assert( type(hash) == 'table' )
 		assert( type(t)    == 'table' )
 		for name, occurences in pairs( t ) do
-			for k, node in pairs( occurences ) do
-				if registered(node) then
-				--local id = nodeToId[ node ]
+			for id, node in pairs(occurences) do
+				if registered(node) and not isCall(node) then
 					table.insert(hash, nodeToId[ node ])
 				end
 			end
 		end
 	end
+	--
+	-- Browse left side node in order to compose an human redeable
+	-- name from declaration identifier
+	--
+	-- @param id Numeric identifier of nodes-to-name container such as:
+	--	<li>`Local</li>
+	--	<li>`Localrec</li>
+	--
+	local function fetchIdentifier( id )
+		-- Compose human redeable name from identifiers and assign it
+		-- to every declaration
+		require 'metalua.ast_to_string'
+		local node = idToNode[id]
 
+		-- Dealing with `Forin and `Fornum
+		if node.tag == 'Forin' or node.tag == 'Fornum' then
+			-- Nothing to as there no declaration with nameless nodes
+			return
+		end
+		-- Dealing with `Local and `Localrec
+		local identifiers, declarations = node[1], node[2]
+		for index, declaration in pairs( declarations ) do
+
+			-- Avoid 'lineinfo'
+			if ( type(index) == 'number' ) then
+
+				-- Naming `Table and `Function nested in `Pair
+				if declaration.tag == "Table" then
+					nameNestedPair( nodeToId[declaration] )
+				end
+
+				-- Compute name when an identifier is available
+				local human = ""
+				if identifiers[index] then
+					human=ast_to_string(identifiers[index])
+					if string.sub(human, #human-2) == " ()" then
+						human=string.sub(human,1,#human-3)
+					end
+				end
+				declaration["name"] = human
+			end
+		end
+	end
+
+	--
+	-- Retrieve identifier of enclosing parent node. Useful to deal with
+	-- global declarations
+	--
+	-- @param id Number identifier of declaration node
+	-- @return Identifier of parent node when available
+	--
+	local function topExpression(identifier)
+		local node = idToNode[identifier]
+		if not node or node.tag and ( node.tag == "Set"
+			or node.tag == "Local"
+			or node.tag == "Localrec"
+			or node.tag == "Pair"
+			or node.tag == "While"
+			or node.tag == "If"
+			or node.tag == "Fornum"
+			or node.tag == "Return"
+			or node.tag == "Forin" ) then
+				return identifier
+		end
+		return topExpression(parent[identifier])
+	end
+
+	--
+	-- Provides node position in parent node children list
+	--
+	-- @param	index Number identifier of position requested node
+	-- @return	Number position of node in parent chunk, nil if position not
+	-- 	found
+	--
+	local function getNodePositionInParent(index)
+		assert(type(index) == "number", "'number' expected")
+		local parentId= topExpression(index)
+		-- Locate chunk identifier
+		local nodes = idToNode[parentId][1]
+		for position, node in pairs(nodes) do
+			if node == idToNode[index] then return position end
+		end
+	end
+
+	--
+	-- Assign name to `Function and `Table nested in `Pairs like:
+	--	<code>
+	--	local table = {
+	--		nestedTable={},
+	--		nestedFunction=function()end
+	--	}
+	--	</code>
+	-- @param id Number identifier of `Table wich potentially contains
+	--	`Pairs
+	function nameNestedPair(id)
+		assert(type(id)=='number', "'number' expected")
+		local node = idToNode[ id ]
+		for k, value in pairs( node ) do
+			if value.tag == "Pair" then
+				-- Compose human redable name for 
+				local index, val = value[1], value[2]
+				if val.tag == "Function" or val.tag == "Table" then
+					require 'metalua.ast_to_string'
+					local human = ast_to_string(index)
+					if string.find(human, '"') then
+						human = string.sub(human, 2, #human-1)
+					end
+					val.name = human
+				end
+			end
+		end
+	end
+	--
+	-- Browse right side of parent node in order to compose an human
+	-- redeable name from declaration identifier
+	--
+	-- @param id Numeric identifier of node containing name
+	--
+	local function fetchDeclaration( id )
+		local node = idToNode[id]
+		-- Compose name
+		require 'metalua.ast_to_string'
+		local human = ast_to_string(node)
+		if string.sub(human, #human -2) == " ()" then
+			human =	string.sub(human,1, #human -3)
+		end
+
+		-- Get position of node to name in parent chunk, in order to handle
+		-- composites statements like: 
+		-- local int, f = 0, function()end
+		local nodePosition = getNodePositionInParent(id)
+		local parentNode = idToNode[topExpression(id)]
+		-- Browse left side of parent node, to find declaration identifier
+		if parentNode then
+			-- Retrieve identifier node right side 
+			local rightSide = parentNode[2]
+			-- No right side to deal with
+			if not rightSide then return end
+			local relatedDeclaration= rightSide[nodePosition]
+			if relatedDeclaration then
+				-- Name `Function and `Table nested in `Pair
+				if relatedDeclaration.tag == "Table" then
+					nameNestedPair( nodeToId[ relatedDeclaration ] )
+				end		
+				-- Assign name to declaration
+				relatedDeclaration["name"]=human
+			end
+		end
+	end
 	-- Sort variables in source 
 	assert(
 		type(ast) == 'table',
 		"AST of 'table' type expected, "..type(ast).." found."
 	)
-
+	-- Seek for local and global declarations
+	require 'metalua.walk.bindings'
 	local declareds, leftovers = bindings( ast )
 	cacheDeclaration(localDeclarationsIDs, declareds)
 	cacheGlobalDeclaration(publicDeclarationsIDs, leftovers)
+
+	-- Now that AST is indexed and local declarations separated from globals
+	-- ones, let's back patch declaration with their identifier name
+	for key, declaration in pairs( localDeclarationsIDs ) do
+		-- Here we are dealing with declation nodes such as
+		--	`Function and `Table
+		-- The aim is to fetch their name from according left side expression
+		fetchIdentifier( declaration )
+	end
+
+	for key, identifier in pairs( publicDeclarationsIDs ) do
+		--
+		-- Locate top node identifier of composite identifier such as `Index
+		-- and `Invoke
+		--
+		-- @param	id Number identifier of node supposed part of composite
+		--			identifier
+		-- @return	Number identifier of composite identifier top node
+		--
+		local function topIndex(id)
+			assert(type(id)=="number")
+			local node, parentNode= idToNode[id], idToNode[ parent[id] ]
+			if not parentNode.tag or
+				( parentNode.tag~="Index" and parentNode.tag~="Invoke" )
+			then return id end
+			return topIndex( parent[id] )
+		end
+
+		-- Here we are dealing with declarations identifiers such as:
+		--	`Index and `Id
+		-- The aim is to compose their name then patch right side expressions
+		fetchDeclaration( topIndex( identifier ) )
+	end
 end
 
 --
@@ -170,16 +323,15 @@ function index( ast )
 	--
  	doIndex( ast )
 
-	
 	--
  	-- Append declaration data on declaration nodes
 	--
 	publicDeclarationsIDs = {}
 	localDeclarationsIDs = {}
-	matchDeclaration( ast )
 	if #idToNode > 0 then
 		rememberParents( 1 )
 	end
+	matchDeclaration( ast )
 end
 
 --
@@ -191,33 +343,27 @@ end
 --
 function children( id )
   local child = {}
+if not idToNode[ id ] then print("problem with "..id) end
+
   for  k,v in ipairs( idToNode[ id ] ) do
-    if ( type(v) == "table" and k ~= "lineinfo" ) then
+    if type(v) == "table" and k ~= "lineinfo" then
       child[ #child + 1 ] = nodeToId[ v ]
     end
   end
+--print ("les enfants "..table.concat(child, " "))
   return child, #child
 end
 
+-- 
+-- Get node's identifier
 --
--- Lists key and value of asked node, exept tables
---
--- @param ast	Tree to parse
--- @param id	ID of node to describe in tree
---
-function describe(ast, id)
-  -- Use root if no index is given
-  local node = id ~=nil and find_node(ast,id) or ast
-
-  -- Make sure we deal with an array
-  assert( type(node) == "table" )
-  for key,value in pairs( node ) do
-   if ( type(value) ~= "table" ) then
-      print( key )
-      print( value )
-   end
-  end
+-- @param int ID of requested node
+-- @return Node's identifier or empty string when identifier is not available
+-- 
+function getIdentifierName( id )
+  return idToNode[ id ][ 'name' ] or ""
 end
+
 -- 
 -- Get node's tag
 --
@@ -247,7 +393,11 @@ end
 -- @param int ID of requested node
 -- 
 function getStart( id )
-  return tonumber(idToNode[ id ][ 'lineinfo' ]['first'][3])
+  local node = idToNode[ id ]
+  if node and node[ 'lineinfo' ] then
+	return tonumber(node[ 'lineinfo' ]['first'][3])
+  end
+  return 0
 end
 
 -- 
@@ -256,11 +406,12 @@ end
 -- @param int ID of requested node
 -- 
 function getEnd( id )
-  assert (
-    type(idToNode[ id ].lineinfo) == "table",
-    "No line info for node "..id
-  )
-  return tonumber(idToNode[ id ][ 'lineinfo' ]['last'][3])
+  assert (type(id == "number"), "No line info for node "..id)
+  local node = idToNode[ id ]
+  if node and node [ 'lineinfo' ] then
+	return tonumber(node[ 'lineinfo' ]['last'][3])
+  end
+  return 0
 end
 
 --
@@ -321,45 +472,46 @@ function getParent(id)
 	end
 	return nil
 end
---[[
-function getRelatedIDs ()
-	local function concatTable (main, t)
-		assert( type(main)	== 'table' )
-		assert( type(t)		== 'table' )
-		for k,v in pairs( t ) do
-			table.insert(main, v)
-		end
-		return main
-	end
-	local function extractChildrenFromID( ids )
-		assert( type(ids) == 'table' )
-		local child = {}
-		for k,id in pairs( ids ) do
-			local nodes = children(id)
-			for k, related in pairs(nodes) do
-				table.insert(child, related)
+-- Parse files given from command line
+if arg and #arg > 0 then
+	local start = os.time()
+	local path="/d/LuaEclipse/plugins/org.keplerproject.luaeclipse.metalua.32bits/"
+	package.path = path.."?.luac;"..path.."?.lua;"..package.path 
+	local verbose = arg[1] and arg[1]=="-v"
+	local firstArgPosition = verbose and 2 or 1
+	local good, bad, errors = {},{},{}
+	require 'metalua.compiler'
+	for position,filename in pairs(arg) do
+		if firstArgPosition <= position then
+			print(math.floor(position*100/#arg).."%\t"..filename)
+			local file = io.open(filename, 'r')
+			local source = file:read("*all")
+			file:close()
+			local tree = mlc.luastring_to_ast( source )
+			if verbose then
+				print( source )
+				table.print(tree, "nohash", 1)
+			end
+			-- Initialising node identification
+			id=0
+			local status, err = pcall( index, tree )
+			if status then
+				table.insert( good , filename )
+			else
+				table.insert( bad , filename )
+				table.insert( errors, err )
 			end
 		end
-		return child
 	end
-	local declared = getDeclarationsIDs()
-	local free = getGlobalDeclarationsIDs()
-	local ids = concatTable (declared, free)
-	ids = extractChildrenFromID( ids )
-	return ids,#ids
+	print("Success\n\t"..table.concat(good, "\n\t") )
+	if #bad > 0 then
+		print("Failures")
+		for k,v in pairs(bad) do
+			print("\t"..v)
+			print("\t\t"..errors[k])
+		end
+		local percent = #good > 0 and ( #good/(#good+#bad) ) * 100 or 0
+		print(math.floor(percent) .."% of good files")
+	end
+	print ("in "..os.difftime(os.time(), start).."s")
 end
-]]
---[[ ---------------------------------------------------------------------------
-
-
-local path = "/home/kkinfoo/dev/luaEclipse/LuaEclipseM6/plugins/org.keplerproject.luaeclipse.metalua.32bits/"
-package.path = path.."?.luac;"..path.."?.lua;"..package.path 
---print (package.path)
-local source = "tab = {} local var"--" local yy , xx = {}, function()end xx()"
-require 'metalua.compiler'
-local ast = mlc.luastring_to_ast( source )
---table.print(ast)
-index( ast )
-print ( source )
-table.print(parent)
-]]

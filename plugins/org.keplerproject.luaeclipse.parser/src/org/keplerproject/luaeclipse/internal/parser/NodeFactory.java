@@ -1,12 +1,12 @@
 /******************************************************************************
- * Copyright (c) 2009 KeplerProject, Sierra Wireless.
+ * Copyright (c) 2009-2011 KeplerProject, Sierra Wireless.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *      Kevin KIN-FOO <kkin-foo@sierrawireless.com>
+ *      Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 package org.keplerproject.luaeclipse.internal.parser;
@@ -62,7 +62,7 @@ import org.keplerproject.luaeclipse.parser.ast.statements.While;
  * From Lua source this class is capable of producing a DLTK AST using the
  * Metalua library.
  * 
- * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
+ * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  */
 public class NodeFactory implements LuaExpressionConstants,
 		LuaStatementConstants {
@@ -122,7 +122,7 @@ public class NodeFactory implements LuaExpressionConstants,
 	 * @return {@link LuaParseErrorAnalyzer}
 	 */
 	public LuaParseError analyser() {
-		return lua.analyzer();
+		return lua.errorAnalyser();
 	}
 
 	private Argument argument(Statement s) {
@@ -136,10 +136,6 @@ public class NodeFactory implements LuaExpressionConstants,
 			name = new SimpleReference(start, end, "...");
 		}
 		return new Argument(name, start, end, null, Declaration.AccPublic);
-	}
-
-	private DeclarationBinder binder() {
-		return lua.getDeclarationBinder();
 	}
 
 	/**
@@ -171,7 +167,7 @@ public class NodeFactory implements LuaExpressionConstants,
 		Chunk chunk, altChunk;
 		Expression expression, altExpression;
 		String string;
-
+		java.lang.String name;
 		// Child node IDs will help for recursive node instantiation
 		List<Long> childNodes = lua.children(id);
 
@@ -204,16 +200,14 @@ public class NodeFactory implements LuaExpressionConstants,
 		 */
 		case LuaExpressionConstants.E_TABLE:
 			// Define Table
-			node = new TableDeclaration("nameless", 0, 0, start, end);
+			name = lua.getIdentifierName(id);
+			node = new TableDeclaration(name, 0, 0, start, end);
+			((TableDeclaration) node).setModifier(modifier);
 
 			// Fill with values
 			chunk = new Chunk(start, end);
 			for (Long child : childNodes) {
-				expression = (Expression) getNode(child);
-				// if (expression instanceof Pair) {
-				// ((Pair) expression).setParent(node);
-				// }
-				chunk.addStatement(expression);
+				chunk.addStatement(getNode(child, modifier));
 			}
 			((TableDeclaration) node).setBody(chunk);
 			break;
@@ -224,10 +218,9 @@ public class NodeFactory implements LuaExpressionConstants,
 			left = getNode(childNodes.get(0), modifier);
 			right = getNode(childNodes.get(1), modifier);
 			if (left instanceof Literal) {
-
-				node = new Pair((Literal) left, right);
+				node = new Pair((Literal) left, right, modifier);
 			} else {
-				node = new Pair((Identifier) left, right);
+				node = new Pair((Identifier) left, right, modifier);
 			}
 			break;
 		/*
@@ -293,12 +286,12 @@ public class NodeFactory implements LuaExpressionConstants,
 		 * "Do" and Chunks statements
 		 */
 		case LuaStatementConstants.S_BLOCK:
-			node = new Chunk(start, end);
-			chunk = (Chunk) node;
+			chunk = new Chunk(start, end);
 			// Inflate block
 			for (Long childID : childNodes) {
 				chunk.addStatement(getNode(childID, modifier));
 			}
+			node = chunk;
 			break;
 		/*
 		 * Functions
@@ -308,8 +301,9 @@ public class NodeFactory implements LuaExpressionConstants,
 					+ childCount;
 			chunk = (Chunk) getNode(childNodes.get(0));
 			altChunk = (Chunk) getNode(childNodes.get(1));
-			// node = new Function(start, end, chunk, altChunk);
-			node = new FunctionDeclaration("nameless", 0, 0, start, end);
+			name = lua.getIdentifierName(id);
+			node = new FunctionDeclaration(name, 0, 0, start, end);
+			((FunctionDeclaration) node).setModifier(modifier);
 			((FunctionDeclaration) node).acceptBody(altChunk);
 			for (Object o : chunk.getStatements()) {
 				if (o instanceof Statement) {
@@ -325,8 +319,8 @@ public class NodeFactory implements LuaExpressionConstants,
 			// Define return statement and values
 			node = new Return(start, end);
 			for (long returnIndex : childNodes) {
-				expression = (Expression) getNode(returnIndex);
-				((Return) node).addExpression(expression);
+				left = getNode(returnIndex);
+				((Return) node).addReturnValue(left);
 			}
 			break;
 		/*
@@ -440,14 +434,16 @@ public class NodeFactory implements LuaExpressionConstants,
 			assert childCount > 3 : "Not enough parameter to built numeric for: "
 					+ childCount;
 			// Extract common informations
-			Identifier variable = (Identifier) getNode(childNodes.get(0));
-			expression = (Expression) getNode(childNodes.get(1));
-			altExpression = (Expression) getNode(childNodes.get(2));
-			chunk = (Chunk) getNode(childNodes.get(childCount - 1));
+			Identifier variable = (Identifier) getNode(childNodes.get(0),
+					modifier);
+			expression = (Expression) getNode(childNodes.get(1), modifier);
+			altExpression = (Expression) getNode(childNodes.get(2), modifier);
+			chunk = (Chunk) getNode(childNodes.get(childCount - 1), modifier);
 
 			// Deal with optional expression
 			if (childCount > 4) {
-				Expression optionnal = (Expression) getNode(childNodes.get(3));
+				Expression optionnal = (Expression) getNode(childNodes.get(3),
+						modifier);
 				node = new ForNumeric(start, end, variable, expression,
 						altExpression, optionnal, chunk);
 			} else {
@@ -459,9 +455,9 @@ public class NodeFactory implements LuaExpressionConstants,
 		case S_FOREACH:
 			assert childCount > 2 : "Not enough parameter to built for each: "
 					+ childCount;
-			chunk = (Chunk) getNode(childNodes.get(0));
-			altChunk = (Chunk) getNode(childNodes.get(1));
-			Chunk lastChunk = (Chunk) getNode(childNodes.get(2));
+			chunk = (Chunk) getNode(childNodes.get(0), modifier);
+			altChunk = (Chunk) getNode(childNodes.get(1), modifier);
+			Chunk lastChunk = (Chunk) getNode(childNodes.get(2), modifier);
 			node = new ForInPair(start, end, chunk, altChunk, lastChunk);
 			break;
 		/*
@@ -587,7 +583,7 @@ public class NodeFactory implements LuaExpressionConstants,
 		// index.setID(id);
 		// }
 		// Handle declarations
-		return binder().bind(node, id, childNodes);
+		return node;// binder().bind(node, id, childNodes);
 	}
 
 	/**

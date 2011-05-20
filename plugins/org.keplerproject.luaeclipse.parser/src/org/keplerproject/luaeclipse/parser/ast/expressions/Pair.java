@@ -1,12 +1,12 @@
 /******************************************************************************
- * Copyright (c) 2009 KeplerProject, Sierra Wireless.
+ * Copyright (c) 2009-2011 KeplerProject, Sierra Wireless.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *      Kevin KIN-FOO <kkin-foo@sierrawireless.com>
+ *      Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 
@@ -18,7 +18,7 @@
  */
 package org.keplerproject.luaeclipse.parser.ast.expressions;
 
-import org.eclipse.dltk.ast.ASTVisitor;
+import org.eclipse.dltk.ast.declarations.Argument;
 import org.eclipse.dltk.ast.expressions.Literal;
 import org.eclipse.dltk.ast.references.SimpleReference;
 import org.eclipse.dltk.ast.statements.Statement;
@@ -28,57 +28,19 @@ import org.keplerproject.luaeclipse.parser.LuaExpressionConstants;
 /**
  * The Class Pair.
  */
-public class Pair extends SimpleReference {
+public class Pair extends Argument {
 
-	private Statement data = null;
-
-	/**
-	 * Instantiates a new pair.
-	 * 
-	 * @param start
-	 *            the start
-	 * @param end
-	 *            the end
-	 * @param left
-	 *            the left
-	 * @param right
-	 *            the right
-	 */
-	public Pair(Identifier name, Statement s) {
-		// super(start, end, left, LuaExpressionConstants.E_PAIR, right);
-		super(name.sourceStart(), name.sourceEnd(), name.getName());
-		this.data = s;
-	}
-	public Pair(Literal name, Statement s) {
-		// super(start, end, left, LuaExpressionConstants.E_PAIR, right);
-		super(name.sourceStart(), name.sourceEnd(),name.getValue());
-		this.data = s;
+	public Pair(final Literal name, final Statement s, final int mods) {
+		this(new SimpleReference(name.sourceStart(), name.sourceEnd(),
+				name.getValue()), s, mods);
 	}
 
-	// @Override
-	// public Statement getParent() {
-	// return this.parent;
-	// }
+	public Pair(final SimpleReference ref, final Statement s, final int mods) {
+		super(ref, ref.sourceStart(), ref.sourceEnd(), s, mods);
+	}
 
-	// @Override
-	// public void setParent(Statement s) {
-	// this.parent = s;
-	// }
 	@Override
 	public int getKind() {
 		return LuaExpressionConstants.E_PAIR;
-	}
-
-	public Statement getData() {
-		return this.data;
-	}
-
-	@Override
-	public void traverse(ASTVisitor pVisitor) throws Exception {
-		if (pVisitor.visit(this)) {
-			super.traverse(pVisitor);
-			this.data.traverse(pVisitor);
-			pVisitor.endvisit(this);
-		}
 	}
 }

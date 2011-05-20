@@ -30,7 +30,7 @@ import org.keplerproject.luaeclipse.internal.parser.error.LuaParseError;
  * The Class LuaSourceParser provides a DLTK AST for Lua source code, when an
  * error occur during parsing it provide the previous version of AST.
  * 
- * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
+ * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  */
 public class LuaSourceParser extends AbstractSourceParser {
 
@@ -79,8 +79,7 @@ public class LuaSourceParser extends AbstractSourceParser {
 		if (factory.errorDetected()) {
 
 			// Report it
-			LuaParseError analyzer = factory.analyser();
-			IProblem problem = buildProblem(file, analyzer);
+			IProblem problem = buildProblem(file, factory.analyser());
 			reporter.reportProblem(problem);
 
 			// Fetch previous stable source from cache
@@ -103,7 +102,8 @@ public class LuaSourceParser extends AbstractSourceParser {
 	/**
 	 * Parses Lua error string and founds its position: offset, line, column
 	 */
-	private IProblem buildProblem(char[] fileName, LuaParseError analyzer) {
+	private IProblem buildProblem(final char[] fileName,
+			final LuaParseError analyzer) {
 		int col = analyzer.getErrorColumn();
 		int offset = analyzer.getErrorOffset();
 		int line = analyzer.getErrorLine();

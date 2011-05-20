@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2009 KeplerProject, Sierra Wireless.
+ * Copyright (c) 2009-2011 KeplerProject, Sierra Wireless.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,7 +49,7 @@ import com.naef.jnlua.LuaState;
  * solution. Object instantiation is performed by {@link NodeFactory}, this just
  * gather Lua AST walking tooling.
  * 
- * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
+ * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  */
 public class MetaluaASTWalker implements LuaExpressionConstants,
 		LuaStatementConstants {
@@ -67,7 +67,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	private String source;
 
 	/** Indicates if Metalua had problem while parsing code. */
-	private LuaParseError _parseError = null;
+	private LuaException _parseError = null;
 
 	private DeclarationBinder binder;
 
@@ -172,9 +172,9 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	/**
 	 * @return {@link IProblem} giving information on syntax error
 	 */
-	public LuaParseError analyzer() {
+	public LuaParseError errorAnalyser() {
 		assert hasSyntaxErrors() : "No problems without syntax error";
-		return _parseError;
+		return LuaParseErrorFactory.get(_parseError);
 	}
 
 	/**
@@ -365,6 +365,9 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		return this.free;
 	}
 
+	public String getIdentifierName(final long id) {
+		return getStringFromLuaFunction(id, "getIdentifierName"); //$NON-NLS-1$
+	}
 	/**
 	 * Retrieve offset for start of node in source from {@link Metalua}
 	 * 
@@ -412,26 +415,29 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 	}
 
 	/**
-	 * Node name.
+	 * Call a Lua String return function
 	 * 
 	 * @param id
-	 *            the id
-	 * 
-	 * @return the string
+	 *            Node identifier
+	 * @param functionName
+	 *            Name of function to call in
+	 *            <code>script/ast_to_table.lua</code>
+	 * @return String result of function, empty string on error
 	 */
-	public String nodeName(final long id) {
-		String name = null;
+	private String getStringFromLuaFunction(final long id,
+			final String functionName) {
 
 		// Stack should be empty
 		int top = getState().getTop();
 
 		// Retrieve Lua function
-		getState().getField(LuaState.GLOBALSINDEX, "getTag");
+		getState().getField(LuaState.GLOBALSINDEX, functionName);
 
 		// Pass given ID as parameter
 		getState().pushNumber((double) id);
 
 		// Call function
+		String name = null;
 		try {
 			getState().call(1, 1);
 			name = getState().toString(-1);
@@ -484,7 +490,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 			// Remove procedure and parameter from Lua stack
 			getState().pop(1);
 		} catch (LuaException e) {
-			_parseError = LuaParseErrorFactory.get(e.getMessage());
+			_parseError = e;
 		}
 
 		// Lua stack should be empty again
@@ -514,6 +520,23 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		}
 		getState().pop(getState().getTop()-top);
 		return hasLineInfo;
+	}
+
+	/**
+	 * Retrieve node type name
+	 * 
+	 * @param id
+	 *            Identifier of node
+	 * 
+	 * @return Type name of node, such as:
+	 *         <ul>
+	 *         <li>Index</li>
+	 *         <li>Set</li>
+	 *         <li>...</li>
+	 *         </ul>
+	 */
+	public String nodeName(final long id) {
+		return getStringFromLuaFunction(id, "getTag"); //$NON-NLS-1$
 	}
 
 	/**
@@ -586,7 +609,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		// Build Lua AST
 		try {
 			getState().call(1, 1);
-			assert getState().getTop() == 1 && getState().isTable(-1) : "Lua AST generation failed.";
+			assert getState().isTable(-1) : "Lua AST generation failed.";
 
 			// Store result in global variable 'ast' in Lua side
 			getState().setGlobal("ast");
@@ -594,8 +617,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 			return true;
 		} catch (LuaException e) {
 			// Notify Error
-			_parseError = LuaParseErrorFactory.get(e.getMessage());
-			Activator.logError("Unable to build AST", e);
+			_parseError = e;
 			return false;
 		}
 	}
