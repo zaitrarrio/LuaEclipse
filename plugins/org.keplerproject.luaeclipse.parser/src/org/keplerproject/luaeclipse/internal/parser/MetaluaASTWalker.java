@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *      Kevin KIN-FOO <kkin-foo@sierrawireless.com>
+ *      Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  *          - initial API and implementation and initial documentation
  *****************************************************************************/
 package org.keplerproject.luaeclipse.internal.parser;
@@ -68,8 +68,6 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 
 	/** Indicates if Metalua had problem while parsing code. */
 	private LuaException _parseError = null;
-
-	private DeclarationBinder binder;
 
 	private List<Long> linked;
 
@@ -144,7 +142,6 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 
 		// Bear source in mind
 		this.source = source;
-		this.binder = null;
 
 		// Detect syntax errors, parse code
 		if (this.parse()) {
@@ -713,15 +710,5 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 
 	public long getParent(long id) {
 		return functionAndIdToLong("getParent", id);
-	}
-
-	public DeclarationBinder getDeclarationBinder() {
-		if (this.binder == null) {
-			List<Long> declarations = getDeclarationsIDs();
-			List<Long> globals = getGlobalDeclarationsIDs();
-			List<Long> parents = getDeclarationParentIDs();
-			this.binder = new DeclarationBinder(declarations, globals, parents);
-		}
-		return this.binder;
 	}
 }

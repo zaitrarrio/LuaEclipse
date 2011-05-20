@@ -19,7 +19,7 @@ import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 import org.eclipse.dltk.ast.parser.AbstractSourceParser;
 import org.eclipse.dltk.ast.parser.IModuleDeclaration;
 import org.eclipse.dltk.compiler.env.IModuleSource;
-import org.eclipse.dltk.compiler.problem.DefaultProblem;
+import org.eclipse.dltk.compiler.problem.DefaultProblemFactory;
 import org.eclipse.dltk.compiler.problem.IProblem;
 import org.eclipse.dltk.compiler.problem.IProblemReporter;
 import org.eclipse.dltk.compiler.problem.ProblemSeverities;
@@ -105,7 +105,6 @@ public class LuaSourceParser extends AbstractSourceParser {
 	private IProblem buildProblem(final char[] fileName,
 			final LuaParseError analyzer) {
 		int col = analyzer.getErrorColumn();
-		int offset = analyzer.getErrorOffset();
 		int line = analyzer.getErrorLine();
 		int id = 1;
 		String[] args = {};
@@ -117,11 +116,9 @@ public class LuaSourceParser extends AbstractSourceParser {
 		String error = analyzer.getErrorString();
 
 		// Convert file name
-		String file = new String(fileName);
-
-		IProblem problem = new DefaultProblem(file, error, id, args, severity,
-				offset, offset, line, col);
-		return problem;
+		DefaultProblemFactory factory = new DefaultProblemFactory();
+		return factory.createProblem(new String(fileName), id, args,
+				new String[] { error }, severity, -1, -1, line, col);
 	}
 
 }

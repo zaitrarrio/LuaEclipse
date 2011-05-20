@@ -11,15 +11,17 @@
  *****************************************************************************/
 package org.keplerproject.luaeclipse.internal.parser.error;
 
+import com.naef.jnlua.LuaException;
+
 /**
  * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  */
 public class LuaParseErrorFactory {
-    public static LuaParseError get(final String source) {
+	public static LuaParseError get(final LuaException source) {
 	try {
-	    return new LuaParseErrorAnalyzer(source);
+			return new LuaParseErrorAnalyzer(source.getMessage());
 	} catch (Exception e) {
-	    return new LuaParseErrorNotifier(source);
+			return new LuaParseErrorNotifier(source.getMessage());
 	}
 
     }
