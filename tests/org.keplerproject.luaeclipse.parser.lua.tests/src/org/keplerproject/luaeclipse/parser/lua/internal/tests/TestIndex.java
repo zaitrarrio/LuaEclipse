@@ -1,3 +1,14 @@
+/******************************************************************************
+ * Copyright (c) 2011 KeplerProject, Sierra Wireless.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *      Kevin KIN-FOO <kkinfoo@sierrawireless.com>
+ *          - initial API and implementation and initial documentation
+ *****************************************************************************/
 package org.keplerproject.luaeclipse.parser.lua.internal.tests;
 
 import java.io.FileInputStream;
@@ -20,12 +31,24 @@ import com.github.lunatest.LunaTest;
 import com.naef.jnlua.LuaException;
 import com.naef.jnlua.LuaState;
 
+/**
+ * Runs Lua-side test suite in order to allow calling Lua unit testing from
+ * Java.
+ * 
+ * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
+ */
 public class TestIndex extends TestCase {
 
 	private LuaState state;
 	private int stackSize;
+	/** Path of test file resource in plugin */
 	private String testFile = "/script/tests.lua"; //$NON-NLS-1$
 
+	/**
+	 * Loads unit tests contained in {@link #testFile}. Also, loads
+	 * <b>lunatest</b> unit testing library path in Lua-side
+	 * <code>package.path</code>.
+	 */
 	@Before
 	public void setUp() {
 		String code, testedCodeFile;
