@@ -513,11 +513,10 @@ public class NodeFactory implements LuaExpressionConstants,
 					+ "of recursive function: " + childCount;
 
 			// Handle assignment at declaration
-			chunk = (Chunk) getNode(childNodes.get(0));
+			chunk = (Chunk) getNode(childNodes.get(0), Declaration.AccPrivate);
 			if (lua.nodeHasLineInfo(childNodes.get(1))) {
-				altChunk = (Chunk) getNode(childNodes.get(1));
-				// altChunk = addDeclarations(chunk, altChunk,
-				// Declaration.AccPrivate);
+				altChunk = (Chunk) getNode(childNodes.get(1),
+						Declaration.AccPrivate);
 				node = new LocalRec(start, end, chunk, altChunk);
 			} else {
 				// Average declaration

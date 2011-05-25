@@ -72,6 +72,8 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 
 	private List<Long> free;
 
+	final public static String luaFile = "/scripts/ast_to_table.lua"; //$NON-NLS-1$
+
 	/**
 	 * Instantiates a new Lua instance ready to parse.
 	 * 
@@ -89,8 +91,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 			 */
 
 			// Make sure that file is available on disk
-			URL url = Platform.getBundle(Activator.PLUGIN_ID).getEntry(
-					"/scripts/ast_to_table.lua");
+			URL url = Platform.getBundle(Activator.PLUGIN_ID).getEntry(luaFile);
 
 			// Retrieve absolute URI of file
 			String path = new File(FileLocator.toFileURL(url).getFile())

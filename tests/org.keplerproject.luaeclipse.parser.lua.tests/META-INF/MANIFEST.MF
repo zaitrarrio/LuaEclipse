@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tests
+Bundle-SymbolicName: org.keplerproject.luaeclipse.parser.lua.tests;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Fragment-Host: org.keplerproject.luaeclipse.parser;bundle-version="1.2.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: com.github.lunatest;bundle-version="0.9.1",
+ org.junit;bundle-version="4.5.0",
+ org.keplerproject.luaeclipse.tests;bundle-version="1.0.0"
