@@ -28,7 +28,7 @@
               <repository>
                       <id>dltk</id>
                       <layout>p2</layout>
-                      <url>http://download.eclipse.org/technology/dltk/updates</url>
+                      <url>http://download.eclipse.org/technology/dltk/updates-dev/3.0/</url>
               </repository>
       </repositories>
 
