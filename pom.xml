@@ -15,7 +15,7 @@
 	</modules>
 
 	<properties>
-		<tycho-version>0.13.0-SNAPSHOT</tycho-version>
+		<tycho-version>0.12.0</tycho-version>
 		<tycho-groupid>org.eclipse.tycho</tycho-groupid>
 	</properties>
 
