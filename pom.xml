@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.keplerproject.luaeclipse</groupId>
+	<groupId>org.eclipse.koneki.ldt</groupId>
 	<artifactId>aggregator</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
@@ -49,7 +49,7 @@
 					<resolver>p2</resolver>
 <!--					<target>
 						<artifact>
-							<groupId>org.keplerproject.luaeclipse</groupId>
+							<groupId>org.eclipse.koneki.ldt</groupId>
 							<artifactId>target-platform</artifactId>
 							<version>0.0.1-SNAPSHOT</version>
 							<classifier>luaeclipse2</classifier>

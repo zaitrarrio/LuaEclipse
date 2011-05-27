@@ -4,10 +4,10 @@
   <modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>aggregator</artifactId>
-		<groupId>org.keplerproject.luaeclipse</groupId>
+		<groupId>org.eclipse.koneki.ldt</groupId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-  <groupId>org.keplerproject.luaeclipse</groupId>
+  <groupId>org.eclipse.koneki.ldt</groupId>
   <artifactId>plugins</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
@@ -17,15 +17,16 @@
     <module>com.naef.jnlua.linux64</module>
     <module>com.naef.jnlua.macosx</module>
     <module>com.naef.jnlua.windows</module>
-    <module>org.keplerproject.luaeclipse</module>
-    <module>org.keplerproject.luaeclipse.completion</module>
-    <module>org.keplerproject.luaeclipse.editor</module>
-    <module>org.keplerproject.luaeclipse.metalua</module>
-    <module>org.keplerproject.luaeclipse.metalua.32bits</module>
-    <module>org.keplerproject.luaeclipse.metalua.64bits</module>
-    <module>org.keplerproject.luaeclipse.parser</module>
-    <module>org.keplerproject.luaeclipse.templates</module>
-    <module>org.keplerproject.luaeclipse.ui</module>
-    <module>org.keplerproject.luaeclipse.wizards</module>
+    <module>com.naef.jnlua.windows64</module>
+	<module>org.eclipse.koneki.ldt</module>
+    <module>org.eclipse.koneki.ldt.completion</module>
+    <module>org.eclipse.koneki.ldt.editor</module>
+    <module>org.eclipse.koneki.ldt.metalua</module>
+    <module>org.eclipse.koneki.ldt.metalua.32bits</module>
+    <module>org.eclipse.koneki.ldt.metalua.64bits</module>
+    <module>org.eclipse.koneki.ldt.parser</module>
+    <module>org.eclipse.koneki.ldt.templates</module>
+    <module>org.eclipse.koneki.ldt.ui</module>
+    <module>org.eclipse.koneki.ldt.wizards</module>
   </modules>
 </project>

@@ -5,10 +5,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>aggregator</artifactId>
-		<groupId>org.keplerproject.luaeclipse</groupId>
+		<groupId>org.eclipse.koneki.ldt</groupId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>org.keplerproject.luaeclipse</groupId>
+	<groupId>org.eclipse.koneki.ldt</groupId>
 	<artifactId>target-platform</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
