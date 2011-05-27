@@ -19,7 +19,7 @@ package org.eclipse.koneki.ldt.parser.ast.statements;
 
 import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.statements.Block;
-import org.eclipse.koneki.ldt.parser.internal.IndexedNode;
+import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 
 // TODO: Auto-generated Javadoc
 /**

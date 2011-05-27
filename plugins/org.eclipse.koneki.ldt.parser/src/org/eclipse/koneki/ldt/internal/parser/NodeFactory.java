@@ -8,7 +8,7 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.koneki.ldt.parser.internal;
+package org.eclipse.koneki.ldt.internal.parser;
 
 import java.io.File;
 import java.util.List;
@@ -22,6 +22,7 @@ import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.expressions.Literal;
 import org.eclipse.dltk.ast.references.SimpleReference;
 import org.eclipse.dltk.ast.statements.Statement;
+import org.eclipse.dltk.compiler.problem.DefaultProblem;
 import org.eclipse.koneki.ldt.parser.Activator;
 import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
 import org.eclipse.koneki.ldt.parser.ast.declarations.FunctionDeclaration;
@@ -52,19 +53,18 @@ import org.eclipse.koneki.ldt.parser.ast.statements.Repeat;
 import org.eclipse.koneki.ldt.parser.ast.statements.Return;
 import org.eclipse.koneki.ldt.parser.ast.statements.Set;
 import org.eclipse.koneki.ldt.parser.ast.statements.While;
-import org.eclipse.koneki.ldt.parser.internal.error.LuaParseError;
-import org.eclipse.koneki.ldt.parser.internal.error.LuaParseErrorAnalyzer;
 
 /**
  * A factory for creating Node objects.
  * 
- * From Lua source this class is capable of producing a DLTK AST using the
- * Metalua library.
+ * From Lua source this class is capable of producing a DLTK AST using the Metalua library.
  * 
  * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  */
-public class NodeFactory implements LuaExpressionConstants,
-		LuaStatementConstants {
+public class NodeFactory implements LuaExpressionConstants, LuaStatementConstants {
+
+	/** There is a character gap between Lua and Java */
+	private static final int languageGap = 1;
 
 	/** Enables to waked Lua AST from parsed code. */
 	private MetaluaASTWalker lua;
@@ -73,8 +73,7 @@ public class NodeFactory implements LuaExpressionConstants,
 	private ModuleDeclaration root;
 
 	/**
-	 * Initialize factory with current Lua context, assumes that an AST named
-	 * "ast" already exits in Lua context.
+	 * Initialize factory with current Lua context, assumes that an AST named "ast" already exits in Lua context.
 	 * 
 	 * @param MetaluaASTWalker
 	 *            Tool making communication with Lua a lot easier
@@ -120,21 +119,29 @@ public class NodeFactory implements LuaExpressionConstants,
 	 * 
 	 * @return {@link LuaParseErrorAnalyzer}
 	 */
-	public LuaParseError analyser() {
-		return lua.errorAnalyser();
+	public DefaultProblem getProblem() {
+		return lua.getProblem();
 	}
 
-	private Argument argument(Statement s) {
+	/**
+	 * Creates an Argument out of a {@link Statement}
+	 * 
+	 * @param s
+	 *            Statement to cast
+	 * @param modifiers
+	 *            as described in {@link Declaration}
+	 * @return casted Argument, if given {@link Statement} is not a regular {@link Identifier} it will be processed as {@link Dots}
+	 */
+	private Argument argument(Statement s, int modifiers) {
 		int start = s.sourceStart(), end = s.sourceEnd();
 		SimpleReference name;
 		if (s instanceof Identifier) {
-			Identifier id = (Identifier) s;
-			return new Argument(id, start, null, Declaration.AccPublic);
+			name = (Identifier) s;
 		} else {
 			// Assume type is `Dots
-			name = new SimpleReference(start, end, "...");
+			name = new SimpleReference(start, end, "..."); //$NON-NLS-1$
 		}
-		return new Argument(name, start, end, null, Declaration.AccPublic);
+		return new Argument(name, start, end, null, modifiers);
 	}
 
 	/**
@@ -147,9 +154,8 @@ public class NodeFactory implements LuaExpressionConstants,
 	}
 
 	/**
-	 * Retrieve a node for the given ID from {@linkplain MetaluaASTWalker}
-	 * instance. This node comes with all its child nodes. In order to do so,
-	 * this function is called recursively.
+	 * Retrieve a node for the given ID from {@linkplain MetaluaASTWalker} instance. This node comes with all its child nodes. In order to do so, this
+	 * function is called recursively.
 	 * 
 	 * @param long id ID of the node in Lua indexed AST
 	 * 
@@ -173,8 +179,8 @@ public class NodeFactory implements LuaExpressionConstants,
 
 		// Define position in code
 		int childCount = childNodes.size();
+		int start = lua.getStartPosition(id) - languageGap;
 		int end = lua.getEndPosition(id);
-		int start = lua.getStartPosition(id);
 
 		/*
 		 * Fetch root type
@@ -248,38 +254,31 @@ public class NodeFactory implements LuaExpressionConstants,
 		 * Binary Operations
 		 */
 		case LuaExpressionConstants.E_BIN_OP:
-			assert childCount > 1 : "Too many expressions "
-					+ "in binary operation: " + childCount;
+			assert childCount > 1 : "Too many expressions in binary operation: " //$NON-NLS-1$
+					+ childCount;
 			// Determine king of expression
 			int kind = MetaluaASTWalker.opid(lua.getValue(id));
 
 			// Compute both sides of '='
 			left = (Expression) getNode(childNodes.get(0), modifier);
 			right = (Expression) getNode(childNodes.get(1), modifier);
-			node = new BinaryExpression(start, end, (Expression) left, kind,
-					(Expression) right);
+			node = new BinaryExpression(start, end, (Expression) left, kind, (Expression) right);
 			break;
 		/*
 		 * Assignment
 		 */
 		case LuaExpressionConstants.E_ASSIGN:
 			// Deal with assignment
-			assert childCount == 2 : "Invalid number of parameters "
-					+ "for a 'Set' instruction :" + childCount;
+			assert childCount == 2 : "Invalid number of parameters for a 'Set' statement :" + childCount; //$NON-NLS-1$
 			chunk = (Chunk) getNode(childNodes.get(0), modifier);
 			altChunk = (Chunk) getNode(childNodes.get(1), modifier);
-			/*
-			 * In case of function assigned to variables, use variables names as
-			 * function name. Mainly useful for having valid value on outline.
-			 */
-			// altChunk = addDeclarations(chunk, altChunk, modifier);
 			node = new Set(start, end, chunk, altChunk);
 			break;
 		/*
 		 * Identifiers
 		 */
 		case LuaExpressionConstants.E_IDENTIFIER:
-			assert childCount == 0 : "Id has child nodes: " + childCount;
+			assert childCount == 0 : "Id has child nodes: " + childCount; //$NON-NLS-1$
 			node = new Identifier(start, end, lua.getValue(id));
 			break;
 		/*
@@ -297,8 +296,7 @@ public class NodeFactory implements LuaExpressionConstants,
 		 * Functions
 		 */
 		case Declaration.D_METHOD:
-			assert childCount == 2 : "Wrong child nodes count for a function: "
-					+ childCount;
+			assert childCount == 2 : "Wrong child nodes count for a function: " + childCount; //$NON-NLS-1$
 			chunk = (Chunk) getNode(childNodes.get(0));
 			altChunk = (Chunk) getNode(childNodes.get(1));
 			ref = referenceFromNodeId(id);
@@ -307,7 +305,7 @@ public class NodeFactory implements LuaExpressionConstants,
 			((FunctionDeclaration) node).acceptBody(altChunk);
 			for (Object o : chunk.getStatements()) {
 				if (o instanceof Statement) {
-					Argument arg = argument((Statement) o);
+					Argument arg = argument((Statement) o, modifier);
 					((FunctionDeclaration) node).addArgument(arg);
 				}
 			}
@@ -333,7 +331,7 @@ public class NodeFactory implements LuaExpressionConstants,
 		 * Parenthesis
 		 */
 		case LuaExpressionConstants.E_PAREN:
-			assert childCount == 1 : "Too many expressions between parenthesis.";
+			assert childCount == 1 : "Too many expressions between parenthesis."; //$NON-NLS-1$
 			expression = (Expression) getNode(childNodes.get(0));
 			node = new Parenthesis(start, end, expression);
 			break;
@@ -341,8 +339,7 @@ public class NodeFactory implements LuaExpressionConstants,
 		 * While
 		 */
 		case S_WHILE:
-			assert childCount == 2 : "Wrong parameters count to build while statement: "
-					+ childCount;
+			assert childCount == 2 : "Wrong parameters count to build while statement: " + childCount; //$NON-NLS-1$
 			expression = (Expression) getNode(childNodes.get(0));
 			chunk = (Chunk) getNode(childNodes.get(1));
 			node = new While(start, end, expression, chunk);
@@ -351,8 +348,7 @@ public class NodeFactory implements LuaExpressionConstants,
 		 * Repeat
 		 */
 		case S_UNTIL:
-			assert childCount == 2 : "Wrong parameters count to build repeat statement: "
-					+ childCount;
+			assert childCount == 2 : "Wrong parameters count to build repeat statement: " + childCount; //$NON-NLS-1$
 			chunk = (Chunk) getNode(childNodes.get(0));
 			expression = (Expression) getNode(childNodes.get(1));
 			node = new Repeat(start, end, chunk, expression);
@@ -361,14 +357,12 @@ public class NodeFactory implements LuaExpressionConstants,
 		 * Local variable declaration
 		 */
 		case ASTNode.D_VAR_DECL:
-			assert childCount == 2 : "Wrong count of parameters "
-					+ "for local declaration: " + childCount;
+			assert childCount == 2 : "Wrong count of parameters for local declaration: " + childCount; //$NON-NLS-1$
 
 			// Handle assignment at declaration
 			chunk = (Chunk) getNode(childNodes.get(0), Declaration.AccPrivate);
 			if (lua.nodeHasLineInfo(childNodes.get(1))) {
-				altChunk = (Chunk) getNode(childNodes.get(1),
-						Declaration.AccPrivate);
+				altChunk = (Chunk) getNode(childNodes.get(1), Declaration.AccPrivate);
 				// altChunk = addDeclarations(chunk, altChunk,
 				// Declaration.AccPrivate, true);
 				node = new Local(start, end, chunk, altChunk);
@@ -381,13 +375,10 @@ public class NodeFactory implements LuaExpressionConstants,
 		 */
 		case S_IF:
 			/*
-			 * We're dealing with a mutant statement. A regular `If has 3 child
-			 * nodes. Besides, it could have one more option for the "else"
-			 * part. Furthermore, "elseif" nodes could indefinitely follow an if
-			 * statement.
+			 * We're dealing with a mutant statement. A regular `If has 3 child nodes. Besides, it could have one more option for the "else" part.
+			 * Furthermore, "elseif" nodes could indefinitely follow an if statement.
 			 */
-			assert childCount > 1 : "Not enough clauses for if statement: "
-					+ childCount;
+			assert childCount > 1 : "Not enough clauses for if statement: " + childCount; //$NON-NLS-1$
 
 			// Extract if components
 			expression = (Expression) getNode(childNodes.get(0));
@@ -402,8 +393,7 @@ public class NodeFactory implements LuaExpressionConstants,
 				node = new ElseIf(start, end, expression, chunk);
 
 				/*
-				 * Elseif nodes goes by pair: Expression then Chunk. That's why
-				 * we'll use a range of 2.
+				 * Elseif nodes goes by pair: Expression then Chunk. That's why we'll use a range of 2.
 				 */
 				for (int pair = 2; pair < childCount - 1; pair += 2) {
 
@@ -412,8 +402,7 @@ public class NodeFactory implements LuaExpressionConstants,
 					chunk = (Chunk) getNode(childNodes.get(pair + 1));
 
 					// Append ElseIf nodes' expression and chunk
-					((ElseIf) (node)).addExpressionAndRelatedChunk(expression,
-							chunk);
+					((ElseIf) (node)).addExpressionAndRelatedChunk(expression, chunk);
 				}
 
 				// Append else chunk
@@ -431,30 +420,24 @@ public class NodeFactory implements LuaExpressionConstants,
 		 * For loop
 		 */
 		case S_FOR:
-			assert childCount > 3 : "Not enough parameter to built numeric for: "
-					+ childCount;
+			assert childCount > 3 : "Not enough parameter to build numeric for: " + childCount; //$NON-NLS-1$
 			// Extract common informations
-			Identifier variable = (Identifier) getNode(childNodes.get(0),
-					modifier);
+			Identifier variable = (Identifier) getNode(childNodes.get(0), modifier);
 			expression = (Expression) getNode(childNodes.get(1), modifier);
 			altExpression = (Expression) getNode(childNodes.get(2), modifier);
 			chunk = (Chunk) getNode(childNodes.get(childCount - 1), modifier);
 
 			// Deal with optional expression
 			if (childCount > 4) {
-				Expression optionnal = (Expression) getNode(childNodes.get(3),
-						modifier);
-				node = new ForNumeric(start, end, variable, expression,
-						altExpression, optionnal, chunk);
+				Expression optionnal = (Expression) getNode(childNodes.get(3), modifier);
+				node = new ForNumeric(start, end, variable, expression, altExpression, optionnal, chunk);
 			} else {
 				// Regular numeric for
-				node = new ForNumeric(start, end, variable, expression,
-						altExpression, chunk);
+				node = new ForNumeric(start, end, variable, expression, altExpression, chunk);
 			}
 			break;
 		case S_FOREACH:
-			assert childCount > 2 : "Not enough parameter to built for each: "
-					+ childCount;
+			assert childCount > 2 : "Not enough parameter to built for each: " + childCount; //$NON-NLS-1$
 			chunk = (Chunk) getNode(childNodes.get(0), modifier);
 			altChunk = (Chunk) getNode(childNodes.get(1), modifier);
 			Chunk lastChunk = (Chunk) getNode(childNodes.get(2), modifier);
@@ -465,7 +448,7 @@ public class NodeFactory implements LuaExpressionConstants,
 		 */
 		case E_CALL:
 			// Allocate function with its name
-			assert childCount > 0 : "No name given for function call.";
+			assert childCount > 0 : "No name given for function call."; //$NON-NLS-1$
 			altExpression = (Expression) getNode(childNodes.get(0));
 
 			// Append parameters for call
@@ -473,7 +456,7 @@ public class NodeFactory implements LuaExpressionConstants,
 				CallArgumentsList args = new CallArgumentsList();
 				for (int parameter = 1; parameter < childCount; parameter++) {
 					left = getNode(childNodes.get(parameter));
-					args.addNode(left);
+					args.addNode(argument(left, modifier));
 
 					// Define parameter list position in code
 					if (parameter == 1) {
@@ -493,8 +476,7 @@ public class NodeFactory implements LuaExpressionConstants,
 		 */
 		case E_INDEX:
 			// Indexed array and value of index
-			assert childCount == 2 : "Wrong parameter count for index: "
-					+ childCount;
+			assert childCount == 2 : "Wrong parameter count for index: " + childCount; //$NON-NLS-1$
 			left = getNode(childNodes.get(0), modifier);
 			right = getNode(childNodes.get(1), modifier);
 			if (left instanceof Invoke) {
@@ -510,14 +492,12 @@ public class NodeFactory implements LuaExpressionConstants,
 		 * Local recursion
 		 */
 		case D_FUNC_DEC:
-			assert childCount == 2 : "Too many parameters for local declaration "
-					+ "of recursive function: " + childCount;
+			assert childCount == 2 : "Too many parameters for local declaration of recursive function: " + childCount; //$NON-NLS-1$
 
 			// Handle assignment at declaration
 			chunk = (Chunk) getNode(childNodes.get(0), Declaration.AccPrivate);
 			if (lua.nodeHasLineInfo(childNodes.get(1))) {
-				altChunk = (Chunk) getNode(childNodes.get(1),
-						Declaration.AccPrivate);
+				altChunk = (Chunk) getNode(childNodes.get(1), Declaration.AccPrivate);
 				node = new LocalRec(start, end, chunk, altChunk);
 			} else {
 				// Average declaration
@@ -534,15 +514,15 @@ public class NodeFactory implements LuaExpressionConstants,
 		 * Invoke
 		 */
 		case E_INVOKE:
-			assert childCount > 1 : "No name defined for invocation.";
+			assert childCount > 1 : "No name defined for invocation."; //$NON-NLS-1$
 			expression = (Expression) getNode(childNodes.get(0), modifier);
 			string = (String) getNode(childNodes.get(1), modifier);
 			if (childCount > 2) {
 				CallArgumentsList args = new CallArgumentsList();
 				for (int parameter = 2; parameter < childCount; parameter++) {
-					Expression e = (Expression) getNode(childNodes
-							.get(parameter));
-					args.addNode(e);
+					Expression e;
+					e = (Expression) getNode(childNodes.get(parameter));
+					args.addNode(argument(e, modifier));
 
 					// Define parameter list position in code
 					if (parameter == 2) {
@@ -556,38 +536,19 @@ public class NodeFactory implements LuaExpressionConstants,
 				node = new Invoke(start, end, expression, string);
 			}
 			break;
-		}
-
 		/*
-		 * Check if gap of 2 characters in Lua string is allowed
+		 * Dealing with errors
 		 */
-		boolean correctRange = (start - 1) <= (end + 1);
-		//
-		// There is an exception for functions that can be declared as
-		//
-		// name = function ( var )
-		// someCode()
-		// end
-		//
-		// For DLTK the node containing "name" is in the "node" of the function,
-		// in Lua it's not the case
-		//
-		correctRange = correctRange || (kindOfNode == S_BLOCK);
-		assert correctRange : "Wrong code offsets for node: " + id
-				+ ". Begins at " + start + ", ends at " + end;
-		// if (node instanceof
-		// org.eclipse.koneki.ldt.parser.internal.Index) {
-		// org.eclipse.koneki.ldt.parser.internal.Index index;
-		// index = (org.eclipse.koneki.ldt.parser.internal.Index) node;
-		// index.setID(id);
-		// }
-		// Handle declarations
-		return node;// binder().bind(node, id, childNodes);
+		case E_ERROR:
+			lua.buildProblem(id);
+			node = new Chunk(start, end);
+			break;
+		}
+		return node;
 	}
 
 	/**
-	 * Gets the root of DLTK AST, starts a top down parsing from the first AST
-	 * node.
+	 * Gets the root of DLTK AST, starts a top down parsing from the first AST node.
 	 * 
 	 * @see ModuleDeclaration
 	 * @return ModuleDeclaration root of any DLTK compliant AST
@@ -607,13 +568,21 @@ public class NodeFactory implements LuaExpressionConstants,
 		return root;
 	}
 
+	/**
+	 * Compute a name for a given node numeric identifier
+	 * 
+	 * @param id
+	 *            Numeric identifier of node to name
+	 * @return Metalua flavored name of given node
+	 */
 	private SimpleReference referenceFromNodeId(final long id) {
+		// Fetch top node of expression
 		final long refId = lua.getIdentifier(id);
 		java.lang.String representation = new java.lang.String();
 		int start = 0, end = 0;
 		if (refId > 0) {
 			// Get position
-			start = lua.getStartPosition(refId) - 1;
+			start = lua.getStartPosition(refId) - languageGap;
 			end = lua.getEndPosition(refId);
 			// Compose name
 			representation = lua.stringRepresentation(refId);

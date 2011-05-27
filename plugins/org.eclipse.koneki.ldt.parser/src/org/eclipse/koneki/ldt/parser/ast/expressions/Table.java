@@ -23,9 +23,9 @@ import java.util.List;
 import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.statements.Statement;
+import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
 import org.eclipse.koneki.ldt.parser.ast.statements.Chunk;
-import org.eclipse.koneki.ldt.parser.internal.IndexedNode;
 
 // TODO: Auto-generated Javadoc
 /**

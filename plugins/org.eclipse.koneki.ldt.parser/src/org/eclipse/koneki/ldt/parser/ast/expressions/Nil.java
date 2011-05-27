@@ -12,8 +12,8 @@
 package org.eclipse.koneki.ldt.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.expressions.NilLiteral;
+import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
-import org.eclipse.koneki.ldt.parser.internal.IndexedNode;
 
 public class Nil extends NilLiteral implements LuaExpressionConstants, IndexedNode {
 

@@ -18,7 +18,7 @@
 package org.eclipse.koneki.ldt.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.expressions.Expression;
-import org.eclipse.koneki.ldt.parser.internal.IndexedNode;
+import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 
 /**
  * The Class LogicalValue.

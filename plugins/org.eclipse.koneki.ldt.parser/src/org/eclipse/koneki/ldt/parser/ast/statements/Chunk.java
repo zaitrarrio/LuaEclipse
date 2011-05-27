@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.eclipse.dltk.ast.statements.Block;
 import org.eclipse.dltk.ast.statements.Statement;
-import org.eclipse.koneki.ldt.parser.internal.IndexedNode;
+import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 
 // TODO: Auto-generated Javadoc
 /**

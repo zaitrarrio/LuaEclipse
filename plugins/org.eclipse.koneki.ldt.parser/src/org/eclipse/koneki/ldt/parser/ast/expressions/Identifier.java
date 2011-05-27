@@ -19,7 +19,7 @@ package org.eclipse.koneki.ldt.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.references.SimpleReference;
 import org.eclipse.dltk.utils.CorePrinter;
-import org.eclipse.koneki.ldt.parser.internal.IndexedNode;
+import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -67,11 +67,10 @@ public class Identifier extends SimpleReference implements LeftHandSide, Indexed
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.dltk.ast.expressions.Literal#toString()
+	/**
+	 * Human readable name of model identifier.
 	 */
+	@Override
 	public java.lang.String toString() {
 		return getStringRepresentation();
 	}

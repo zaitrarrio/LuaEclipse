@@ -21,8 +21,8 @@ import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.statements.Statement;
 import org.eclipse.dltk.utils.CorePrinter;
+import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
-import org.eclipse.koneki.ldt.parser.internal.IndexedNode;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -81,13 +81,13 @@ public class UnaryExpression extends Expression implements IndexedNode {
 
 	@Override
 	public java.lang.String getOperator() {
-		switch ( this.getKind() ){
+		switch (this.getKind()) {
 		case LuaExpressionConstants.E_LENGTH:
-			return "#";
+			return "#"; //$NON-NLS-1$
 		case LuaExpressionConstants.E_UN_MINUS:
-			return "-";
+			return "-"; //$NON-NLS-1$
 		case LuaExpressionConstants.E_BNOT:
-			return " not ";
+			return " not "; //$NON-NLS-1$
 		}
 		return super.getOperator();
 	}

@@ -7,21 +7,11 @@
  *
  * Contributors:
  *     Sierra Wireless - initial API and implementation
- *******************************************************************************/
-package org.eclipse.koneki.ldt.parser.internal.error;
+ ******************************************************************************/
 
-public class LuaParseErrorNotifier extends LuaParseError {
+package org.eclipse.koneki.ldt.internal.parser;
 
-    public LuaParseErrorNotifier(String errorMessage) {
-	super(errorMessage);
-	initPositions();
-    }
-
-    @Override
-    protected void initPositions() {
-	setErrorColumn(1);
-	setErrorLine(1);
-	setErrorOffset(1);
-    }
-
+public interface IndexedNode {
+    long getID();
+    void setID(long id);
 }

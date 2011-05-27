@@ -14,12 +14,12 @@ import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.statements.Statement;
 import org.eclipse.dltk.utils.CorePrinter;
-import org.eclipse.koneki.ldt.parser.internal.IndexedNode;
+import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 
 /**
  * Defines a two operand expression.
  * 
- * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
+ * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  */
 public class BinaryExpression extends Expression implements IndexedNode {
 
@@ -50,8 +50,7 @@ public class BinaryExpression extends Expression implements IndexedNode {
 	 * 
 	 * @see org.eclipse.dltk.ast.expressions.ExpressionConstants
 	 */
-	public BinaryExpression(int start, int end, Expression left, int kind,
-			Expression right) {
+	public BinaryExpression(int start, int end, Expression left, int kind, Expression right) {
 		super(start, end);
 		this.kind = kind;
 		this.left = left;
@@ -79,7 +78,7 @@ public class BinaryExpression extends Expression implements IndexedNode {
 	public java.lang.String getOperator() {
 		switch (getKind()) {
 		case E_CONCAT:
-			return "..";
+			return ".."; //$NON-NLS-1$
 		default:
 		}
 		return super.getOperator();
@@ -107,9 +106,7 @@ public class BinaryExpression extends Expression implements IndexedNode {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.dltk.ast.expressions.Expression#printNode(org.eclipse.dltk
-	 * .utils.CorePrinter)
+	 * @see org.eclipse.dltk.ast.expressions.Expression#printNode(org.eclipse.dltk .utils.CorePrinter)
 	 */
 	public void printNode(CorePrinter output) {
 		if (this.left != null) {
@@ -126,9 +123,7 @@ public class BinaryExpression extends Expression implements IndexedNode {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.dltk.ast.statements.Statement#traverse(org.eclipse.dltk.ast
-	 * .ASTVisitor)
+	 * @see org.eclipse.dltk.ast.statements.Statement#traverse(org.eclipse.dltk.ast .ASTVisitor)
 	 */
 	public void traverse(ASTVisitor visitor) throws Exception {
 		if (visitor.visit(this)) {

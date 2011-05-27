@@ -14,10 +14,10 @@ import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.declarations.Argument;
 import org.eclipse.dltk.ast.statements.Block;
 import org.eclipse.dltk.utils.CorePrinter;
+import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
 import org.eclipse.koneki.ldt.parser.ast.declarations.FunctionDeclaration;
 import org.eclipse.koneki.ldt.parser.ast.statements.Chunk;
-import org.eclipse.koneki.ldt.parser.internal.IndexedNode;
 
 /**
  * The Class Function represent a function node of an DLTK AST. This node is

@@ -41,5 +41,12 @@
          </parser>
       </parserContribution>
    </extension>
-
+   <extension
+         point="org.eclipse.dltk.core.selectionEngine">
+      <selectionEngine
+            class="org.eclipse.koneki.ldt.parser.LuaSelectionEngine"
+            nature="org.eclipse.koneki.ldt.nature"
+            priority="0">
+      </selectionEngine>
+   </extension>
 </plugin>

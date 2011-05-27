@@ -268,6 +268,7 @@ end
 -- @param ADT to index
 --
 function index( ast )
+	local error = false
  	local function doIndex( adt )
 		local function childNodes( ast )
 			local nodes = {}
@@ -282,6 +283,11 @@ function index( ast )
 		local id = getID()
 		idToNode[ id ] = adt
 	 	nodeToId[ adt ] = id
+
+		-- Check if current node is an error
+		if adt and adt.tag and adt.tag == 'Error' then
+			error = true
+		end
 
 		-- Index child nodes
 		for k,v in ipairs( childNodes(adt) )do
@@ -316,7 +322,9 @@ function index( ast )
 	if #idToNode > 0 then
 		rememberParents( 1 )
 	end
-	matchDeclaration( ast )
+	if not error then
+		matchDeclaration( ast )
+	end
 end
 
 --
