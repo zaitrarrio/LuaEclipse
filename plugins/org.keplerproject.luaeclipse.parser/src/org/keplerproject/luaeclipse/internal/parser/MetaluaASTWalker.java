@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.declarations.Declaration;
+import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.compiler.problem.IProblem;
 import org.keplerproject.luaeclipse.internal.parser.error.LuaParseError;
 import org.keplerproject.luaeclipse.internal.parser.error.LuaParseErrorFactory;
@@ -106,7 +107,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 			// Run file
 			FileInputStream input = new FileInputStream(new File(path));
 			getState().load(input, "parsingUtilities"); //$NON-NLS-1$
-			getState().call(0,0);
+			getState().call(0, 0);
 		} catch (IOException e) {
 			Activator.log(e);
 		} catch (LuaException e) {
@@ -228,7 +229,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 			Activator.logError("Unable to compute child nodes identifier", e); //$NON-NLS-1$
 		}
 		// Flush stack
-		getState().pop(getState().getTop()-top);
+		getState().pop(getState().getTop() - top);
 
 		/*
 		 * Sort list
@@ -308,7 +309,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 				getState().pop(1);
 			}
 		} catch (LuaException e) {
-			Activator.logWarning("Unable to run function: "+function, e);
+			Activator.logWarning("Unable to run function: " + function, e);
 		}
 		getState().pop(1);
 		assert top == getState().getTop() : "Stack is unbalanced after fetching declarations.";
@@ -362,9 +363,18 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		return this.free;
 	}
 
-	public String getIdentifierName(final long id) {
-		return getStringFromLuaFunction(id, "getIdentifierName"); //$NON-NLS-1$
+	/**
+	 * Gives expression identifier for given node
+	 * 
+	 * @param id
+	 *            Node identifier of node waiting for name from another node
+	 * @return {@link Expression} node identifier or <code>0</code> when no
+	 *         identifier is found
+	 */
+	public long getIdentifier(final long id) {
+		return functionAndIdToLong("getIdentifierId", id); //$NON-NLS-1$
 	}
+
 	/**
 	 * Retrieve offset for start of node in source from {@link Metalua}
 	 * 
@@ -404,7 +414,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 			value = getState().toString(-1);
 		} catch (LuaException e) {
 			value = new String();
-			Activator.logWarning("Unable to get value for node: "+id, e);
+			Activator.logWarning("Unable to get value for node: " + id, e);
 		}
 		// Flush stack
 		getState().pop(getState().getTop() - top);
@@ -444,7 +454,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		}
 
 		// Flush stack
-		getState().pop(getState().getTop()-top);
+		getState().pop(getState().getTop() - top);
 		return name;
 	}
 
@@ -515,7 +525,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 		} catch (Exception e) {
 			hasLineInfo = false;
 		}
-		getState().pop(getState().getTop()-top);
+		getState().pop(getState().getTop() - top);
 		return hasLineInfo;
 	}
 
@@ -710,5 +720,9 @@ public class MetaluaASTWalker implements LuaExpressionConstants,
 
 	public long getParent(long id) {
 		return functionAndIdToLong("getParent", id);
+	}
+
+	public java.lang.String stringRepresentation(long id) {
+		return getStringFromLuaFunction(id, "getIdentifierName"); //$NON-NLS-1$
 	}
 }

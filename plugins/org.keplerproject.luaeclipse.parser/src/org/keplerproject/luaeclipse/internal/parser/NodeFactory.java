@@ -166,7 +166,8 @@ public class NodeFactory implements LuaExpressionConstants,
 		Chunk chunk, altChunk;
 		Expression expression, altExpression;
 		String string;
-		java.lang.String name;
+		SimpleReference ref;
+
 		// Child node IDs will help for recursive node instantiation
 		List<Long> childNodes = lua.children(id);
 
@@ -199,8 +200,8 @@ public class NodeFactory implements LuaExpressionConstants,
 		 */
 		case LuaExpressionConstants.E_TABLE:
 			// Define Table
-			name = lua.getIdentifierName(id);
-			node = new TableDeclaration(name, 0, 0, start, end);
+			ref = referenceFromNodeId(id);
+			node = new TableDeclaration(ref, start, end);
 			((TableDeclaration) node).setModifier(modifier);
 
 			// Fill with values
@@ -300,8 +301,8 @@ public class NodeFactory implements LuaExpressionConstants,
 					+ childCount;
 			chunk = (Chunk) getNode(childNodes.get(0));
 			altChunk = (Chunk) getNode(childNodes.get(1));
-			name = lua.getIdentifierName(id);
-			node = new FunctionDeclaration(name, 0, 0, start, end);
+			ref = referenceFromNodeId(id);
+			node = new FunctionDeclaration(ref, start, end);
 			((FunctionDeclaration) node).setModifier(modifier);
 			((FunctionDeclaration) node).acceptBody(altChunk);
 			for (Object o : chunk.getStatements()) {
@@ -604,5 +605,19 @@ public class NodeFactory implements LuaExpressionConstants,
 			}
 		}
 		return root;
+	}
+
+	private SimpleReference referenceFromNodeId(final long id) {
+		final long refId = lua.getIdentifier(id);
+		java.lang.String representation = new java.lang.String();
+		int start = 0, end = 0;
+		if (refId > 0) {
+			// Get position
+			start = lua.getStartPosition(refId) - 1;
+			end = lua.getEndPosition(refId);
+			// Compose name
+			representation = lua.stringRepresentation(refId);
+		}
+		return new SimpleReference(start, end, representation);
 	}
 }

@@ -1,6 +1,6 @@
 --#!/usr/bin/lua
 --------------------------------------------------------------------------------
---  Copyright (c) 2009-2011 KeplerProject, Sierra Wireless.
+--  Copyright (c) 2009-2011 Sierra Wireless.
 --  All rights reserved. This program and the accompanying materials
 --  are made available under the terms of the Eclipse Public License v1.0
 --  which accompanies this distribution, and is available at
@@ -29,6 +29,30 @@ local function getID()
   return id
 end
 
+
+--
+-- Assign name to `Function and `Table nested in `Pairs like:
+--	<code>
+--	local table = {
+--		nestedTable={},
+--		nestedFunction=function()end
+--	}
+--	</code>
+-- @param id Number identifier of `Table wich potentially contains
+--	`Pairs
+local function nameNestedPair(id)
+	assert(type(id)=='number', "'number' expected")
+	local node = idToNode[ id ]
+	for k, value in pairs( node ) do
+		if value.tag == "Pair" then
+			-- Compose human redable name for 
+			local index, val = value[1], value[2]
+			if val.tag == "Function" or val.tag == "Table" then
+				val.identifier = nodeToId[index]
+			end
+		end
+	end
+end
 --
 -- Assing name to "valuable" nodes, such as:
 -- * `Function
@@ -89,9 +113,9 @@ local function matchDeclaration( ast )
 	--	<li>`Localrec</li>
 	--
 	local function fetchIdentifier( id )
+
 		-- Compose human redeable name from identifiers and assign it
 		-- to every declaration
-		require 'metalua.ast_to_string'
 		local node = idToNode[id]
 
 		-- Dealing with `Forin and `Fornum
@@ -99,6 +123,7 @@ local function matchDeclaration( ast )
 			-- Nothing to as there no declaration with nameless nodes
 			return
 		end
+
 		-- Dealing with `Local and `Localrec
 		local identifiers, declarations = node[1], node[2]
 		for index, declaration in pairs( declarations ) do
@@ -111,15 +136,12 @@ local function matchDeclaration( ast )
 					nameNestedPair( nodeToId[declaration] )
 				end
 
-				-- Compute name when an identifier is available
-				local human = ""
+				-- Associate identifier id when available
 				if identifiers[index] then
-					human=ast_to_string(identifiers[index])
-					if string.sub(human, #human-2) == " ()" then
-						human=string.sub(human,1,#human-3)
-					end
+					declaration["identifier"] = nodeToId[identifiers[index]]
+				else
+					declaration["identifier"] = 0
 				end
-				declaration["name"] = human
 			end
 		end
 	end
@@ -163,35 +185,6 @@ local function matchDeclaration( ast )
 			if node == idToNode[index] then return position end
 		end
 	end
-
-	--
-	-- Assign name to `Function and `Table nested in `Pairs like:
-	--	<code>
-	--	local table = {
-	--		nestedTable={},
-	--		nestedFunction=function()end
-	--	}
-	--	</code>
-	-- @param id Number identifier of `Table wich potentially contains
-	--	`Pairs
-	function nameNestedPair(id)
-		assert(type(id)=='number', "'number' expected")
-		local node = idToNode[ id ]
-		for k, value in pairs( node ) do
-			if value.tag == "Pair" then
-				-- Compose human redable name for 
-				local index, val = value[1], value[2]
-				if val.tag == "Function" or val.tag == "Table" then
-					require 'metalua.ast_to_string'
-					local human = ast_to_string(index)
-					if string.find(human, '"') then
-						human = string.sub(human, 2, #human-1)
-					end
-					val.name = human
-				end
-			end
-		end
-	end
 	--
 	-- Browse right side of parent node in order to compose an human
 	-- redeable name from declaration identifier
@@ -199,14 +192,6 @@ local function matchDeclaration( ast )
 	-- @param id Numeric identifier of node containing name
 	--
 	local function fetchDeclaration( id )
-		local node = idToNode[id]
-		-- Compose name
-		require 'metalua.ast_to_string'
-		local human = ast_to_string(node)
-		if string.sub(human, #human -2) == " ()" then
-			human =	string.sub(human,1, #human -3)
-		end
-
 		-- Get position of node to name in parent chunk, in order to handle
 		-- composites statements like: 
 		-- local int, f = 0, function()end
@@ -225,7 +210,7 @@ local function matchDeclaration( ast )
 					nameNestedPair( nodeToId[ relatedDeclaration ] )
 				end		
 				-- Assign name to declaration
-				relatedDeclaration["name"]=human
+				relatedDeclaration["identifier"]=id
 			end
 		end
 	end
@@ -350,18 +335,36 @@ if not idToNode[ id ] then print("problem with "..id) end
       child[ #child + 1 ] = nodeToId[ v ]
     end
   end
---print ("les enfants "..table.concat(child, " "))
   return child, #child
 end
 
 -- 
--- Get node's identifier
+-- Get node's identifier index number
 --
 -- @param int ID of requested node
--- @return Node's identifier or empty string when identifier is not available
+-- @return number identifier id or 0 while identifier is not available
 -- 
-function getIdentifierName( id )
-  return idToNode[ id ][ 'name' ] or ""
+function getIdentifierId( id )
+  return idToNode[ id ][ 'identifier' ] or ""
+end
+
+-- 
+-- Get node's identifier name
+--
+-- @param int ID of requested node
+-- @return identifier name, empty string while identifier is not available
+--
+function getIdentifierName(id)
+	-- Compose name
+	local node = idToNode[ id ] 
+	require 'metalua.ast_to_string'
+	local human = ast_to_string(node)
+	if string.sub(human, #human -2) == " ()" then
+		human =	string.sub(human,1, #human -3)
+	elseif string.find(human, '"') then
+		human = string.sub(human, 2, #human-1)
+	end
+	return  human
 end
 
 -- 
