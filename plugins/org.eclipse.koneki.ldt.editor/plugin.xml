@@ -38,5 +38,12 @@
             language="org.eclipse.koneki.ldt.nature">
       </modelLabelProvider>
    </extension>
+   <extension
+         point="org.eclipse.dltk.core.selectionEngine">
+      <selectionEngine
+            class="org.keplerproject.luaeclipse.editor.SelectionEngine1"
+            priority="0">
+      </selectionEngine>
+   </extension>
 
 </plugin>

@@ -33,5 +33,11 @@
             id="org.eclipse.koneki.ldt.nature.ui.luanatureimage"
             natureId="org.eclipse.koneki.ldt.nature">
       </image>
+   <extension
+         point="org.eclipse.dltk.ui.search">
+      <occurrencesFinder
+            class="org.eclipse.koneki.ldt.ui.search.LuaModelElementOccurrencesFinder"
+            nature="org.eclipse.koneki.ldt.nature">
+      </occurrencesFinder>
    </extension>
 </plugin>
