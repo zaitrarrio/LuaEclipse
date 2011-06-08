@@ -165,13 +165,6 @@ This Agreement is governed by the laws of the State of New York and the intellec
          fragment="true"/>
 
    <plugin
-         id="org.eclipse.koneki.ldt.completion"
-         download-size="0"
-         install-size="0"
-         version="1.0.0.qualifier"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.koneki.ldt.wizards"
          download-size="0"
          install-size="0"
