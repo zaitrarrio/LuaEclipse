@@ -38,12 +38,26 @@
             language="org.eclipse.koneki.ldt.nature">
       </modelLabelProvider>
    </extension>
-   <extension
-         point="org.eclipse.dltk.core.selectionEngine">
-      <selectionEngine
-            class="org.keplerproject.luaeclipse.editor.SelectionEngine1"
+ <extension
+         point="org.eclipse.dltk.core.completionEngine">
+      <completionEngine
+            class="org.eclipse.koneki.ldt.editor.internal.completion.LuaCompletionEngine"
+            nature="org.eclipse.koneki.ldt.nature"
             priority="0">
-      </selectionEngine>
+      </completionEngine>
    </extension>
-
+   <extension
+         id="LuaTypeCompletionProposalComputer"
+         name="LuaEclipse code assistance"
+         point="org.eclipse.dltk.ui.scriptCompletionProposalComputer">
+      <scriptCompletionProposalComputer
+            activate="true"
+            categoryId="org.eclipse.dltk.ui.scriptTypeProposalCategory"
+            class="org.eclipse.koneki.ldt.editor.internal.completion.LuaCompletionProposalComputer"
+            toolkitId="org.eclipse.koneki.ldt.nature">
+         <partition
+               type="__dftl_partition_content_type">
+         </partition>
+      </scriptCompletionProposalComputer>
+   </extension>
 </plugin>

@@ -14,9 +14,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.dltk.core;bundle-version="[2.0.0,3.0.0)",
  org.eclipse.koneki.ldt;bundle-version="1.0.0",
  org.eclipse.koneki.ldt.parser;bundle-version="1.0.0",
- org.eclipse.koneki.ldt.ui;bundle-version="1.0.1",
- org.eclipse.koneki.ldt.completion;bundle-version="1.0.0"
+ org.eclipse.koneki.ldt.ui;bundle-version="1.0.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.koneki.ldt.editor,
+ org.eclipse.koneki.ldt.editor.completion,
  org.eclipse.koneki.ldt.editor.internal.text

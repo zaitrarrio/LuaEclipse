@@ -8,7 +8,7 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.koneki.ldt.completion;
+package org.eclipse.koneki.ldt.editor.completion;
 
 import org.eclipse.dltk.ui.text.completion.ScriptCompletionProcessor;
 import org.eclipse.jface.text.contentassist.ContentAssistant;

@@ -31,7 +31,7 @@ import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.koneki.ldt.completion.LuaCompletionProcessor;
+import org.eclipse.koneki.ldt.editor.completion.LuaCompletionProcessor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.ITextEditor;
 

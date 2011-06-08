@@ -10,7 +10,6 @@
  *******************************************************************************/
 
 package org.eclipse.koneki.ldt.editor;
-
 import org.eclipse.dltk.core.IDLTKLanguageToolkit;
 import org.eclipse.dltk.internal.ui.editor.ScriptEditor;
 import org.eclipse.dltk.ui.text.ScriptTextTools;

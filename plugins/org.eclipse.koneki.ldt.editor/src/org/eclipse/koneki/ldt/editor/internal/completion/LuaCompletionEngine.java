@@ -7,13 +7,12 @@
  *
  * Contributors:
  *     Sierra Wireless - initial API and implementation
+ *     Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  *******************************************************************************/
-package org.eclipse.koneki.ldt.completion.internal;
-
-import java.util.Map;
+package org.eclipse.koneki.ldt.editor.internal.completion;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.dltk.codeassist.ICompletionEngine;
+import org.eclipse.dltk.codeassist.ScriptCompletionEngine;
 import org.eclipse.dltk.compiler.env.IModuleSource;
 import org.eclipse.dltk.core.CompletionProposal;
 import org.eclipse.dltk.core.CompletionRequestor;
@@ -28,10 +27,10 @@ import org.eclipse.dltk.core.ModelException;
 
 /**
  * 
- * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
+ * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  * 
  */
-public class LuaCompletionEngine implements ICompletionEngine {
+public class LuaCompletionEngine extends ScriptCompletionEngine {
 
     IScriptProject project;
     IProgressMonitor progressMonitor;
@@ -66,10 +65,6 @@ public class LuaCompletionEngine implements ICompletionEngine {
 		e.printStackTrace();
 	    }
 	}
-    }
-
-    protected CompletionProposal createProposal(int kind, int completionOffset) {
-	return CompletionProposal.create(kind, completionOffset - this.offset);
     }
 
     private void createProposal(String name, IModelElement element) {
@@ -112,26 +107,6 @@ public class LuaCompletionEngine implements ICompletionEngine {
 	    this.requestor.accept(proposal);
 	} catch (Exception e) {
 	}
-    }
-
-    @Override
-    public void setOptions(@SuppressWarnings("rawtypes") Map options) {
-    }
-
-    @Override
-    public void setProgressMonitor(IProgressMonitor progressMonitor) {
-	this.progressMonitor = progressMonitor;
-    }
-
-    @Override
-    public void setProject(IScriptProject project) {
-	this.project = project;
-    }
-
-    @Override
-    public void setRequestor(CompletionRequestor requestor) {
-	this.requestor = requestor;
-
     }
 
 }

@@ -8,7 +8,7 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.koneki.ldt.completion.internal;
+package org.eclipse.koneki.ldt.editor.internal.completion;
 
 import org.eclipse.dltk.core.IScriptProject;
 import org.eclipse.dltk.core.ISourceModule;
