@@ -4,7 +4,7 @@ Bundle-Name: Lua Editor
 Bundle-SymbolicName: org.eclipse.koneki.ldt.editor;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Bundle-Activator: org.eclipse.koneki.ldt.editor.Activator
-Bundle-Vendor: Kepler Project
+Bundle-Vendor: Sierra Wireless
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jface.text;bundle-version="3.5.0",

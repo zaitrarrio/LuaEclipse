@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Tests
 Bundle-SymbolicName: org.eclipse.koneki.ldt.metalua.tests;singleton:=true
 Bundle-Version: 1.0.0
-Bundle-Vendor: Kepler project
+Bundle-Vendor: Sierra Wireless
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.eclipse.koneki.ldt.metalua;bundle-version="1.0.0",
  org.eclipse.koneki.ldt.tests;bundle-version="1.0.0",

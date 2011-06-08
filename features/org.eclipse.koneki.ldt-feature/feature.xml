@@ -3,7 +3,7 @@
       id="org.eclipse.koneki.ldt"
       label="Lua Eclipse"
       version="2.0.0.qualifier"
-      provider-name="Kepler project">
+      provider-name="Koneki">
 
    <description url="http://github.com/KINFOO/LuaEclipse/">
       Enable Lua development with source code files edition, lua project,

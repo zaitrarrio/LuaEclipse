@@ -4,7 +4,7 @@ Bundle-Name: Tests on LuaJava
 Bundle-SymbolicName: org.eclipse.koneki.ldt.lua.tests;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.koneki.ldt.lua.tests.Activator
-Bundle-Vendor: Kepler Project
+Bundle-Vendor: Sierra Wireless
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.junit;bundle-version="4.5.0",
