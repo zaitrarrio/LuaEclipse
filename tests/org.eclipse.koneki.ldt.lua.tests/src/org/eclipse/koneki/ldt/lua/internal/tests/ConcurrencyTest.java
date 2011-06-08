@@ -20,8 +20,8 @@ import com.naef.jnlua.LuaState;
 /**
  * The aim here is to ensure that LuaJava is able to handle concurrent calls
  * from different {@link LuaState}.
- *
- * @author Kevin KIN-FOO <kevinkinfoo@gmail.com>
+ * 
+ * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  */
 public class ConcurrencyTest extends TestCase {
 

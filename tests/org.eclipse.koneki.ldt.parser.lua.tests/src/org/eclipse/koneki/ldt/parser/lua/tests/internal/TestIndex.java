@@ -19,12 +19,12 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.koneki.ldt.internal.parser.MetaluaASTWalker;
+import org.eclipse.koneki.ldt.metalua.Metalua;
+import org.eclipse.koneki.ldt.parser.Activator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.eclipse.koneki.ldt.parser.internal.MetaluaASTWalker;
-import org.eclipse.koneki.ldt.metalua.Metalua;
-import org.eclipse.koneki.ldt.parser.Activator;
 import org.osgi.framework.Bundle;
 
 import com.github.lunatest.LunaTest;

@@ -143,7 +143,7 @@ public class TestExpressions extends TestCase {
 		module = new LuaSourceParser().parse(fileName, source, this.reporter);
 		assertFalse("Invocation with argument not handled.", module.isEmpty());
 
-		source = "y(ii):w(ty).y".toCharArray();
+		source = "y=y(ii):w(ty).y".toCharArray();
 		module = new LuaSourceParser().parse(fileName, source, this.reporter);
 		assertFalse("Imbricated invocation is not handled.", module.isEmpty());
 	}
