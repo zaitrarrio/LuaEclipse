@@ -21,7 +21,6 @@ import org.eclipse.dltk.ast.statements.Statement;
 import org.eclipse.dltk.ast.statements.StatementConstants;
 import org.eclipse.dltk.utils.CorePrinter;
 import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
-import org.eclipse.koneki.ldt.parser.ast.expressions.Identifier;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -75,8 +74,8 @@ public class Local extends BinaryStatement implements StatementConstants, Indexe
 		final String comma = ", "; //$NON-NLS-1$
 		Chunk chunk = (Chunk) getLeft();
 		for (Object var : chunk.getStatements()) {
-			Identifier id = (Identifier) var;
-			varList += id.getStringRepresentation() + comma;
+			Statement state = (Statement) var;
+			varList += state.toString() + comma;
 		}
 		if (varList.length() > 0) {
 			varList = varList.substring(0, varList.length() - 2);

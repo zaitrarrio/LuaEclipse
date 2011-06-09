@@ -49,4 +49,13 @@
             priority="0">
       </selectionEngine>
    </extension>
+   <!--
+   <extension
+         point="org.eclipse.dltk.core.search">
+      <matchLocator
+            class="org.eclipse.dltk.core.search.matching.MatchLocator"
+            nature="org.eclipse.koneki.ldt.nature">
+      </matchLocator>
+   </extension>
+   -->
 </plugin>

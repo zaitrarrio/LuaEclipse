@@ -44,6 +44,10 @@ public class MatchNodeVisitor extends ASTVisitor {
 		return result;
 	}
 
+	protected void setNode(ASTNode node) {
+		result = node;
+	}
+
 	/**
 	 * Browse given {@link ASTNode} tree to found a node matching offset provided in {@link #MatchNodeVisitor(int, int)}
 	 * 
@@ -61,10 +65,10 @@ public class MatchNodeVisitor extends ASTVisitor {
 			realStart = realEnd = -42; // never select on blocks
 		}
 		if (realStart >= start && realEnd <= end) {
-			if (result != null && s.sourceStart() >= result.sourceStart() && s.sourceEnd() <= result.sourceEnd()) {
-				result = s;
+			if (getNode() != null && s.sourceStart() >= getNode().sourceStart() && s.sourceEnd() <= getNode().sourceEnd()) {
+				setNode(s);
 			} else {
-				result = s;
+				setNode(s);
 			}
 		}
 		return true;

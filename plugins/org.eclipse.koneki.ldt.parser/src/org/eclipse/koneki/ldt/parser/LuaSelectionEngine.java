@@ -29,20 +29,18 @@ public class LuaSelectionEngine extends ScriptSelectionEngine {
 	@Override
 	public IModelElement[] select(IModuleSource module, int start, int end) {
 		ModuleDeclaration ast = parser.parse(module);
-		ASTNode node = findMinimalNode(ast, start, end);
+		ASTNode node = findMinimalDeclaration(ast, start, end);
+		// ((ISourceModule) module).
 		if (node == null) {
 			return new IModelElement[0];
 		}
 		try {
 			IModelElement elt = ((ISourceModule) module).getElementAt(node.sourceStart());
-			// IModelElement[] code = ((ISourceModule) module).
-			// for (IModelElement elt : code) {
-			if (elt instanceof IModelElement)
+			if (elt != null) {
 				elements.add(elt);
-			// }
+			}
 		} catch (ModelException e) {
 			Activator.logWarning("Unable to get element.", e); //$NON-NLS-1$
-			e.printStackTrace();
 		}
 		ArrayList<IModelElement> result;
 		result = new ArrayList<IModelElement>(elements.size());
@@ -52,7 +50,7 @@ public class LuaSelectionEngine extends ScriptSelectionEngine {
 		return result.toArray(new IModelElement[result.size()]);
 	}
 
-	public static ASTNode findMinimalNode(ModuleDeclaration unit, int start, int end) {
+	public static ASTNode findMinimalDeclaration(ModuleDeclaration unit, int start, int end) {
 		MatchNodeVisitor visitor = new MatchNodeVisitor(start, end + 1);
 		try {
 			unit.traverse(visitor);
