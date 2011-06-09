@@ -16,7 +16,9 @@ import java.util.List;
 import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.declarations.Argument;
 import org.eclipse.dltk.ast.declarations.Declaration;
+import org.eclipse.dltk.ast.declarations.MethodDeclaration;
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
+import org.eclipse.dltk.ast.declarations.TypeDeclaration;
 import org.eclipse.dltk.ast.expressions.CallArgumentsList;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.expressions.Literal;
@@ -26,6 +28,7 @@ import org.eclipse.dltk.compiler.problem.DefaultProblem;
 import org.eclipse.koneki.ldt.parser.Activator;
 import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
 import org.eclipse.koneki.ldt.parser.ast.declarations.FunctionDeclaration;
+import org.eclipse.koneki.ldt.parser.ast.declarations.LocalVariableDeclaration;
 import org.eclipse.koneki.ldt.parser.ast.declarations.TableDeclaration;
 import org.eclipse.koneki.ldt.parser.ast.expressions.BinaryExpression;
 import org.eclipse.koneki.ldt.parser.ast.expressions.Boolean;
@@ -169,10 +172,11 @@ public class NodeFactory implements LuaExpressionConstants, LuaStatementConstant
 
 		// Used for binaries expressions
 		Statement left, right;
-		Chunk chunk, altChunk;
+		Chunk chunk, block, altChunk = null;
 		Expression expression, altExpression;
 		String string;
 		SimpleReference ref;
+		List<Statement> list;
 
 		// Child node IDs will help for recursive node instantiation
 		List<Long> childNodes = lua.children(id);
@@ -359,12 +363,32 @@ public class NodeFactory implements LuaExpressionConstants, LuaStatementConstant
 		case ASTNode.D_VAR_DECL:
 			assert childCount == 2 : "Wrong count of parameters for local declaration: " + childCount; //$NON-NLS-1$
 
-			// Handle assignment at declaration
-			chunk = (Chunk) getNode(childNodes.get(0), Declaration.AccPrivate);
+			// Is there an initialization bloc
 			if (lua.nodeHasLineInfo(childNodes.get(1))) {
 				altChunk = (Chunk) getNode(childNodes.get(1), Declaration.AccPrivate);
-				// altChunk = addDeclarations(chunk, altChunk,
-				// Declaration.AccPrivate, true);
+			}
+			// Cast identifiers of left Chunk as LocalVariableDeclaration
+			block = (Chunk) getNode(childNodes.get(0), Declaration.AccPrivate);
+			chunk = new Chunk(block.sourceStart(), block.sourceEnd());
+			for (int child = 0; child < block.getStatements().size(); child++) {
+				Declaration declaration = null;
+				Identifier localNode = (Identifier) block.getStatements().get(child);
+				if (altChunk != null && child < altChunk.getStatements().size()) {
+					Statement init = (Statement) altChunk.getStatements().get(child);
+					if (!(init instanceof MethodDeclaration || init instanceof TypeDeclaration)) {
+						declaration = new LocalVariableDeclaration(localNode, init.sourceStart(), init.sourceEnd());
+					}
+				} else {
+					declaration = new LocalVariableDeclaration(localNode, localNode.sourceStart(), localNode.sourceEnd());
+				}
+				if (declaration instanceof Declaration) {
+					declaration.setModifier(Declaration.AccPrivate);
+					chunk.addStatement(declaration);
+				} else {
+					chunk.addStatement(localNode);
+				}
+			}
+			if (altChunk != null) {
 				node = new Local(start, end, chunk, altChunk);
 			} else {
 				node = new Local(start, end, chunk);

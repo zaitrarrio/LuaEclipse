@@ -35,9 +35,8 @@ public class LocalVariableDeclaration extends FieldDeclaration {
 	 * @param end
 	 *            end offset of variable body
 	 */
-	public LocalVariableDeclaration(String name, int nameStart, int nameEnd,
-			int declStart, int declEnd) {
-		super(name, nameStart, nameEnd, declStart, declEnd);
+	public LocalVariableDeclaration(String name, int nameStart, int nameEnd, int declStart, int declEnd) {
+		super(name, nameStart, nameEnd - 1, declStart, declEnd);
 	}
 
 	/**
@@ -50,12 +49,11 @@ public class LocalVariableDeclaration extends FieldDeclaration {
 	 * @param end
 	 *            end offset of variable body
 	 */
-	public LocalVariableDeclaration(SimpleReference name, int declStart,
-			int declEnd) {
-		this(name.getName(), name.sourceStart(), name.sourceEnd(), declStart,
-				declEnd);
+	public LocalVariableDeclaration(SimpleReference name, int declStart, int declEnd) {
+		this(name.getName(), name.sourceStart(), name.sourceEnd(), declStart, declEnd);
 	}
 
+	@Override
 	public int getKind() {
 		return Declaration.D_DECLARATOR;
 	}
