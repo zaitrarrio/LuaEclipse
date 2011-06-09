@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: JNLua - Windows x86_64
+Bundle-Name: JNLua - Windows x86_64 (incubator)
 Bundle-SymbolicName: com.naef.jnlua.windows64
 Bundle-Version: 0.9.1.qualifier
 Bundle-Vendor: NAEF

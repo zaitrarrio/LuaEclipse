@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: JNLua for OSX 64 bits
+Bundle-Name: JNLua for OSX 64 bits (incubator)
 Bundle-SymbolicName: com.naef.jnlua.macosx
 Bundle-Version: 0.9.1.qualifier
 Bundle-Vendor: NAEF

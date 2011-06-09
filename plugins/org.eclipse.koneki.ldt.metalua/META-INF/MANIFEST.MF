@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Metalua
+Bundle-Name: Metalua (incubator)
 Bundle-SymbolicName: org.eclipse.koneki.ldt.metalua;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.koneki.ldt.metalua.Activator

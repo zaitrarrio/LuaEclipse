@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: LuaEclipse DLTK compliant Lua Parser
+Bundle-Name: LuaEclipse DLTK compliant Lua Parser (incubator)
 Bundle-SymbolicName: org.eclipse.koneki.ldt.parser;singleton:=true
 Bundle-Version: 1.2.0.qualifier
 Bundle-Activator: org.eclipse.koneki.ldt.parser.Activator

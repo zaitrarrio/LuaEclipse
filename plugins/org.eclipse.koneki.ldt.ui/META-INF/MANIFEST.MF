@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: LuaEclipse User Interface
+Bundle-Name: LuaEclipse UI (incubator)
 Bundle-SymbolicName: org.eclipse.koneki.ldt.ui;singleton:=true
 Bundle-Version: 1.0.1.qualifier
 Bundle-Activator: org.eclipse.koneki.ldt.ui.Activator

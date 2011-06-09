@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Completion engine for Luaeclipse 2
+Bundle-Name: Completion engine for Luaeclipse 2 (incubator)
 Bundle-SymbolicName: org.eclipse.koneki.ldt.completion;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.koneki.ldt.completion.Activator

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Lua Editor
+Bundle-Name: Lua Editor (incubator)
 Bundle-SymbolicName: org.eclipse.koneki.ldt.editor;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Bundle-Activator: org.eclipse.koneki.ldt.editor.Activator
