@@ -47,9 +47,13 @@
      <view
             name="Lua Documentation"
             icon="img/luadoc_view.gif"
-            category=""
+            category="org.eclipse.koneki.ldt.ui.luaviewcategory"
             class="org.eclipse.koneki.ldt.ui.views.LuaDocumentationView"
             id="org.eclipse.koneki.ldt.ui.luadocumentationview">
 		</view>
+     <category
+           id="org.eclipse.koneki.ldt.ui.luaviewcategory"
+           name="Lua">
+     </category>
    </extension>
 </plugin>
