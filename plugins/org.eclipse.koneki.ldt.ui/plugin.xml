@@ -26,12 +26,30 @@
             name="Lua interpreters">
       </page>
    </extension>
-      <extension
+     <extension
          point="org.eclipse.ui.ide.projectNatureImages">
       <image
             icon="img/lua_nature.png"
             id="org.eclipse.koneki.ldt.nature.ui.luanatureimage"
             natureId="org.eclipse.koneki.ldt.nature">
       </image>
+   </extension>
+   <extension
+         point="org.eclipse.dltk.ui.scriptDocumentationProviders">
+      <provider
+            class="org.eclipse.koneki.ldt.ui.documentation.LuaDocumentationProvider"
+            id="org.eclipse.koneki.ldt.ui.luadocumentationprodivder"
+            nature="org.eclipse.koneki.ldt.nature">
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+     <view
+            name="Lua Documentation"
+            icon=""
+            category=""
+            class="org.eclipse.koneki.ldt.ui.views.LuaDocumentationView"
+            id="org.eclipse.koneki.ldt.ui.luadocumentationview">
+		</view>
    </extension>
 </plugin>

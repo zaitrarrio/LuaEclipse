@@ -28,5 +28,6 @@
     <module>org.eclipse.koneki.ldt.templates</module>
     <module>org.eclipse.koneki.ldt.ui</module>
     <module>org.eclipse.koneki.ldt.wizards</module>
+    <module>org.eclipse.koneki.ldt.luadoc</module>
   </modules>
 </project>

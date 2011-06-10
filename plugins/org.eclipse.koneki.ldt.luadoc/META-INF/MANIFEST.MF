@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Luadoc
+Bundle-SymbolicName: org.eclipse.koneki.ldt.luadoc
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.eclipse.koneki.ldt.luadoc.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ com.naef.jnlua;bundle-version="0.9.1"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: org.eclipse.koneki.ldt.luadoc
