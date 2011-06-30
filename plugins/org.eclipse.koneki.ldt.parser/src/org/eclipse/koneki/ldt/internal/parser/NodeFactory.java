@@ -12,7 +12,10 @@ package org.eclipse.koneki.ldt.internal.parser;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
+import org.eclipse.dltk.ast.ASTListNode;
 import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.declarations.Argument;
 import org.eclipse.dltk.ast.declarations.Declaration;
@@ -25,8 +28,8 @@ import org.eclipse.dltk.ast.expressions.Literal;
 import org.eclipse.dltk.ast.references.SimpleReference;
 import org.eclipse.dltk.ast.statements.Statement;
 import org.eclipse.dltk.compiler.problem.DefaultProblem;
-import org.eclipse.koneki.ldt.parser.Activator;
 import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
+import org.eclipse.koneki.ldt.parser.ast.LuaModuleDeclaration;
 import org.eclipse.koneki.ldt.parser.ast.declarations.FunctionDeclaration;
 import org.eclipse.koneki.ldt.parser.ast.declarations.LocalVariableDeclaration;
 import org.eclipse.koneki.ldt.parser.ast.declarations.TableDeclaration;
@@ -34,6 +37,7 @@ import org.eclipse.koneki.ldt.parser.ast.expressions.BinaryExpression;
 import org.eclipse.koneki.ldt.parser.ast.expressions.Boolean;
 import org.eclipse.koneki.ldt.parser.ast.expressions.Call;
 import org.eclipse.koneki.ldt.parser.ast.expressions.Dots;
+import org.eclipse.koneki.ldt.parser.ast.expressions.Function;
 import org.eclipse.koneki.ldt.parser.ast.expressions.Identifier;
 import org.eclipse.koneki.ldt.parser.ast.expressions.Index;
 import org.eclipse.koneki.ldt.parser.ast.expressions.Invoke;
@@ -42,6 +46,7 @@ import org.eclipse.koneki.ldt.parser.ast.expressions.Number;
 import org.eclipse.koneki.ldt.parser.ast.expressions.Pair;
 import org.eclipse.koneki.ldt.parser.ast.expressions.Parenthesis;
 import org.eclipse.koneki.ldt.parser.ast.expressions.String;
+import org.eclipse.koneki.ldt.parser.ast.expressions.Table;
 import org.eclipse.koneki.ldt.parser.ast.expressions.UnaryExpression;
 import org.eclipse.koneki.ldt.parser.ast.statements.Break;
 import org.eclipse.koneki.ldt.parser.ast.statements.Chunk;
@@ -75,16 +80,24 @@ public class NodeFactory implements LuaExpressionConstants, LuaStatementConstant
 	/** Root of all the nodes produced by this instance of {@link NodeFactory}. */
 	private ModuleDeclaration root;
 
+	private Map<Long, Statement> nodes;
+
 	/**
 	 * Initialize factory with current Lua context, assumes that an AST named "ast" already exits in Lua context.
 	 * 
-	 * @param MetaluaASTWalker
+	 * @param walker
 	 *            Tool making communication with Lua a lot easier
-	 * @param int sourceLength the source's length
+	 * @param sourceLength
+	 *            Browsed source's length
 	 */
-	protected NodeFactory(MetaluaASTWalker w, int sourceLength) {
-		this.lua = w;
-		this.root = new ModuleDeclaration(sourceLength);
+	protected NodeFactory(MetaluaASTWalker walker, int sourceLength) {
+		this.lua = walker;
+		this.nodes = new TreeMap<Long, Statement>();
+		this.root = new LuaModuleDeclaration(sourceLength);
+		// Fill AST
+		this.root.addStatement(getNode(1));
+		// Work is long done, clear cache
+		this.nodes.clear();
 	}
 
 	/**
@@ -157,17 +170,26 @@ public class NodeFactory implements LuaExpressionConstants, LuaStatementConstant
 	}
 
 	/**
-	 * Retrieve a node for the given ID from {@linkplain MetaluaASTWalker} instance. This node comes with all its child nodes. In order to do so, this
-	 * function is called recursively.
+	 * Just calling {@link #getNode(long, int)} with public modifiers
 	 * 
-	 * @param long id ID of the node in Lua indexed AST
-	 * 
+	 * @param id
+	 *            ID of the node in Lua indexed AST
 	 * @return DLTK compliant node from Lua AST node for ID
 	 */
 	public Statement getNode(final long id) {
 		return getNode(id, Declaration.AccPublic);
 	}
 
+	/**
+	 * Retrieve a node for the given ID from {@linkplain MetaluaASTWalker} instance. This node comes with all its child nodes. In order to do so, this
+	 * function is called recursively.
+	 * 
+	 * @param id
+	 *            ID of the node in Lua indexed AST
+	 * @param modifier
+	 *            As defined in {@link Declaration}
+	 * @return DLTK compliant node from Lua AST node for ID
+	 */
 	public Statement getNode(final long id, int modifier) {
 
 		// Used for binaries expressions
@@ -176,7 +198,6 @@ public class NodeFactory implements LuaExpressionConstants, LuaStatementConstant
 		Expression expression, altExpression;
 		String string;
 		SimpleReference ref;
-		List<Statement> list;
 
 		// Child node IDs will help for recursive node instantiation
 		List<Long> childNodes = lua.children(id);
@@ -209,17 +230,27 @@ public class NodeFactory implements LuaExpressionConstants, LuaStatementConstant
 		 * Tables
 		 */
 		case LuaExpressionConstants.E_TABLE:
-			// Define Table
-			ref = referenceFromNodeId(id);
-			node = new TableDeclaration(ref, start, end);
-			((TableDeclaration) node).setModifier(modifier);
+			// Deal with table declaration
+			if (lua.isDeclaration(id)) {
+				// Define Table
+				ref = referenceFromNodeId(id);
+				node = new TableDeclaration(ref, start, end);
+				((TableDeclaration) node).setModifier(modifier);
 
-			// Fill with values
-			chunk = new Chunk(start, end);
-			for (Long child : childNodes) {
-				chunk.addStatement(getNode(child, modifier));
+				// Fill with values
+				chunk = new Chunk(start, end);
+				for (Long child : childNodes) {
+					chunk.addStatement(getNode(child, modifier));
+				}
+				((TableDeclaration) node).setBody(chunk);
+			} else {
+				// Else way it is simple data
+				ASTListNode listNode = new ASTListNode(start, end);
+				for (final long childId : childNodes) {
+					listNode.addNode(getNode(childId, modifier));
+				}
+				node = new Table(start, end, listNode);
 			}
-			((TableDeclaration) node).setBody(chunk);
 			break;
 		/*
 		 * Pairs
@@ -303,15 +334,21 @@ public class NodeFactory implements LuaExpressionConstants, LuaStatementConstant
 			assert childCount == 2 : "Wrong child nodes count for a function: " + childCount; //$NON-NLS-1$
 			chunk = (Chunk) getNode(childNodes.get(0));
 			altChunk = (Chunk) getNode(childNodes.get(1));
-			ref = referenceFromNodeId(id);
-			node = new FunctionDeclaration(ref, start, end);
-			((FunctionDeclaration) node).setModifier(modifier);
-			((FunctionDeclaration) node).acceptBody(altChunk);
-			for (Object o : chunk.getStatements()) {
-				if (o instanceof Statement) {
-					Argument arg = argument((Statement) o, modifier);
-					((FunctionDeclaration) node).addArgument(arg);
+			// Deal with function declaration
+			if (lua.isDeclaration(id)) {
+				ref = referenceFromNodeId(id);
+				node = new FunctionDeclaration(ref, start, end);
+				((FunctionDeclaration) node).setModifier(modifier);
+				((FunctionDeclaration) node).acceptBody(altChunk);
+				for (Object o : chunk.getStatements()) {
+					if (o instanceof Statement) {
+						Argument arg = argument((Statement) o, modifier);
+						((FunctionDeclaration) node).addArgument(arg);
+					}
 				}
+			} else {
+				// Deal with it as simple data
+				node = new Function(start, end, chunk, altChunk);
 			}
 			break;
 		/*
@@ -568,6 +605,8 @@ public class NodeFactory implements LuaExpressionConstants, LuaStatementConstant
 			node = new Chunk(start, end);
 			break;
 		}
+		// Cache node for coming declaration/occurrences matching
+		nodes.put(id, node);
 		return node;
 	}
 
@@ -578,17 +617,6 @@ public class NodeFactory implements LuaExpressionConstants, LuaStatementConstant
 	 * @return ModuleDeclaration root of any DLTK compliant AST
 	 */
 	public ModuleDeclaration getRoot() {
-		// Proceed source parsing only when there are no errors
-		if (!errorDetected()) {
-			try {
-				// Start top down parsing
-				root.addStatement(getNode(1));
-			} catch (Throwable t) {
-				// Avoid any kind of crashing
-				Activator.log(t);
-				return new ModuleDeclaration(lua.getSource().length());
-			}
-		}
 		return root;
 	}
 

@@ -43,6 +43,8 @@ public class LuaSourceParser extends AbstractSourceParser {
 	private static Map<String, String> _cache = null;
 	static {
 		_cache = Collections.synchronizedMap(new HashMap<String, String>());
+		// Use DLTK flavored AST caching
+		SourceParserUtil.enableCache();
 	}
 
 	/**

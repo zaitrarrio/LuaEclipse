@@ -12,28 +12,17 @@
 package org.eclipse.koneki.ldt.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.expressions.NilLiteral;
-import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
 
-public class Nil extends NilLiteral implements LuaExpressionConstants, IndexedNode {
+public class Nil extends NilLiteral implements LuaExpressionConstants {
 
-    private long id;
+	public Nil(int start, int end) {
+		super(start, end);
+	}
 
-    public Nil(int start, int end) {
-	super(start, end);
-    }
-
-    @Override
-    public int getKind() {
-	return NIL_LITTERAL;
-    }
-
-    public long getID() {
-	return id;
-    }
-
-    public void setID(long id) {
-	this.id = id;
-    }
+	@Override
+	public int getKind() {
+		return NIL_LITTERAL;
+	}
 
 }

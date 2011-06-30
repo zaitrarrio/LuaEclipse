@@ -19,50 +19,38 @@ package org.eclipse.koneki.ldt.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.expressions.FloatNumericLiteral;
 import org.eclipse.dltk.utils.CorePrinter;
-import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Number.
  */
-public class Number extends FloatNumericLiteral implements
-	LuaExpressionConstants, IndexedNode {
+public class Number extends FloatNumericLiteral implements LuaExpressionConstants {
 
-    private long id;
+	/**
+	 * Instantiates a new number.
+	 * 
+	 * @param start
+	 *            the start
+	 * @param end
+	 *            the end
+	 * @param value
+	 *            the value
+	 */
+	public Number(int start, int end, double value) {
+		super(start, end, value);
+	}
 
-    /**
-     * Instantiates a new number.
-     * 
-     * @param start
-     *            the start
-     * @param end
-     *            the end
-     * @param value
-     *            the value
-     */
-    public Number(int start, int end, double value) {
-	super(start, end, value);
-    }
+	public void printNode(CorePrinter output) {
+		output.formatPrintLn(getValue());
+	}
 
-    public long getID() {
-	return id;
-    }
-
-    public void printNode(CorePrinter output) {
-	output.formatPrintLn(getValue());
-    }
-
-    public void setID(long id) {
-	this.id = id;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.dltk.ast.expressions.Literal#toString()
-     */
-    public java.lang.String toString() {
-	return getValue();
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.dltk.ast.expressions.Literal#toString()
+	 */
+	public java.lang.String toString() {
+		return getValue();
+	}
 }

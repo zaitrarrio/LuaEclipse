@@ -21,22 +21,19 @@ import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.statements.Statement;
 import org.eclipse.dltk.utils.CorePrinter;
-import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class UnaryExpression.
  */
-public class UnaryExpression extends Expression implements IndexedNode {
+public class UnaryExpression extends Expression {
 
 	/** The kind. */
 	private int kind;
 
 	/** The expression. */
 	private Statement expression;
-
-	private long id;
 
 	/**
 	 * Instantiates a new unary expression.
@@ -75,10 +72,6 @@ public class UnaryExpression extends Expression implements IndexedNode {
 		return kind;
 	}
 
-	public long getID() {
-		return id;
-	}
-
 	@Override
 	public java.lang.String getOperator() {
 		switch (this.getKind()) {
@@ -90,10 +83,6 @@ public class UnaryExpression extends Expression implements IndexedNode {
 			return " not "; //$NON-NLS-1$
 		}
 		return super.getOperator();
-	}
-
-	public void setID(long id) {
-		this.id = id;
 	}
 
 	/**

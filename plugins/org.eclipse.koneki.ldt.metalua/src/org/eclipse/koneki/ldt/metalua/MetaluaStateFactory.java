@@ -32,10 +32,9 @@ import com.naef.jnlua.LuaState;
 /**
  * Provides {@link LuaState} loaded with Metalua.
  * 
- * @author Kévin KIN-FOO <kkinfoo@anwyware-tech.com> {@linkplain http
- *         ://metalua.luaforge.net/manual000.html}
+ * @author Kévin KIN-FOO <kkinfoo@anwyware-tech.com> {@linkplain http ://metalua.luaforge.net/manual000.html}
  */
-class MetaluaStateFactory {
+public class MetaluaStateFactory {
 
 	private static String sourcePath = null;
 
@@ -64,8 +63,7 @@ class MetaluaStateFactory {
 
 		// Update path in order to be able to load Metalua
 		String metaluaPath = MetaluaStateFactory.sourcesPath();
-		String path = "package.path = package.path  .. [[;" + metaluaPath
-				+ "?.luac;" + metaluaPath + "?.lua]]";
+		String path = "package.path = package.path  .. [[;" + metaluaPath + "?.luac;" + metaluaPath + "?.lua]]";
 
 		// Load Metalua's byte code
 		String require = "require 'metalua.compiler'";
@@ -75,11 +73,19 @@ class MetaluaStateFactory {
 		l.call(0, 0);
 		l.load(require, "requireContentFromPath");
 		l.call(0, 0);
+<<<<<<< HEAD
 //		switch (l.LdoString(path) + l.LdoString(require)) {
 //		default:
 //			Metalua.raise(l);
 //		case 0:
 //		}
+=======
+		// switch (l.LdoString(path) + l.LdoString(require)) {
+		// default:
+		// Metalua.raise(l);
+		// case 0:
+		// }
+>>>>>>> starting full metalua parser
 
 		// State is ready
 		return l;
@@ -100,8 +106,7 @@ class MetaluaStateFactory {
 			// Stop when fragment's root can't be located
 			try {
 				/*
-				 * A folder called as below is available only from fragments, it
-				 * contains Metalua files.
+				 * A folder called as below is available only from fragments, it contains Metalua files.
 				 */
 				String folder = "metalua";
 
@@ -110,8 +115,7 @@ class MetaluaStateFactory {
 				String _sourcePath = FileLocator.toFileURL(ressource).getPath();
 
 				/*
-				 * Remove folder name at the end of path in order to obtain
-				 * fragment location on disk. It is the real Metalua path.
+				 * Remove folder name at the end of path in order to obtain fragment location on disk. It is the real Metalua path.
 				 */
 				_sourcePath = new File(_sourcePath).getParent() + File.separator;
 				sourcePath = _sourcePath;

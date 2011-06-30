@@ -15,19 +15,15 @@ import org.eclipse.dltk.ast.declarations.Declaration;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.expressions.Literal;
 import org.eclipse.dltk.ast.statements.Statement;
-import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
 
 /**
- * The Class Index represents a couple of {@linkplain Expression}s. As instance,
- * in statement <code>table.field = nil</code> Metalua sees
- * <code>`Set{ { `Index{ `Id "table", `String "field" } }, { `Nil } }</code>.
- * So, the node <code>table.field</code> is represented by an index node.
+ * The Class Index represents a couple of {@linkplain Expression}s. As instance, in statement <code>table.field = nil</code> Metalua sees
+ * <code>`Set{ { `Index{ `Id "table", `String "field" } }, { `Nil } }</code>. So, the node <code>table.field</code> is represented by an index node.
  * 
  * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  */
-public class Index extends Identifier implements LeftHandSide,
-		LuaExpressionConstants, IndexedNode {
+public class Index extends Identifier implements LeftHandSide, LuaExpressionConstants {
 
 	private long id;
 
@@ -35,8 +31,7 @@ public class Index extends Identifier implements LeftHandSide,
 	private Expression container;
 
 	/**
-	 * Instantiates a new index node, start and end offsets are computed from
-	 * nodes provided at instantiation.
+	 * Instantiates a new index node, start and end offsets are computed from nodes provided at instantiation.
 	 * 
 	 * @param key
 	 *            {@linkplain Expression} on left side
@@ -48,8 +43,7 @@ public class Index extends Identifier implements LeftHandSide,
 	}
 
 	/**
-	 * Instantiates a new index node, start and end offsets are computed from
-	 * nodes provided at instantiation.
+	 * Instantiates a new index node, start and end offsets are computed from nodes provided at instantiation.
 	 * 
 	 * @param key
 	 *            {@linkplain Expression} on left side
@@ -61,10 +55,8 @@ public class Index extends Identifier implements LeftHandSide,
 	}
 
 	/**
-	 * Instantiates a new index node, start and end offsets are computed from
-	 * nodes provided at instantiation. This method is for internal use, because
-	 * implementation is focus to use mainly {@linkplain Declaration} and final
-	 * {@linkplain Expression}s as {@linkplain Literal}s
+	 * Instantiates a new index node, start and end offsets are computed from nodes provided at instantiation. This method is for internal use,
+	 * because implementation is focus to use mainly {@linkplain Declaration} and final {@linkplain Expression}s as {@linkplain Literal}s
 	 * 
 	 * @param key
 	 *            {@linkplain Expression} on left side
@@ -77,10 +69,8 @@ public class Index extends Identifier implements LeftHandSide,
 	}
 
 	/**
-	 * Depending in the type of statement, data about the name is not stored in
-	 * the same place. This method is for finding valid names in
-	 * {@linkplain Declaration}s and {@linkplain Literal}s. In case of other
-	 * types, default behavior is to use regular {@link #toString()}
+	 * Depending in the type of statement, data about the name is not stored in the same place. This method is for finding valid names in
+	 * {@linkplain Declaration}s and {@linkplain Literal}s. In case of other types, default behavior is to use regular {@link #toString()}
 	 * 
 	 * @param statement
 	 *            {@linkplain Statement} node where we'll seek for a name
@@ -96,9 +86,8 @@ public class Index extends Identifier implements LeftHandSide,
 	}
 
 	/**
-	 * As mentioned in header, an `Index is just a composition of
-	 * {@linkplain Expression}s. Left side of this expression can be useful to
-	 * link semantic of right side to another logic unit.
+	 * As mentioned in header, an `Index is just a composition of {@linkplain Expression}s. Left side of this expression can be useful to link
+	 * semantic of right side to another logic unit.
 	 * 
 	 * @return {@linkplain Expression}, left side of Index
 	 */

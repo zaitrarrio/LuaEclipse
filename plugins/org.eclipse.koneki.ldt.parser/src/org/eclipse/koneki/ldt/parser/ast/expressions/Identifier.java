@@ -19,7 +19,6 @@ package org.eclipse.koneki.ldt.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.references.SimpleReference;
 import org.eclipse.dltk.utils.CorePrinter;
-import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -27,9 +26,7 @@ import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
  * 
  * @author kkinfoo
  */
-public class Identifier extends SimpleReference implements LeftHandSide, IndexedNode {
-
-	private long id;
+public class Identifier extends SimpleReference {
 
 	/**
 	 * Instantiates a new identifier.
@@ -45,26 +42,8 @@ public class Identifier extends SimpleReference implements LeftHandSide, Indexed
 		super(start, end, value);
 	}
 
-	public long getID() {
-		return id;
-	}
-
 	public void printNode(CorePrinter output) {
 		output.formatPrintLn(getName());
-	}
-
-	public void setID(long id) {
-		this.id = id;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.anwrt.ldt.parser.ast.expressions.LeftHandSide#isLeftHandSide()
-	 */
-	@Override
-	public boolean isLeftHandSide() {
-		return true;
 	}
 
 	/**

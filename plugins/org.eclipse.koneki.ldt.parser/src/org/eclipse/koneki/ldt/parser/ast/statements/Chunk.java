@@ -21,59 +21,36 @@ import java.util.List;
 
 import org.eclipse.dltk.ast.statements.Block;
 import org.eclipse.dltk.ast.statements.Statement;
-import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Chunk.
  */
-public class Chunk extends Block implements IndexedNode {
+public class Chunk extends Block {
 
-    private long id;
+	/**
+	 * Instantiates a new chunk.
+	 * 
+	 * @param start
+	 *            the start
+	 * @param end
+	 *            the end
+	 * @param statems
+	 *            the statems
+	 */
+	public Chunk(int start, int end, List<Statement> statems) {
+		super(start, end, statems);
+	}
 
-    /**
-     * Instantiates a new chunk.
-     */
-    // public Chunk() {
-    // super();
-    // }
-
-    /**
-     * Instantiates a new chunk.
-     * 
-     * @param start
-     *            the start
-     * @param end
-     *            the end
-     * @param statems
-     *            the statems
-     */
-    public Chunk(int start, int end, List<Statement> statems) {
-	super(start, end, statems);
-    }
-
-    /**
-     * Instantiates a new chunk.
-     * 
-     * @param start
-     *            the start
-     * @param end
-     *            the end
-     */
-    public Chunk(int start, int end) {
-	super(start, end);
-    }
-
-    public long getID() {
-	return id;
-    }
-
-    public void setID(long id) {
-	this.id = id;
-    }
-
-    // @Override
-    // public void traverse(ASTVisitor visitor) throws Exception {
-    // super.traverse(visitor);
-    // }
+	/**
+	 * Instantiates a new chunk.
+	 * 
+	 * @param start
+	 *            the start
+	 * @param end
+	 *            the end
+	 */
+	public Chunk(int start, int end) {
+		super(start, end);
+	}
 }

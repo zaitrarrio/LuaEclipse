@@ -18,44 +18,33 @@
 package org.eclipse.koneki.ldt.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.expressions.Expression;
-import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Dots.
  */
-public class Dots extends Expression implements LuaExpressionConstants, IndexedNode {
+public class Dots extends Expression implements LuaExpressionConstants {
 
-    private long id;
+	/**
+	 * Instantiates a new dots.
+	 * 
+	 * @param start
+	 *            the start
+	 * @param end
+	 *            the end
+	 */
+	public Dots(int start, int end) {
+		super(start, end);
+	}
 
-    /**
-     * Instantiates a new dots.
-     * 
-     * @param start
-     *            the start
-     * @param end
-     *            the end
-     */
-    public Dots(int start, int end) {
-	super(start, end);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.dltk.ast.statements.Statement#getKind()
-     */
-    @Override
-    public int getKind() {
-	return E_DOTS;
-    }
-
-    public long getID() {
-	return id;
-    }
-
-    public void setID(long id) {
-	this.id = id;
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.dltk.ast.statements.Statement#getKind()
+	 */
+	@Override
+	public int getKind() {
+		return E_DOTS;
+	}
 }

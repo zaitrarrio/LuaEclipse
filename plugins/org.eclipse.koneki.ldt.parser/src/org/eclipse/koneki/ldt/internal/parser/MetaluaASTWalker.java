@@ -15,9 +15,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
@@ -54,11 +53,6 @@ public class MetaluaASTWalker implements LuaExpressionConstants, LuaStatementCon
 	/** Instance of Lua, AST is fetched from this object */
 	private LuaState _state;
 
-	/**
-	 * When retrieving ID of child nodes, they must be sorted. That's why this object is for.
-	 */
-	private Comparator<Long> comparator;
-
 	/** Lua source code to parse */
 	private String source;
 
@@ -70,6 +64,9 @@ public class MetaluaASTWalker implements LuaExpressionConstants, LuaStatementCon
 
 	/** Name of variable containing computed AST in {@linkplain LuaState} */
 	private final String astVariable = "ast"; //$NON-NLS-1$
+
+	/** Numeric value returned when identifier of a node has not been found */
+	public static long NODE_NOT_FOUND = 0;
 
 	/**
 	 * Instantiates a new Lua instance ready to parse.
@@ -103,22 +100,6 @@ public class MetaluaASTWalker implements LuaExpressionConstants, LuaStatementCon
 		} catch (LuaException e) {
 			Activator.log(e);
 		}
-		// Implement comparator in order to be able to sort child node IDs
-		this.comparator = new Comparator<Long>() {
-			public int compare(Long l1, Long l2) {
-				return l1.compareTo(l2);
-			}
-
-			@Override
-			@SuppressWarnings("unchecked")
-			public boolean equals(Object obj) {
-				if (obj instanceof Comparator<?>) {
-					Comparator<Long> comparator = (Comparator<Long>) obj;
-					return this.compare(Long.valueOf(2), Long.valueOf(3)) == comparator.compare(Long.valueOf(2), Long.valueOf(3));
-				}
-				return false;
-			}
-		};
 	}
 
 	/**
@@ -156,6 +137,47 @@ public class MetaluaASTWalker implements LuaExpressionConstants, LuaStatementCon
 	}
 
 	/**
+	 * Converts Metalua `Error node in DLTK {@link IProblem}, result can be fetch from {@link #getProblem()}
+	 * 
+	 * @param idOfErrorNode
+	 *            Numeric identifier of `Error node
+	 */
+	public void buildProblem(final long idOfErrorNode) {
+		// Retrieve AST
+		int top = getState().getTop();
+
+		// Retrieve error message
+		final String message = getValue(idOfErrorNode);
+
+		// Read error position table
+		getState().getGlobal(astVariable);
+		assert getState().isTable(-1);
+		getState().getField(-1, "lineinfo"); //$NON-NLS-1$
+		assert getState().isTable(-1);
+		getState().getField(-1, "first"); //$NON-NLS-1$
+		assert getState().isTable(-1);
+		int[] positions = new int[3];
+		for (int index = 0; index < positions.length; index++) {
+			// +1 because Lua table starts at 1
+			getState().pushNumber(index + 1);
+			getState().getTable(-2);
+			assert getState().isNumber(-1);
+			positions[index] = (int) getState().toNumber(-1);
+			getState().pop(1);
+		}
+		// Clear stack
+		getState().pop(getState().getTop() - top);
+		final int line = positions[0];
+		final int col = positions[1];
+		final int offset = positions[2];
+		ProblemSeverity type = ProblemSeverity.ERROR;
+		String[] args = new String[0];
+		IProblemIdentifier id;
+		id = DefaultProblemIdentifier.decode((int) idOfErrorNode);
+		_parseError = new DefaultProblem(new String(), message, id, args, type, offset, -1, line, col);
+	}
+
+	/**
 	 * Give children ID list.
 	 * 
 	 * @param id
@@ -164,13 +186,208 @@ public class MetaluaASTWalker implements LuaExpressionConstants, LuaStatementCon
 	 * @return the list< long> IDs of child nodes of node for the given ID
 	 */
 	public List<Long> children(final long id) {
+		return getTableFromLuaFunction(id, "children"); //$NON-NLS-1$
+	}
+
+	/** Enable to compare Lua AST walkers */
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof MetaluaASTWalker)) {
+			return false;
+		}
+		MetaluaASTWalker node = (MetaluaASTWalker) o;
+		return getSource().equals(node.getSource()) && getState().equals(node.getState());
+	}
+
+	/**
+	 * Provides result of a Boolean return Lua function
+	 * 
+	 * @param id
+	 *            Numeric identifier of parameter node
+	 * @param functionName
+	 *            Name of Lua function to call
+	 * @return true when function call succeed,false else way
+	 */
+	private boolean getBooleanFromLuaFunction(final long id, final String functionName) {
+		boolean hasLineInfo;
+		int top = getState().getTop();
+		getState().getGlobal(functionName);
+		getState().pushNumber((double) id);
+		try {
+			getState().call(1, 1);
+			assert getState().isBoolean(-1) : "Boolean sould be on top of stack"; //$NON-NLS-1$
+			hasLineInfo = getState().toBoolean(-1);
+		} catch (Exception e) {
+			hasLineInfo = false;
+		}
+		getState().pop(getState().getTop() - top);
+		return hasLineInfo;
+	}
+
+	/**
+	 * Retrieve offset for end of node in source from {@link Metalua}
+	 * 
+	 * @param ID
+	 *            of a just parsed node
+	 * @return position of end of the source of the current node in parsed code source.
+	 */
+	public int getEndPosition(final long id) {
+		return (int) getLongFromLuaFunction(id, "getEnd"); //$NON-NLS-1$
+	}
+
+	/**
+	 * Provides the identifier of declaration given node refers to
+	 * 
+	 * @param id
+	 *            Numeric identifier of given node
+	 * @return Numeric identifier of declaration or {@link #NODE_NOT_FOUND}
+	 */
+	public long getDeclaration(final long id) {
+		return getLongFromLuaFunction(id, "getDeclaration");//$NON-NLS-1$
+	}
+
+	/**
+	 * Gives expression identifier for given node
+	 * 
+	 * @param id
+	 *            Node identifier of node waiting for name from another node
+	 * @return {@link Expression} node identifier or <code>0</code> when no identifier is found
+	 */
+	public long getIdentifier(final long id) {
+		return getLongFromLuaFunction(id, "getIdentifierId"); //$NON-NLS-1$
+	}
+
+	/**
+	 * Utility that enable to call a Lua function which return an Integer.
+	 * 
+	 * @param function
+	 *            Name of function to call
+	 * @param id
+	 *            Numeric identifier of node, parameter of called function
+	 * @return Integer result of function or {@link #NODE_NOT_FOUND} in case of failure
+	 */
+	private long getLongFromLuaFunction(final long id, String function) {
+		long value = NODE_NOT_FOUND;
+		int top = getState().getTop();
+		getState().getGlobal(function);
+		getState().pushNumber((double) id);
+		assert getState().isNumber(-1) : "Unable to load ID of node."; //$NON-NLS-1$
+		assert getState().isFunction(-2) : "Unable to load function to compute end position in source."; //$NON-NLS-1$
+		try {
+			getState().call(1, 1);
+			if (getState().isNumber(-1)) {
+				value = (long) getState().toNumber(-1);
+				getState().pop(1);
+			}
+		} catch (LuaException e) {
+			Activator.logError("Unable to load node identifier", e); //$NON-NLS-1$
+		} catch (IllegalArgumentException e) {
+			Activator.log(e);
+		}
+		assert getState().getTop() == top : "Lua stack should be balanced"; //$NON-NLS-1$
+		return value;
+	}
+
+	/**
+	 * Numeric identifier of parent node
+	 * 
+	 * @param id
+	 *            numeric identifier of child node
+	 * @return numeric identifier of parent node or 0 in case of failure
+	 */
+	public long getParent(long id) {
+		return getLongFromLuaFunction(id, "getParent"); //$NON-NLS-1$
+	}
+
+	/**
+	 * Return an IProblem when there is a syntax error in parsed code
+	 * 
+	 * @return Error instanced in {@link #buildProblem(long)}
+	 */
+	public DefaultProblem getProblem() {
+		return _parseError;
+	}
+
+	/** Last parsed source */
+	public String getSource() {
+		return source;
+	}
+
+	/**
+	 * Retrieve offset for start of node in source from {@link Metalua}
+	 * 
+	 * @param ID
+	 *            of a just parsed node
+	 * @return position of start of the source of the current node in parsed code source.
+	 */
+	public int getStartPosition(final long id) {
+		return (int) getLongFromLuaFunction(id, "getStart"); //$NON-NLS-1$
+	}
+
+	/** Lua instance loaded with {@linkplain Metalua} used to parse source code */
+	protected synchronized LuaState getState() {
+		return _state;
+	}
+
+	/**
+	 * Call a Lua String return function
+	 * 
+	 * @param id
+	 *            Node identifier
+	 * @param functionName
+	 *            Name of function to call in <code>script/ast_to_table.lua</code>
+	 * @return String result of function, empty string on error
+	 */
+	private String getStringFromLuaFunction(final long id, final String functionName) {
+
+		// Stack should be empty
+		int top = getState().getTop();
+
+		// Retrieve Lua function
+		getState().getField(LuaState.GLOBALSINDEX, functionName);
+
+		// Pass given ID as parameter
+		getState().pushNumber((double) id);
+
+		// Call function
+		String name = null;
+		try {
+			getState().call(1, 1);
+			name = getState().toString(-1);
+		} catch (LuaException e) {
+			Activator.logWarning("Unable to get node name for id: " + id, e); //$NON-NLS-1$
+			name = new String();
+		}
+
+		// Flush stack
+		getState().pop(getState().getTop() - top);
+		return name;
+	}
+
+	/**
+	 * Retrieve table content resulting from call to a Lua function, this function has to return a table and its size like:
+	 * 
+	 * <pre>
+	 * function sample()
+	 * 	local table = {}
+	 * 	return table,#table
+	 * end
+	 * </pre>
+	 * 
+	 * @param id
+	 *            Numeric node identifier, used as function parameter
+	 * @param functionName
+	 *            Name of function to call
+	 * @return Sorted List of numeric identifiers
+	 */
+	private List<Long> getTableFromLuaFunction(final long id, final String functionName) {
 
 		// Work on empty stack
 		int top = getState().getTop();
-		List<Long> child = new ArrayList<Long>();
+		TreeSet<Long> child = new TreeSet<Long>();
 
 		// Fetch Lua function
-		getState().getGlobal("children"); //$NON-NLS-1$
+		getState().getGlobal(functionName);
 
 		// Provide parameter
 		getState().pushNumber((double) id);
@@ -209,94 +426,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants, LuaStatementCon
 		}
 		// Flush stack
 		getState().pop(getState().getTop() - top);
-
-		/*
-		 * Sort list
-		 */
-		Collections.sort(child, this.comparator);
-		return child;
-	}
-
-	/** Enable to compare Lua AST walkers */
-	@Override
-	public boolean equals(Object o) {
-		if (!(o instanceof MetaluaASTWalker)) {
-			return false;
-		}
-		MetaluaASTWalker node = (MetaluaASTWalker) o;
-		return getSource().equals(node.getSource()) && getComparator().equals(node.getComparator()) && getState().equals(node.getState());
-	}
-
-	/**
-	 * Utility that enable to call a Lua function which return an Integer.
-	 * 
-	 * @param function
-	 *            Name of function to call
-	 * @param id
-	 *            Numeric identifier of node, parameter of called function
-	 * @return Integer result of function or 0 in case of failure
-	 */
-	private long functionAndIdToLong(String function, long id) {
-
-		long value = 0;
-		int top = getState().getTop();
-		getState().getGlobal(function);
-		getState().pushNumber((double) id);
-		assert getState().isNumber(-1) : "Unable to load ID of node."; //$NON-NLS-1$
-		assert getState().isFunction(-2) : "Unable to load function to compute end position in source."; //$NON-NLS-1$
-		try {
-			getState().call(1, 1);
-			if (getState().isNumber(-1)) {
-				value = (long) getState().toNumber(-1);
-				getState().pop(1);
-			}
-		} catch (LuaException e) {
-			Activator.logError("Unable to load node identifier", e); //$NON-NLS-1$
-		} catch (IllegalArgumentException e) {
-			Activator.log(e);
-		}
-		assert getState().getTop() == top : "Lua stack should be balanced"; //$NON-NLS-1$
-		return value;
-	}
-
-	/**
-	 * Gives comparator used to sort out child nodes IDs, only useful in {@link #equals(Object)}.
-	 */
-	protected Comparator<Long> getComparator() {
-		return comparator;
-	}
-
-	/**
-	 * Retrieve offset for end of node in source from {@link Metalua}
-	 * 
-	 * @param ID
-	 *            of a just parsed node
-	 * @return position of end of the source of the current node in parsed code source.
-	 */
-	public int getEndPosition(final long id) {
-		return (int) functionAndIdToLong("getEnd", id); //$NON-NLS-1$
-	}
-
-	/**
-	 * Gives expression identifier for given node
-	 * 
-	 * @param id
-	 *            Node identifier of node waiting for name from another node
-	 * @return {@link Expression} node identifier or <code>0</code> when no identifier is found
-	 */
-	public long getIdentifier(final long id) {
-		return functionAndIdToLong("getIdentifierId", id); //$NON-NLS-1$
-	}
-
-	/**
-	 * Retrieve offset for start of node in source from {@link Metalua}
-	 * 
-	 * @param ID
-	 *            of a just parsed node
-	 * @return position of start of the source of the current node in parsed code source.
-	 */
-	public int getStartPosition(final long id) {
-		return (int) functionAndIdToLong("getStart", id); //$NON-NLS-1$
+		return new ArrayList<Long>(child);
 	}
 
 	/**
@@ -331,51 +461,6 @@ public class MetaluaASTWalker implements LuaExpressionConstants, LuaStatementCon
 		// Flush stack
 		getState().pop(getState().getTop() - top);
 		return value;
-	}
-
-	/**
-	 * Call a Lua String return function
-	 * 
-	 * @param id
-	 *            Node identifier
-	 * @param functionName
-	 *            Name of function to call in <code>script/ast_to_table.lua</code>
-	 * @return String result of function, empty string on error
-	 */
-	private String getStringFromLuaFunction(final long id, final String functionName) {
-
-		// Stack should be empty
-		int top = getState().getTop();
-
-		// Retrieve Lua function
-		getState().getField(LuaState.GLOBALSINDEX, functionName);
-
-		// Pass given ID as parameter
-		getState().pushNumber((double) id);
-
-		// Call function
-		String name = null;
-		try {
-			getState().call(1, 1);
-			name = getState().toString(-1);
-		} catch (LuaException e) {
-			Activator.logWarning("Unable to get node name for id: " + id, e); //$NON-NLS-1$
-			name = new String();
-		}
-
-		// Flush stack
-		getState().pop(getState().getTop() - top);
-		return name;
-	}
-
-	/** Last parsed source */
-	public String getSource() {
-		return source;
-	}
-
-	/** Lua instance loaded with {@linkplain Metalua} used to parse source code */
-	protected synchronized LuaState getState() {
-		return _state;
 	}
 
 	/** Indicates if any error occurred. */
@@ -415,6 +500,17 @@ public class MetaluaASTWalker implements LuaExpressionConstants, LuaStatementCon
 	}
 
 	/**
+	 * Indicates if a node is a declaration
+	 * 
+	 * @param id
+	 *            Numeric identifier of node
+	 * @return true is given node is a declaration, false else way
+	 */
+	public boolean isDeclaration(final long id) {
+		return getBooleanFromLuaFunction(id, "isDeclaration"); //$NON-NLS-1$
+	}
+
+	/**
 	 * Indicates if nodes has line info in Lua AST, most of the time chunks don't.
 	 * 
 	 * @param id
@@ -422,19 +518,7 @@ public class MetaluaASTWalker implements LuaExpressionConstants, LuaStatementCon
 	 * @return {@link Boolean}
 	 */
 	public boolean nodeHasLineInfo(final long id) {
-		boolean hasLineInfo;
-		int top = getState().getTop();
-		getState().getGlobal("hasLineInfo"); //$NON-NLS-1$
-		getState().pushNumber((double) id);
-		try {
-			getState().call(1, 1);
-			assert getState().isBoolean(-1) : "Boolean sould be on top of stack"; //$NON-NLS-1$
-			hasLineInfo = getState().toBoolean(-1);
-		} catch (Exception e) {
-			hasLineInfo = false;
-		}
-		getState().pop(getState().getTop() - top);
-		return hasLineInfo;
+		return getBooleanFromLuaFunction(id, "hasLineInfo");//$NON-NLS-1$
 	}
 
 	/**
@@ -542,6 +626,21 @@ public class MetaluaASTWalker implements LuaExpressionConstants, LuaStatementCon
 	}
 
 	/**
+	 * Fetch Metalua string representation of expression under a node. <code>
+	 * `Index{
+	 * 		`Id{tab}, 
+	 * 		`String {field}
+	 * }</code> will produce <code>tab.field</code>
+	 * 
+	 * @param id
+	 *            Numeric identifier of expression top node
+	 * @return Metalua flavored representation of expression
+	 */
+	public String stringRepresentation(long id) {
+		return getStringFromLuaFunction(id, "getIdentifierName"); //$NON-NLS-1$
+	}
+
+	/**
 	 * Retrieve kind of statement or expression from Lua AST.
 	 * 
 	 * @param id
@@ -625,81 +724,5 @@ public class MetaluaASTWalker implements LuaExpressionConstants, LuaStatementCon
 		}
 		// Typical blocks do not have tags
 		return LuaStatementConstants.S_BLOCK;
-	}
-
-	/**
-	 * Numeric identifier of parent node
-	 * 
-	 * @param id
-	 *            numeric identifier of child node
-	 * @return numeric identifier of parent node or 0 in case of failure
-	 */
-	public long getParent(long id) {
-		return functionAndIdToLong("getParent", id); //$NON-NLS-1$
-	}
-
-	/**
-	 * Fetch Metalua string representation of expression under a node. <code>
-	 * `Index{
-	 * 		`Id{tab}, 
-	 * 		`String {field}
-	 * }</code> will produce <code>tab.field</code>
-	 * 
-	 * @param id
-	 *            Numeric identifier of expression top node
-	 * @return Metalua flavored representation of expression
-	 */
-	public String stringRepresentation(long id) {
-		return getStringFromLuaFunction(id, "getIdentifierName"); //$NON-NLS-1$
-	}
-
-	/**
-	 * Converts Metalua `Error node in DLTK {@link IProblem}, result can be fetch from {@link #getProblem()}
-	 * 
-	 * @param idOfErrorNode
-	 *            Numeric identifier of `Error node
-	 */
-	public void buildProblem(final long idOfErrorNode) {
-		// Retrieve AST
-		int top = getState().getTop();
-
-		// Retrieve error message
-		final String message = getValue(idOfErrorNode);
-
-		// Read error position table
-		getState().getGlobal(astVariable);
-		assert getState().isTable(-1);
-		getState().getField(-1, "lineinfo"); //$NON-NLS-1$
-		assert getState().isTable(-1);
-		getState().getField(-1, "first"); //$NON-NLS-1$
-		assert getState().isTable(-1);
-		int[] positions = new int[3];
-		for (int index = 0; index < positions.length; index++) {
-			// +1 because Lua table starts at 1
-			getState().pushNumber(index + 1);
-			getState().getTable(-2);
-			assert getState().isNumber(-1);
-			positions[index] = (int) getState().toNumber(-1);
-			getState().pop(1);
-		}
-		// Clear stack
-		getState().pop(getState().getTop() - top);
-		final int line = positions[0];
-		final int col = positions[1];
-		final int offset = positions[2];
-		ProblemSeverity type = ProblemSeverity.ERROR;
-		String[] args = new String[0];
-		IProblemIdentifier id;
-		id = DefaultProblemIdentifier.decode((int) idOfErrorNode);
-		_parseError = new DefaultProblem(new String(), message, id, args, type, offset, -1, line, col);
-	}
-
-	/**
-	 * Return an IProblem when there is a syntax error in parsed code
-	 * 
-	 * @return Error instanced in {@link #buildProblem(long)}
-	 */
-	public DefaultProblem getProblem() {
-		return _parseError;
 	}
 }

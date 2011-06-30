@@ -14,14 +14,13 @@ import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.statements.Statement;
 import org.eclipse.dltk.utils.CorePrinter;
-import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 
 /**
  * Defines a two operand expression.
  * 
  * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  */
-public class BinaryExpression extends Expression implements IndexedNode {
+public class BinaryExpression extends Expression {
 
 	/** Left parent of the expression. */
 	private Statement left;
@@ -138,13 +137,4 @@ public class BinaryExpression extends Expression implements IndexedNode {
 		}
 	}
 
-	@Override
-	public long getID() {
-		return id;
-	}
-
-	@Override
-	public void setID(long id) {
-		this.id = id;
-	}
 }

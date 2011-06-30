@@ -20,15 +20,12 @@ package org.eclipse.koneki.ldt.parser.ast.statements;
 import org.eclipse.dltk.ast.statements.Statement;
 import org.eclipse.dltk.ast.statements.StatementConstants;
 import org.eclipse.dltk.utils.CorePrinter;
-import org.eclipse.koneki.ldt.internal.parser.IndexedNode;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Local.
  */
-public class Local extends BinaryStatement implements StatementConstants, IndexedNode {
-
-	private long id;
+public class Local extends BinaryStatement implements StatementConstants {
 
 	/**
 	 * Instantiates a new local.
@@ -58,14 +55,6 @@ public class Local extends BinaryStatement implements StatementConstants, Indexe
 	 */
 	public Local(int start, int end, Chunk identifiers) {
 		this(start, end, identifiers, null);
-	}
-
-	public long getID() {
-		return id;
-	}
-
-	public void setID(long id) {
-		this.id = id;
 	}
 
 	public void printNode(CorePrinter output) {

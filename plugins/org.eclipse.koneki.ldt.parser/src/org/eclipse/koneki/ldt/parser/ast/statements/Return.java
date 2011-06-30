@@ -25,7 +25,7 @@ public class Return extends Statement {
 	/** The expressions contained in return {@link Statement} */
 	private Chunk returnValues;
 
-    /**
+	/**
 	 * Instantiates a new return.
 	 * 
 	 * @param start
@@ -36,23 +36,27 @@ public class Return extends Statement {
 	 *            {@link Statement}
 	 */
 	public Return(int start, int end, List<Statement> values) {
+		this(start, end, new Chunk(start, end, values));
+	}
+
+	public Return(int start, int end, Chunk values) {
 		super(start, end);
-		this.returnValues = new Chunk(start, end, values);
-    }
+		this.returnValues = values;
+	}
 
-    /**
-     * Instantiates a new return.
-     * 
-     * @param start
-     *            the start
-     * @param end
-     *            the end
-     */
-    public Return(int start, int end) {
+	/**
+	 * Instantiates a new return.
+	 * 
+	 * @param start
+	 *            the start
+	 * @param end
+	 *            the end
+	 */
+	public Return(int start, int end) {
 		this(start, end, new ArrayList<Statement>());
-    }
+	}
 
-    /**
+	/**
 	 * Adds one of {@link Return} values
 	 * 
 	 * @param value
@@ -62,30 +66,28 @@ public class Return extends Statement {
 	 */
 	public void addReturnValue(Statement value) {
 		this.returnValues.addStatement(value);
-    }
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.dltk.ast.statements.Statement#getKind()
-     */
-    @Override
-    public int getKind() {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.dltk.ast.statements.Statement#getKind()
+	 */
+	@Override
+	public int getKind() {
 		return LuaStatementConstants.S_RETURN;
-    }
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.eclipse.dltk.ast.statements.Statement#traverse(org.eclipse.dltk.ast
-     * .ASTVisitor)
-     */
-    public void traverse(ASTVisitor visitor) throws Exception {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.dltk.ast.statements.Statement#traverse(org.eclipse.dltk.ast .ASTVisitor)
+	 */
+	public void traverse(ASTVisitor visitor) throws Exception {
 		if (visitor.visit(this)) {
 			super.traverse(visitor);
 			returnValues.traverse(visitor);
 			visitor.endvisit(this);
 		}
-    }
+	}
 }
