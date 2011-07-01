@@ -223,8 +223,11 @@ function walk.traverse.expr (cfg, x, ...)
    | `Call{...} | `Invoke{...} -> EL(x)
    | `Index{ a, b }            -> E(a); E(b)
    | `Op{ opid, ... }          -> E(x[2]); if #x==3 then E(x[3]) end
-   | `Function{ params, body } -> I(params); scope(cfg, 'down'); B(body); scope (cfg, 'in')
    | `Stat{ b, e }             -> scope(cfg, 'down'); B(b); E(e); scope (cfg, 'in')
+   | `Function{ params, body } -> 
+      I(params) 
+      local lastp = params[#params]; if lastp and lastp.tag=='Dots' then E(lastp) end
+      scope(cfg, 'down'); B(body); scope (cfg, 'in')
    | `Table{ ... }             ->
       for i = 1, #x do match x[i] with
          | `Pair{ k, v } -> E(k); E(v)
@@ -289,7 +292,11 @@ end
 ----------------------------------------------------------------------
 function walk.binder_list (cfg, x, ...)
    local f = cfg.binder 
-   if f then for v in ivalues(x) do f(v, ...) end end
+   if f then
+      for v in ivalues(x) do 
+         if type(v)=='table' and v.tag=='Id' then f(v, ...) end 
+      end
+   end
 end
 
 ----------------------------------------------------------------------

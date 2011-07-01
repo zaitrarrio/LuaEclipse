@@ -259,9 +259,9 @@ public class NodeFactory implements LuaExpressionConstants, LuaStatementConstant
 			left = getNode(childNodes.get(0), modifier);
 			right = getNode(childNodes.get(1), modifier);
 			if (left instanceof Literal) {
-				node = new Pair((Literal) left, right, modifier);
+				node = new Pair((Literal) left, right);
 			} else {
-				node = new Pair((Identifier) left, right, modifier);
+				node = new Pair((Identifier) left, right);
 			}
 			break;
 		/*

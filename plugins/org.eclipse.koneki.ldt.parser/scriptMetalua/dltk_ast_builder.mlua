@@ -1,0 +1,297 @@
+--------------------------------------------------------------------------------
+--  Copyright (c) 2011 Sierra Wireless.
+--  All rights reserved. This program and the accompanying materials
+--  are made available under the terms of the Eclipse Public License v1.0
+--  which accompanies this distribution, and is available at
+--  http://www.eclipse.org/legal/epl-v10.html
+-- 
+--  Contributors:
+--       Kevin KIN-FOO <kkinfoo@sierrawireless.com>
+--           - initial API and implementation and initial documentation
+--------------------------------------------------------------------------------
+require 'metalua.compiler'
+require 'metalua.walk'
+-{ extension 'match' }
+
+local print = function (string) print(string) io.flush() end
+
+local CallArgumentsList = java.require('org.eclipse.dltk.ast.expressions.CallArgumentsList')
+
+local LuaModuleDeclaration = java.require('org.eclipse.koneki.ldt.parser.ast.LuaModuleDeclaration')
+
+local BinaryExpression=	java.require('org.eclipse.koneki.ldt.parser.ast.expressions.BinaryExpression')
+local Boolean =			java.require('org.eclipse.koneki.ldt.parser.ast.expressions.Boolean')
+local Call =			java.require('org.eclipse.koneki.ldt.parser.ast.expressions.Call')
+local Dots =			java.require('org.eclipse.koneki.ldt.parser.ast.expressions.Dots')
+local Identifier =		java.require('org.eclipse.koneki.ldt.parser.ast.expressions.Identifier')
+local Function =		java.require('org.eclipse.koneki.ldt.parser.ast.expressions.Function')
+local Index =			java.require('org.eclipse.koneki.ldt.parser.ast.expressions.Index')
+local Invoke =			java.require('org.eclipse.koneki.ldt.parser.ast.expressions.Invoke')
+local Nil =				java.require('org.eclipse.koneki.ldt.parser.ast.expressions.Nil')
+local Number =			java.require('org.eclipse.koneki.ldt.parser.ast.expressions.Number')
+local Pair =			java.require('org.eclipse.koneki.ldt.parser.ast.expressions.Pair')
+local Parenthesis=		java.require('org.eclipse.koneki.ldt.parser.ast.expressions.Parenthesis')
+local String =			java.require('org.eclipse.koneki.ldt.parser.ast.expressions.String')
+local Table =			java.require('org.eclipse.koneki.ldt.parser.ast.expressions.Table')
+local UnaryExpression =	java.require('org.eclipse.koneki.ldt.parser.ast.expressions.UnaryExpression')
+
+local Break =		java.require('org.eclipse.koneki.ldt.parser.ast.statements.Break')
+local Chunk =		java.require('org.eclipse.koneki.ldt.parser.ast.statements.Chunk')
+local Do =			java.require('org.eclipse.koneki.ldt.parser.ast.statements.Do')
+local ElseIf =		java.require('org.eclipse.koneki.ldt.parser.ast.statements.ElseIf')
+local ForInPair =	java.require('org.eclipse.koneki.ldt.parser.ast.statements.ForInPair')
+local ForNumeric =	java.require('org.eclipse.koneki.ldt.parser.ast.statements.ForNumeric')
+local If =			java.require('org.eclipse.koneki.ldt.parser.ast.statements.If')
+local Local =		java.require('org.eclipse.koneki.ldt.parser.ast.statements.Local')
+local LocalRec =	java.require('org.eclipse.koneki.ldt.parser.ast.statements.LocalRec')
+local Repeat =		java.require('org.eclipse.koneki.ldt.parser.ast.statements.Repeat')
+local Return =		java.require('org.eclipse.koneki.ldt.parser.ast.statements.Return')
+local Set =			java.require('org.eclipse.koneki.ldt.parser.ast.statements.Set')
+local While =		java.require('org.eclipse.koneki.ldt.parser.ast.statements.While')
+
+--
+-- Simple type printing visitor
+--
+local ind = 0
+local sDown = function(node, ...) ind=ind+1; print(string.rep('| ', ind)..'Down on '..(node.tag or 'chunk')) end
+local sUp = function(node, ...) print(string.rep('| ', ind)..'Up on '..(node.tag or 'chunk')); ind=ind-1 end
+local simple={
+	binder = function(node, ...) sUp(node) sDown(node)end,
+	block = {up = sUp, down = sDown},
+	expr = {up = sUp, down = sDown},
+	stat = {up = sUp, down = sDown}
+}
+--
+-- The real work
+--
+local module = {}
+-- Initialize cache for Lua ast objects
+local hash = {}
+-- Initialize cache for Java Objects
+local object= {}
+local function offsets(node)
+	local start = node.lineinfo and node.lineinfo.first[3] or 0
+	local _end = node.lineinfo and node.lineinfo.last[3] or 0
+	return start, _end
+end
+---
+--
+--
+local function statListToChunk(list)
+	local chunk = Chunk:new(0, 0)
+	for k, node in ipairs(list) do
+	print ("Adding "..(node.tag or 'Chunk')..(object[node]~=nil and ' java ok' or ' java nok'))
+--	table.print(node, 'nohash', 100)
+if node.tag and node.tag == 'Dots' then 
+print('node '..tostring(node))
+end
+		chunk:addStatement(object[node])
+	end
+	return chunk
+end
+---
+--
+--
+local function statListToCallArgList(list)
+	local clist = CallArgumentsList:new(0, 0)
+	for k, node in ipairs(list) do
+		clist:addNode(object[node])
+	end
+	return clist
+end
+local function down(node,parent, ...)
+	if not hash[node] then
+		hash[node] = {}
+	end
+	if parent then
+		table.insert(hash[parent], node)
+	end
+end
+local function apply(node, ...)
+	local first, last = offsets(node)
+	match node with
+		| `Call {...} ->
+			-- Load param list
+			local clist = CallArgumentsList:new(0, 0)
+			for child = 2,(#node-2) do
+				 clist:addNode( object[node[child]] )
+			end
+			object[ node ] = Call:new(first, last, object[node[1]], clist )
+		| `Invoke {expr, string } ->
+			object[ node ] = Invoke:new(first, last, object[expr], object[string])
+		| `Invoke {expr, string, ...} ->
+			local clist = CallArgumentsList:new(0, 0)
+			for child = 3,#node do
+				 clist:addNode( object[node[child]] )
+			end
+			object[ node ] = Invoke:new(first, last, object[expr], object[string], clist)
+	end
+end
+local cfg = {
+	block = {down=down},
+	expr  = {down=down},
+	stat  = {down=down}
+}
+cfg.binder = function(node, parent, ...)
+	local first, last = offsets(node)
+	match node with
+		| `Id{name} ->
+			-- Use general indexation
+			down(node, parent, ...)
+			-- Create Java Identifier
+			object[ node ] = Identifier:new(first, last, name)
+		| _ --[[{  ... }]]->
+			print('In binder missing type `'..(node.tag))
+			table.print(node, 'nohash',1)
+	end
+end
+cfg.block.up =function(node, parent, ...)
+	local first, last = offsets(node)
+	match node with
+		| { tag=nil, ... } -> -- Dealing with Chunks
+			local chunk = Chunk:new(first, last)
+			-- Append childern Java objects
+			if hash[node] then
+				for index, child in pairs(hash[node]) do
+					chunk:addStatement(object[child])
+				end
+			end
+			object[ node ] = chunk
+		| `Do { block } ->
+		print ( '-=========passe doo'..(object[block] == nil and 'undefined' or 'defined'))
+		table.print ( block)
+			object[ node ] = Do:new(first, last, statListToChunk(block))
+		| _ --[[{  ... }]]->
+			print('In block missing type `'..(node.tag))
+			table.print(node, 'nohash',1)
+	end
+end
+cfg.stat.up = function (node, ...)
+	local first, last = offsets(node)
+	match node with
+		| `Set {left, right} ->
+			object[ node ] = Set:new(first, last, statListToChunk(left), statListToChunk(right))
+		| `While {expr, block} ->
+			object[ node ] = While:new(first, last, object[expr], object[block])
+		| `Repeat {block, expr} ->
+			object[ node ] = Repeat:new(first, last, object[block], object[expr])
+		| `If { expr , block} ->
+			object[ node ] = If:new(first, last, object[expr], object[block])
+		| `If { expr , block, alt} ->
+			object[ node ] = If:new(first, last, object[expr], object[block], object[alt])
+		| `If { expr , block, ... } if (select("#", ...)%2) == 0 ->
+			object[ node ] = ElseIf:new(first, last, object[expr], object[block])
+			for k =1,select("#", ...),2 do
+				local cond, block = select(k, ...)
+				object[ node ]:addExpressionAndRelatedChunk(object[cond], object[block])
+			end
+		| `If { expr , block, ... } if (select("#", ...)%2) == 1 ->
+			local dotsSize = select("#", ...)
+			local elseBlock = select(dotsSize, ...)
+			-- Get last 'else' chunk
+			object[ node ] = ElseIf:new(first, last, object[expr], object[block], object[elseBlock])
+			for k =1,dotsSize,2 do
+				local cond, block = select(k, ...)
+				object[ node ]:addExpressionAndRelatedChunk(object[cond], object[block])
+			end
+		| `Fornum {identifier, min, max, range, block} ->
+			object[ node ] = ForNumeric:new(first, last, object[identifier], object[min], object[max], object[range], object[block])
+		| `Fornum {identifier, min, max, block} ->
+			object[ node ] = ForNumeric:new(first, last, object[identifier], object[min], object[max], object[block])
+		| `Forin {identifiers, exprs, block} ->
+			object[ node ] = ForInPair:new(first, last, statListToChunk(identifiers), statListToChunk(exprs), object[block])
+		| `Local {identifiers} ->
+			object[ node ] = Local:new(first, last, statListToChunk(identifiers))
+		| `Local {identifiers, inits} ->
+			object[ node ] = Local:new(first, last, statListToChunk(identifiers), statListToChunk(inits))
+		| `Localrec {identifiers} ->
+			object[ node ] = LocalRec:new(first, last, statListToChunk(identifiers))
+		| `Localrec {identifiers, inits} ->
+			object[ node ] = LocalRec:new(first, last, statListToChunk(identifiers), statListToChunk(inits))
+		| `Break ->
+			object[ node ] = Break:new(first, last)
+		| `Return {...} ->
+			object[ node ] = Return:new(first, last) 
+			-- Back patch children
+			for k,child in ipairs( node ) do
+				 object[ node ]:addReturnValue( object[child] )
+			end
+		| `Call{...} | `Invoke{...} ->
+			apply(node, ...)
+		| _ --[[{  ... }]]->
+			print('In stat.up missing type `'..(node.tag))
+			table.print(node, 'nohash',1)
+	end
+	-- Do not forget `Call and `Invoke
+end
+cfg.expr.up = function (node, ...)
+	local first, last = offsets(node)
+	match node with
+		| `Function {param, block} ->
+			object[ node ] = Function:new(first, last, statListToChunk( param ), object[block])
+		| `Nil ->
+			object[ node ] = Nil:new(first, last)
+		| `Dots ->
+			object[ node ] = Dots:new(first, last)
+		| `True | `False ->
+			object[ node ] = Boolean:new(first, last, node.tag == "True")
+		| `Number{number} ->
+			object[ node ] = Number:new(first, last, number)
+		| `String{string} ->
+			object[ node ] = String:new(first, last, string)
+		| `Pair { expr, sexpr } ->
+			object[ node ] = Pair:new(first, last, object[expr], object[sexpr])
+		| `Table { ... } ->
+			object[ node ] = Table:new(first, last)
+			-- Backpatch table content at initialisation
+			for k, child in ipairs( node ) do
+				object[ node ]:addStatement( object[child] )
+			end
+		
+		| `Op { operator, left, right} ->
+			object[ node ] = BinaryExpression:new(first, last,object[left], operator, object[right])
+		| `Op { operator, expr } ->
+			object[ node ] = UnaryExpression:new(first, last, operator, object[expr])
+		| `Paren{ expr } ->
+			object[ node ] = Parenthesis:new(first, last, object[expr])
+		| `Id { name } ->
+			object[ node ] = Identifier:new(first, last, name)
+		| `Index { expr, sexpr } ->
+			object[ node ] = Index:new(first, last, object[expr], object[sexpr])
+		| `Call{...} | `Invoke{...} ->
+			apply(node, ...)
+		| _ --[[{  ... } ]]->
+			print('In expr.up missing type `'..(node.tag))
+			table.print(node, 'nohash',1)
+	end
+end
+--
+--
+--
+module.ast_builder = function(source)
+	-- Build AST
+	local ast = mlc.luastring_to_ast(source)
+	-- Walk through AST
+--	walk.block(simple, ast)
+	walk.block(cfg, ast)
+	-- Achive DLTK Java Objects AST
+	local root = LuaModuleDeclaration:new(#source, true)
+	root:addStatement( object[ast] )
+	print('done')
+	return root
+end
+return module
+--[[
+if arg and #arg > 1 then
+	local path="/d/LuaEclipse/plugins/org.eclipse.koneki.ldt.metalua.32bits/"
+	package.path = path.."?.luac;"..path.."?.lua;"..package.path
+	for i =2,#arg do
+		local file = io.open(arg[i], 'r')
+		local source = file:read("*all")
+		file:close()
+		local ast, cache = mlc.luastring_to_ast( source )
+		table.print(ast, "nohash", 1)
+		table.print(ast_builder( ast ), 1)
+	end
+end
+]]

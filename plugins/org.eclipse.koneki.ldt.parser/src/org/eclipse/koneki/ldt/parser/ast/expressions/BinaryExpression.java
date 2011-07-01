@@ -14,6 +14,7 @@ import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.statements.Statement;
 import org.eclipse.dltk.utils.CorePrinter;
+import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
 
 /**
  * Defines a two operand expression.
@@ -62,6 +63,10 @@ public class BinaryExpression extends Expression {
 			this.setEnd(right.sourceEnd());
 			assert right instanceof Expression;
 		}
+	}
+
+	public BinaryExpression(int start, int end, Expression left, String operatorName, Expression right) {
+		this(start, end, left, operatorNameToKind(operatorName), right);
 	}
 
 	/**
@@ -137,4 +142,40 @@ public class BinaryExpression extends Expression {
 		}
 	}
 
+	public static int operatorNameToKind(final String s) {
+
+		if ("sub".equals(s)) { //$NON-NLS-1$
+			return LuaExpressionConstants.E_MINUS;
+		} else if ("mul".equals(s)) { //$NON-NLS-1$
+			return LuaExpressionConstants.E_MULT;
+		} else if ("div".equals(s)) { //$NON-NLS-1$
+			return LuaExpressionConstants.E_DIV;
+		} else if ("eq".equals(s)) { //$NON-NLS-1$
+			return LuaExpressionConstants.E_EQUAL;
+		} else if ("concat".equals(s)) { //$NON-NLS-1$
+			return LuaExpressionConstants.E_CONCAT;
+		} else if ("mod".equals(s)) { //$NON-NLS-1$
+			return LuaExpressionConstants.E_MOD;
+		} else if ("pow".equals(s)) { //$NON-NLS-1$
+			return LuaExpressionConstants.E_POWER;
+		} else if ("lt".equals(s)) { //$NON-NLS-1$
+			return LuaExpressionConstants.E_LT;
+		} else if ("le".equals(s)) { //$NON-NLS-1$
+			return LuaExpressionConstants.E_LE;
+		} else if ("and".equals(s)) { //$NON-NLS-1$
+			return LuaExpressionConstants.E_LAND;
+		} else if ("or".equals(s)) { //$NON-NLS-1$
+			return LuaExpressionConstants.E_LOR;
+		} else if ("not".equals(s)) { //$NON-NLS-1$
+			return LuaExpressionConstants.E_BNOT;
+		} else if ("len".equals(s)) { //$NON-NLS-1$
+			return LuaExpressionConstants.E_LENGTH;
+		} else if ("unm".equals(s)) { //$NON-NLS-1$
+			return LuaExpressionConstants.E_UN_MINUS;
+		} else {
+			// Assume it's an addition
+			assert "add".equals(s) : "Unhandled operator: " + s; //$NON-NLS-1$ //$NON-NLS-2$
+			return LuaExpressionConstants.E_PLUS;
+		}
+	}
 }
