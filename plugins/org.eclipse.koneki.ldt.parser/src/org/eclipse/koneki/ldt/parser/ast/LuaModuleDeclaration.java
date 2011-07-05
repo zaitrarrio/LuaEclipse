@@ -18,12 +18,19 @@
 package org.eclipse.koneki.ldt.parser.ast;
 
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
+import org.eclipse.dltk.compiler.problem.DefaultProblem;
+import org.eclipse.dltk.compiler.problem.DefaultProblemIdentifier;
+import org.eclipse.dltk.compiler.problem.IProblemIdentifier;
+import org.eclipse.dltk.compiler.problem.ProblemSeverity;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class LuaModuleDeclaration.
  */
 public class LuaModuleDeclaration extends ModuleDeclaration {
+
+	/** Indicates if any problem occurred during parsing */
+	private DefaultProblem problem = null;
 
 	/**
 	 * Instantiates a new Lua module declaration.
@@ -50,5 +57,18 @@ public class LuaModuleDeclaration extends ModuleDeclaration {
 	@Override
 	public boolean equals(Object o) {
 		return o instanceof LuaModuleDeclaration;
+	}
+
+	public void setProblem(final int line, final int column, final int offset, final String message) {
+		IProblemIdentifier id = DefaultProblemIdentifier.decode(offset);
+		problem = new DefaultProblem(new String(), message, id, new String[0], ProblemSeverity.ERROR, offset, -1, line, column);
+	}
+
+	public boolean hasError() {
+		return problem != null;
+	}
+
+	public DefaultProblem getProblem() {
+		return problem;
 	}
 }
