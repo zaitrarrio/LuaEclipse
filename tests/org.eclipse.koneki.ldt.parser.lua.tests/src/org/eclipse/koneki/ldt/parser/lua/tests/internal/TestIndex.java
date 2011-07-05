@@ -32,9 +32,8 @@ import com.naef.jnlua.LuaException;
 import com.naef.jnlua.LuaState;
 
 /**
- * Runs Lua-side test suite in order to allow calling Lua unit testing from
- * Java.
- *
+ * Runs Lua-side test suite in order to allow calling Lua unit testing from Java.
+ * 
  * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  */
 public class TestIndex extends TestCase {
@@ -45,9 +44,7 @@ public class TestIndex extends TestCase {
 	private String testFile = "/script/tests.lua"; //$NON-NLS-1$
 
 	/**
-	 * Loads unit tests contained in {@link #testFile}. Also, loads
-	 * <b>lunatest</b> unit testing library path in Lua-side
-	 * <code>package.path</code>.
+	 * Loads unit tests contained in {@link #testFile}. Also, loads <b>lunatest</b> unit testing library path in Lua-side <code>package.path</code>.
 	 */
 	@Before
 	public void setUp() {
@@ -62,7 +59,7 @@ public class TestIndex extends TestCase {
 
 			// Load it in Lua instance
 			FileInputStream input = new FileInputStream(testedCodeFile);
-			getState().load(input, "loadingLuaParserIndex");
+			getState().load(input, "loadingLuaParserIndex"); //$NON-NLS-1$
 			getState().call(0, 0);
 			input.close();
 
@@ -70,7 +67,7 @@ public class TestIndex extends TestCase {
 			Path path = LunaTest.getPath();
 			code = "package.path = package.path  .. [[;" + path //$NON-NLS-1$
 					+ "?.luac;" + path + "?.lua]]"; //$NON-NLS-1$ //$NON-NLS-2$
-			getState().load(code, "lunatestPathLoading");
+			getState().load(code, "lunatestPathLoading"); //$NON-NLS-1$
 			getState().call(0, 0);
 		} catch (IOException e) {
 			fail(e.getMessage());
@@ -96,13 +93,13 @@ public class TestIndex extends TestCase {
 			String filename = FileLocator.toFileURL(ressource).getPath();
 			// Load lua unit test file
 			FileInputStream input = new FileInputStream(filename);
-			getState().load(input, "loadingLuaParserIndex");
+			getState().load(input, "loadingLuaParserIndex"); //$NON-NLS-1$
 			getState().call(0, 0);
 			input.close();
 
 			// Load lunatest runner
-			getState().getGlobal("lunatest");
-			getState().getField(-1, "run");
+			getState().getGlobal("lunatest"); //$NON-NLS-1$
+			getState().getField(-1, "run"); //$NON-NLS-1$
 			getState().remove(-2);
 			// Run tests
 			getState().call(0, 2);
