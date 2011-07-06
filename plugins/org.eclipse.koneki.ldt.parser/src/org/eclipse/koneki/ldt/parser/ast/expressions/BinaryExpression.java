@@ -65,7 +65,7 @@ public class BinaryExpression extends Expression {
 		}
 	}
 
-	public BinaryExpression(int start, int end, Expression left, String operatorName, Expression right) {
+	public BinaryExpression(int start, int end, Expression left, java.lang.String operatorName, Expression right) {
 		this(start, end, left, operatorNameToKind(operatorName), right);
 	}
 
@@ -142,7 +142,7 @@ public class BinaryExpression extends Expression {
 		}
 	}
 
-	public static int operatorNameToKind(final String s) {
+	public static int operatorNameToKind(final java.lang.String s) {
 
 		if ("sub".equals(s)) { //$NON-NLS-1$
 			return LuaExpressionConstants.E_MINUS;

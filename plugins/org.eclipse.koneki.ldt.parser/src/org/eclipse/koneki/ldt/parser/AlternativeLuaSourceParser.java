@@ -18,7 +18,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.dltk.ast.parser.AbstractSourceParser;
 import org.eclipse.dltk.ast.parser.IModuleDeclaration;
 import org.eclipse.dltk.compiler.env.IModuleSource;
+import org.eclipse.dltk.compiler.problem.DefaultProblem;
 import org.eclipse.dltk.compiler.problem.IProblemReporter;
+import org.eclipse.koneki.ldt.internal.parser.DLTKObjectFactory;
 import org.eclipse.koneki.ldt.metalua.MetaluaStateFactory;
 import org.eclipse.koneki.ldt.parser.ast.LuaModuleDeclaration;
 
@@ -42,6 +44,9 @@ public class AlternativeLuaSourceParser extends AbstractSourceParser {
 		// Create a lua instance
 		LuaState lua = MetaluaStateFactory.newLuaState();
 
+		// Load module which helps avoiding reflection between Lua and Java
+		DLTKObjectFactory.register(lua);
+
 		/*
 		 * Load Metalua ast parser utility module
 		 */
@@ -61,6 +66,12 @@ public class AlternativeLuaSourceParser extends AbstractSourceParser {
 			lua.pushString(input.getSourceContents());
 			lua.call(1, 1);
 			module = lua.checkJavaObject(-1, LuaModuleDeclaration.class);
+			// Deal with errors on lua side
+			if (module.hasError()) {
+				DefaultProblem problem = module.getProblem();
+				problem.setOriginatingFileName(input.getFileName());
+				reporter.reportProblem(problem);
+			}
 			return module;
 		} catch (IOException e) {
 			Activator.logError("Unable to read metalua ast builder file", e); //$NON-NLS-1$

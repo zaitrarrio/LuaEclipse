@@ -53,7 +53,7 @@ public class UnaryExpression extends Expression {
 		this.kind = kind;
 	}
 
-	public UnaryExpression(int start, int end, String operatorName, Statement e) {
+	public UnaryExpression(int start, int end, java.lang.String operatorName, Statement e) {
 		this(start, end, BinaryExpression.operatorNameToKind(operatorName), e);
 	}
 
