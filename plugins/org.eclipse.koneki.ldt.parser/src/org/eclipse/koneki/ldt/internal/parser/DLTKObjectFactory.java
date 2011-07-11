@@ -40,10 +40,20 @@ import org.eclipse.koneki.ldt.parser.ast.statements.While;
 import com.naef.jnlua.LuaState;
 import com.naef.jnlua.NamedJavaFunction;
 
+/**
+ * Offers to create DLTK Java objects from a single access, avoid wasting time with reflection.
+ */
 public class DLTKObjectFactory {
 
+	/**
+	 * Gives a {@link LuaState} access to a logic module named <code>DLTK</code> which enable DLTK Object creation
+	 * 
+	 * @param L
+	 *            {@link LuaState} to load
+	 * @return true in case of success, false else way
+	 */
 	public static boolean register(LuaState L) {
-		// check Luastate
+		// Nothing to do if no LuaState is given
 		if (L == null) {
 			return false;
 		}
@@ -177,11 +187,12 @@ public class DLTKObjectFactory {
 				new NamedJavaFunction() {
 					@Override
 					public int invoke(LuaState l) {
-						Declaration declaration = l.checkJavaObject(2, Declaration.class);
-						if (declaration != null) {
-							l.pushJavaObject(new Index(l.checkJavaObject(1, Expression.class), declaration));
+						Expression left = l.checkJavaObject(1, Expression.class);
+						Statement statement = l.checkJavaObject(2, Statement.class);
+						if (statement instanceof Declaration) {
+							l.pushJavaObject(new Index(left, (Declaration) statement));
 						} else {
-							l.pushJavaObject(new Index(l.checkJavaObject(1, Expression.class), l.checkJavaObject(2, Expression.class)));
+							l.pushJavaObject(new Index(left, (Expression) statement));
 						}
 						return 1;
 					}
