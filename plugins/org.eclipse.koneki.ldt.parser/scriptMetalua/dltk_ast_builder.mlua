@@ -302,7 +302,9 @@ module.ast_builder = function(source)
 		local line, column, offset = ast.lineinfo.first[1], ast.lineinfo.first[2], ast.lineinfo.first[3]
 		DLTK.setProblem(root, line, column, offset, ast[1])
 		return root
-	end 
+	end
+	-- Mark intersting nodes such as declaration
+	ast = mark.declaration( ast )
 	-- Walk through AST
 	walk.block(visitor, ast)
 	-- Achive DLTK Java Objects AST

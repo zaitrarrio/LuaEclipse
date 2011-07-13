@@ -10,11 +10,13 @@
  *******************************************************************************/
 package org.eclipse.koneki.ldt.parser;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.parser.AbstractSourceParser;
 import org.eclipse.dltk.ast.parser.IModuleDeclaration;
 import org.eclipse.dltk.compiler.env.IModuleSource;
@@ -28,38 +30,65 @@ import com.naef.jnlua.LuaException;
 import com.naef.jnlua.LuaState;
 
 /**
- * TODO Comment this class
+ * Generates AST from Metalua analysis, {@link ASTNode}s are created straight from Lua
+ * 
+ * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  */
 public class AlternativeLuaSourceParser extends AbstractSourceParser {
 
-	private static String metaluaScriptPath = "/scriptMetalua/dltk_ast_builder.mlua";//$NON-NLS-1$
+	private static String builderScriptPath = "/scriptMetalua/dltk_ast_builder.mlua";//$NON-NLS-1$
+	private static String markerScriptPath = "/scriptMetalua/declaration_marker.lua";//$NON-NLS-1$
+
 	/** Load Metalua ast parser utility module */
 	private static LuaState lua;
 	static {
 		lua = MetaluaStateFactory.newLuaState();
 		// Load module which helps avoiding reflection between Lua and Java
 		DLTKObjectFactory.register(lua);
-		// Enable
-
-		URL url = Platform.getBundle(Activator.PLUGIN_ID).getEntry(metaluaScriptPath);
-		String path;
+		// Local needed files on disk
+		URL builder = Platform.getBundle(Activator.PLUGIN_ID).getEntry(builderScriptPath);
+		URL marker = Platform.getBundle(Activator.PLUGIN_ID).getEntry(markerScriptPath);
+		// Load needed files
 		try {
-			path = FileLocator.toFileURL(url).getFile();
+			// Module used to detect declaration
+			String path = FileLocator.toFileURL(marker).getFile();
+			lua.load(new FileInputStream(path), "Loading AST marker."); //$NON-NLS-1$
+			lua.call(0, 1);
+
+			// Associate module and variable name
+			lua.setGlobal("mark"); //$NON-NLS-1$
+
+			// Module used to generate AST
+			path = FileLocator.toFileURL(builder).getFile();
 			lua.getGlobal("mlc"); //$NON-NLS-1$
 			lua.getField(-1, "luafile_to_function"); //$NON-NLS-1$
-			lua.remove(-2); // remove mlc table
-			lua.pushString(path); // arg
+
+			// Remove mlc table
+			lua.remove(-2);
+
+			// Provide path of module as argument
+			lua.pushString(path);
+
+			// Metalua code loading
 			lua.call(1, 2);
-			lua.pop(1); // remove nil
+
+			// Remove nil awkward nil, returned every time
+			lua.pop(1);
+
+			// Metalua code compilation
 			lua.call(0, 1);
 		} catch (IOException e) {
-			Activator.logError("Unable to read metalua ast builder file", e); //$NON-NLS-1$
+			Activator.logError("Unable to read metalua ast builder and marker files", e); //$NON-NLS-1$
 		}
 	}
 
 	/**
-	 * @see org.eclipse.dltk.ast.parser.ISourceParser#parse(org.eclipse.dltk.compiler.env.IModuleSource,
-	 *      org.eclipse.dltk.compiler.problem.IProblemReporter)
+	 * Generate DLTK AST straight from Lua
+	 * 
+	 * @param input
+	 *            Source to parse
+	 * @param reporter
+	 *            Enable to report errors in parsed source code
 	 */
 	@Override
 	public IModuleDeclaration parse(IModuleSource input, IProblemReporter reporter) {
