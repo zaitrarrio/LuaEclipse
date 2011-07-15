@@ -60,7 +60,7 @@ local declaration = {}
 -- @return number Node's start offset
 -- @return number Node's end offset
 local function offsets(node)
-	local start = node.lineinfo and node.lineinfo.first[3] or 0
+	local start = node.lineinfo and node.lineinfo.first[3] - 1 or 0
 	local _end = node.lineinfo and node.lineinfo.last[3] or 0
 	return start, _end
 end
@@ -162,17 +162,20 @@ visitor.binder = function(node, parent, ...)
 			if mark.is_declaration( node ) then
 				-- Create appropriate declaration type
 				local type = mark.declaration_type (node) or 'undef'
+				local init = mark.declaration_initialization( node )
 				print ( 'declaration spotted: '..type )
 				if type == 'Function' then
 					-- Function Declaration
-					local init = mark.declaration_initialization( node )
-					local name, nStart, nEnd = node[1], offsets(init)
-					object[ node ] = DLTK.FunctionDeclaration(name, nStart, nEnd, first, last, mark.declaration_scope(node))
+					local name, bStart, bEnd = node[1], offsets(init)
+					object[ node ] = DLTK.FunctionDeclaration(name, first, last, bStart, bEnd, mark.declaration_scope(node))
 					-- Register node for backpatch as Java object for parameters and body are still not available
 					table.insert(declaration, node)
 				elseif type == 'Table' then
 					-- Table Declaration
-					object[ node ] = DLTK.Identifier(first, last, name)
+					local name, iStart, iEnd = node[1], offsets(init)
+					object[ node ] = DLTK.TableDeclaration(name, first, last, iStart, iEnd, mark.declaration_scope(node))
+					-- Register node for backpatch as Java object for parameters and body are still not available
+					table.insert(declaration, node)
 				elseif type == 'Nil' or type == 'Number' or type == 'String' or type == 'Boolean' then
 					-- Scalar Declaration
 					object[ node ] = DLTK.Identifier(first, last, name)
