@@ -47,6 +47,13 @@ local hash = {}
 --	value:	Java DLTK Node
 local object= {}
 ---
+-- Contains Declaration Metalua nodes
+--
+-- Use to backpatch nodes which had not full descents at construction
+--	key:	Random numbers
+--	value:	Metalua AST Node
+local declaration = {}
+---
 -- Provides Metalua AST Nodes offset
 --
 -- @param node Metalua AST Node
@@ -151,8 +158,32 @@ visitor.binder = function(node, parent, ...)
 		| `Id{name} ->
 			-- Use general indexation
 			down(node, parent, ...)
-			-- Create Java Identifier
-			object[ node ] = DLTK.Identifier(first, last, name)
+			--Process as a Declaration
+			if mark.is_declaration( node ) then
+				-- Create appropriate declaration type
+				local type = mark.declaration_type (node) or 'undef'
+				print ( 'declaration spotted: '..type )
+				if type == 'Function' then
+					-- Function Declaration
+					local init = mark.declaration_initialization( node )
+					local name, nStart, nEnd = node[1], offsets(init)
+					object[ node ] = DLTK.FunctionDeclaration(name, nStart, nEnd, first, last, mark.declaration_scope(node))
+					-- Register node for backpatch as Java object for parameters and body are still not available
+					table.insert(declaration, node)
+				elseif type == 'Table' then
+					-- Table Declaration
+					object[ node ] = DLTK.Identifier(first, last, name)
+				elseif type == 'Nil' or type == 'Number' or type == 'String' or type == 'Boolean' then
+					-- Scalar Declaration
+					object[ node ] = DLTK.Identifier(first, last, name)
+				else
+					-- Default Declaration
+					object[ node ] = DLTK.Identifier(first, last, name)
+				end
+			else
+				-- Create Java Identifier
+				object[ node ] = DLTK.Identifier(first, last, name)
+			end
 		| _ ->
 --			print('In binder missing type `'..(node.tag))
 --			table.print(node, 'nohash',1)
@@ -289,6 +320,21 @@ visitor.expr.up = function (node, ...)
 	end
 end
 ---
+-- Back patch node missing Java objects at their construction, uses global table <code>declaration</code>
+local function backpatch()
+	for k, node in ipairs(declaration) do
+		local type = mark.declaration_type(node)
+		local init = mark.declaration_initialization(node)
+		if type == 'Function' then
+			local params, body = init[1], init[2]
+			-- Define function's parameters
+			DLTK.acceptArguments(object[node], statListToChunk( params ))
+			-- Define function's body
+			DLTK.acceptBody(object[node], object[ body ])
+		end
+	end
+end
+---
 -- Build a Metalua AST from source code
 --
 -- @param	source Code to parse
@@ -307,7 +353,9 @@ module.ast_builder = function(source)
 	ast = mark.declaration( ast )
 	-- Walk through AST
 	walk.block(visitor, ast)
-	-- Achive DLTK Java Objects AST
+	-- Backpatch partial nodes
+	backpatch()
+	-- Achieve DLTK Java Objects AST
 	DLTK.addStatementToModuleDeclaration(root, object[ast])
 	return root
 end

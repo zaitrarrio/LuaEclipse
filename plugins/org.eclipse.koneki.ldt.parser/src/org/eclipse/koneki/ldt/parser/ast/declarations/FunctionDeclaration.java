@@ -10,13 +10,18 @@
  *******************************************************************************/
 package org.eclipse.koneki.ldt.parser.ast.declarations;
 
+import org.eclipse.dltk.ast.ASTNode;
+import org.eclipse.dltk.ast.declarations.Argument;
 import org.eclipse.dltk.ast.declarations.MethodDeclaration;
 import org.eclipse.dltk.ast.references.SimpleReference;
+import org.eclipse.dltk.ast.statements.Statement;
+import org.eclipse.koneki.ldt.parser.ast.expressions.Identifier;
+import org.eclipse.koneki.ldt.parser.ast.statements.Chunk;
 
 /**
  * Declaration of a function detected by outline and code assistance
  * 
- * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
+ * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  */
 public class FunctionDeclaration extends MethodDeclaration {
 	/**
@@ -33,8 +38,7 @@ public class FunctionDeclaration extends MethodDeclaration {
 	 * @param end
 	 *            end offset of function body
 	 */
-	public FunctionDeclaration(String name, int nameStart, int nameEnd,
-			int start, int end) {
+	public FunctionDeclaration(String name, int nameStart, int nameEnd, int start, int end) {
 		super(name, nameStart, nameEnd, start, end);
 	}
 
@@ -53,4 +57,27 @@ public class FunctionDeclaration extends MethodDeclaration {
 		this(name.getName(), name.sourceStart(), name.sourceEnd(), start, end);
 	}
 
+	/**
+	 * Defines declared function Arguments
+	 * 
+	 * By default, parameters of {@link MethodDeclaration} are empty. This method is for casting declared function's parameters into {@link Argument}
+	 * s.
+	 * 
+	 * @param params
+	 *            {@link Chunk} containing parameters as {@link Identifier}s. Invalid {@link ASTNode}s will be shown as <code>...</code>.
+	 */
+	public void acceptArguments(Chunk params) {
+		for (Object o : params.getChilds()) {
+			Argument arg;
+			if (o instanceof Identifier) {
+				Identifier id = (Identifier) o;
+				arg = new Argument(id, id.sourceStart(), id.sourceEnd(), null, this.getModifiers());
+			} else {
+				Statement statement = (Statement) o;
+				SimpleReference dots = new SimpleReference(statement.sourceStart(), statement.sourceEnd(), "..."); //$NON-NLS-1$
+				arg = new Argument(dots, dots.sourceStart(), null, this.getModifiers());
+			}
+			addArgument(arg);
+		}
+	}
 }

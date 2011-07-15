@@ -53,22 +53,39 @@ mark.declaration = function ( ast )
 				identifier.scope = 'local'
 			end
 		end
---[[		for name, occurrences in pairs( namesAndOccurrences ) do
-			for i, occurrence in pairs( occurrences ) do
-				local meta  = {
-					occurrences = occurrences,
-				match node with
-					| `Local {identifiers} ->
-						object[ node ] = DLTK.Local(first, last, statListToChunk(identifiers))
-					| `Local {identifiers, inits} ->
-						object[ node ] = DLTK.Local(first, last, statListToChunk(identifiers), statListToChunk(inits))
-					| `Localrec {identifiers} ->
-						object[ node ] = DLTK.LocalRec(first, last, statListToChunk(identifiers))
-					| `Localrec {identifiers, inits} ->
-				end	
-			end
-		end]]
 	end
 	return ast
+end
+---
+-- Indicates wether given node represent a declaration or not
+--
+-- @param	node	Metalua node to check
+-- @return true if node is defined and has a scope 
+mark.is_declaration = function( node )
+	return type(node)=='table' and node.scope
+end
+---
+-- Provides type of initialization
+--
+-- @param node Metalua node to inspect
+-- @return String representing initialization node type, such as 'Function', 'Table', and so on. Nil is returned when node is invalid
+mark.declaration_type= function( node )
+	return node and node.type or nil
+end
+---
+-- Provides initialization node
+--
+-- @param node Metalua node representing Declaration
+-- @return Table representing initialization node. Nil is returned when node is unavailable.
+mark.declaration_initialization= function( node )
+	return node and node.init or nil
+end
+---
+-- Provides initialization node scope
+--
+-- @param node Metalua node representing Declaration
+-- @return String representing initialization node scope 'local' or 'global'. Nil is returned when scope is unavailable.
+mark.declaration_scope= function( node )
+	return node and node.scope or nil
 end
 return mark

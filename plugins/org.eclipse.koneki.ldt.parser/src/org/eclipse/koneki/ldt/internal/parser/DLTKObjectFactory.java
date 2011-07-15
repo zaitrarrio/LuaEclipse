@@ -9,6 +9,7 @@ import org.eclipse.dltk.ast.expressions.Literal;
 import org.eclipse.dltk.ast.references.SimpleReference;
 import org.eclipse.dltk.ast.statements.Statement;
 import org.eclipse.koneki.ldt.parser.ast.LuaModuleDeclaration;
+import org.eclipse.koneki.ldt.parser.ast.declarations.FunctionDeclaration;
 import org.eclipse.koneki.ldt.parser.ast.expressions.BinaryExpression;
 import org.eclipse.koneki.ldt.parser.ast.expressions.Boolean;
 import org.eclipse.koneki.ldt.parser.ast.expressions.Call;
@@ -626,6 +627,56 @@ public class DLTKObjectFactory {
 					@Override
 					public String getName() {
 						return "setProblem"; //$NON-NLS-1$
+					}
+				}, // FunctionDeclaration
+				new NamedJavaFunction() {
+					@Override
+					public int invoke(LuaState l) {
+						String name = l.checkJavaObject(1, String.class);
+						int nameStart = l.checkInteger(2);
+						int nameEnd = l.checkInteger(3);
+						int start = l.checkInteger(4);
+						int end = l.checkInteger(5);
+						FunctionDeclaration declaration = new FunctionDeclaration(name, nameStart, nameEnd, start, end);
+						if ("local".equals(l.checkJavaObject(6, String.class))) { //$NON-NLS-1$
+							declaration.setModifier(Declaration.AccPrivate);
+						} else {
+							declaration.setModifier(Declaration.AccPublic);
+						}
+						l.pushJavaObject(declaration);
+						return 1;
+					}
+
+					@Override
+					public String getName() {
+						return "FunctionDeclaration"; //$NON-NLS-1$
+					}
+				}, new NamedJavaFunction() {
+					@Override
+					public int invoke(LuaState l) {
+						FunctionDeclaration declaration = l.checkJavaObject(1, FunctionDeclaration.class);
+						Chunk body = l.checkJavaObject(2, Chunk.class);
+						declaration.acceptBody(body);
+						return 1;
+					}
+
+					@Override
+					public String getName() {
+						return "acceptBody"; //$NON-NLS-1$
+					}
+				}, // FunctionDeclaration
+				new NamedJavaFunction() {
+					@Override
+					public int invoke(LuaState l) {
+						FunctionDeclaration declaration = l.checkJavaObject(1, FunctionDeclaration.class);
+						Chunk params = l.checkJavaObject(2, Chunk.class);
+						declaration.acceptArguments(params);
+						return 1;
+					}
+
+					@Override
+					public String getName() {
+						return "acceptArguments"; //$NON-NLS-1$
 					}
 				}, };
 
