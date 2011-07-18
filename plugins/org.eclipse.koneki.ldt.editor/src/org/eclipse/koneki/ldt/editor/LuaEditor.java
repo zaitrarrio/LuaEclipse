@@ -10,6 +10,7 @@
  *******************************************************************************/
 
 package org.eclipse.koneki.ldt.editor;
+
 import org.eclipse.dltk.core.IDLTKLanguageToolkit;
 import org.eclipse.dltk.internal.ui.editor.ScriptEditor;
 import org.eclipse.dltk.ui.text.ScriptTextTools;
@@ -31,21 +32,18 @@ import org.eclipse.ui.IEditorInput;
 public class LuaEditor extends ScriptEditor {
 
 	public static final String EDITOR_CONTEXT = "#LuaEditorContext";
-	public static final String EDITOR_ID = Activator.PLUGIN_ID + ".LuaEditor"; //$NON-NLS-1$
+	public static final String EDITOR_ID = Activator.PLUGIN_ID; //$NON-NLS-1$
 	private IFoldingStructureProvider foldingStructureProvider = null;
 
 	/**
 	 * Connects partitions used to deal with comments or strings in editor.
 	 */
-	protected void connectPartitioningToElement(IEditorInput input,
-			IDocument document) {
+	protected void connectPartitioningToElement(IEditorInput input, IDocument document) {
 		if (document instanceof IDocumentExtension3) {
 			IDocumentExtension3 extension = (IDocumentExtension3) document;
-			if (extension
-					.getDocumentPartitioner(ILuaPartitions.LUA_PARTITIONING) == null) {
+			if (extension.getDocumentPartitioner(ILuaPartitions.LUA_PARTITIONING) == null) {
 				LuaTextTools tools = Activator.getDefault().getTextTools();
-				tools.setupDocumentPartitioner(document,
-						ILuaPartitions.LUA_PARTITIONING);
+				tools.setupDocumentPartitioner(document, ILuaPartitions.LUA_PARTITIONING);
 			}
 		}
 	}
@@ -65,7 +63,7 @@ public class LuaEditor extends ScriptEditor {
 		}
 		return foldingStructureProvider;
 	}
-	
+
 	@Override
 	public IDLTKLanguageToolkit getLanguageToolkit() {
 		return LuaLanguageToolkit.getDefault();
