@@ -14,10 +14,13 @@ package org.eclipse.koneki.ldt.internal.parser;
 import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.declarations.Declaration;
-import org.eclipse.dltk.ast.references.Reference;
 import org.eclipse.dltk.ast.statements.Block;
-import org.eclipse.dltk.ast.statements.Statement;
 
+/**
+ * Visits ASTs in order to find node under start and end offsets.
+ * 
+ * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
+ */
 public class MatchNodeVisitor extends ASTVisitor {
 	private ASTNode result = null;
 	private final int end, start;
@@ -57,12 +60,13 @@ public class MatchNodeVisitor extends ASTVisitor {
 	public boolean visitGeneral(ASTNode s) throws Exception {
 		int realStart = s.sourceStart();
 		int realEnd = s.sourceEnd();
-		if (s instanceof Declaration || s instanceof Reference) {
-			Statement statement = (Statement) s;
-			realStart = statement.sourceStart();
-			realEnd = statement.sourceEnd();
+		if (s instanceof Declaration) {
+			Declaration declaration = (Declaration) s;
+			realStart = declaration.getNameStart();
+			realEnd = declaration.getNameEnd();
 		} else if (s instanceof Block) {
-			realStart = realEnd = -42; // never select on blocks
+			// Ignore composite nodes like Chunk and Block
+			realStart = realEnd = -42;
 		}
 		if (realStart >= start && realEnd <= end) {
 			if (getNode() != null && s.sourceStart() >= getNode().sourceStart() && s.sourceEnd() <= getNode().sourceEnd()) {

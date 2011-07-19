@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.koneki.ldt.parser.ast.declarations;
 
+import java.util.ArrayList;
+
 import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.declarations.Argument;
 import org.eclipse.dltk.ast.declarations.MethodDeclaration;
@@ -23,7 +25,9 @@ import org.eclipse.koneki.ldt.parser.ast.statements.Chunk;
  * 
  * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  */
-public class FunctionDeclaration extends MethodDeclaration {
+public class FunctionDeclaration extends MethodDeclaration implements IOccurrenceHolder {
+	private ArrayList<ASTNode> occurrences;
+
 	/**
 	 * Initialize a function declaration node
 	 * 
@@ -40,6 +44,7 @@ public class FunctionDeclaration extends MethodDeclaration {
 	 */
 	public FunctionDeclaration(String name, int nameStart, int nameEnd, int start, int end) {
 		super(name, nameStart, nameEnd, start, end);
+		occurrences = new ArrayList<ASTNode>();
 	}
 
 	/**
@@ -79,5 +84,15 @@ public class FunctionDeclaration extends MethodDeclaration {
 			}
 			addArgument(arg);
 		}
+	}
+
+	@Override
+	public void addOccurrence(ASTNode node) {
+		occurrences.add(node);
+	}
+
+	@Override
+	public ASTNode[] getOccurrences() {
+		return occurrences.toArray(new ASTNode[occurrences.size()]);
 	}
 }

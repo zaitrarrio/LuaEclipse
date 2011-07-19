@@ -31,7 +31,7 @@ import org.eclipse.dltk.compiler.problem.DefaultProblem;
 import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
 import org.eclipse.koneki.ldt.parser.ast.LuaModuleDeclaration;
 import org.eclipse.koneki.ldt.parser.ast.declarations.FunctionDeclaration;
-import org.eclipse.koneki.ldt.parser.ast.declarations.LocalVariableDeclaration;
+import org.eclipse.koneki.ldt.parser.ast.declarations.VariableDeclaration;
 import org.eclipse.koneki.ldt.parser.ast.declarations.TableDeclaration;
 import org.eclipse.koneki.ldt.parser.ast.expressions.BinaryExpression;
 import org.eclipse.koneki.ldt.parser.ast.expressions.Boolean;
@@ -413,10 +413,10 @@ public class NodeFactory implements LuaExpressionConstants, LuaStatementConstant
 				if (altChunk != null && child < altChunk.getStatements().size()) {
 					Statement init = (Statement) altChunk.getStatements().get(child);
 					if (!(init instanceof MethodDeclaration || init instanceof TypeDeclaration)) {
-						declaration = new LocalVariableDeclaration(localNode, init.sourceStart(), init.sourceEnd());
+						declaration = new VariableDeclaration(localNode, init.sourceStart(), init.sourceEnd());
 					}
 				} else {
-					declaration = new LocalVariableDeclaration(localNode, localNode.sourceStart(), localNode.sourceEnd());
+					declaration = new VariableDeclaration(localNode, localNode.sourceStart(), localNode.sourceEnd());
 				}
 				if (declaration instanceof Declaration) {
 					declaration.setModifier(Declaration.AccPrivate);

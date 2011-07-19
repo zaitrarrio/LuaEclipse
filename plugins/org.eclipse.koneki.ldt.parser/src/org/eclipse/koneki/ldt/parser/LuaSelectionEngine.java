@@ -22,7 +22,13 @@ import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.ModelException;
 import org.eclipse.dltk.core.SourceParserUtil;
 import org.eclipse.koneki.ldt.internal.parser.MatchNodeVisitor;
+import org.eclipse.koneki.ldt.parser.ast.expressions.Identifier;
 
+/**
+ * Retrieve {@link ASTNode}s under given source code position.
+ * 
+ * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
+ */
 public class LuaSelectionEngine extends ScriptSelectionEngine {
 	private LuaAssistParser parser = new LuaAssistParser();
 	private List<IModelElement> elements = new ArrayList<IModelElement>();
@@ -54,10 +60,14 @@ public class LuaSelectionEngine extends ScriptSelectionEngine {
 			return new IModelElement[0];
 		}
 		try {
-			IModelElement elt = ((ISourceModule) module).getElementAt(node.sourceStart());
-			if (elt != null) {
-				elements.add(elt);
+			if (node instanceof Identifier) {
+				Identifier id = (Identifier) node;
+				if (id.hasDeclaration()) {
+					node = id.getDeclaration();
+				}
 			}
+			IModelElement elt = ((ISourceModule) module).getElementAt(node.sourceStart());
+			elements.add(elt);
 		} catch (ModelException e) {
 			Activator.logWarning("Unable to get model element.", e); //$NON-NLS-1$
 		}

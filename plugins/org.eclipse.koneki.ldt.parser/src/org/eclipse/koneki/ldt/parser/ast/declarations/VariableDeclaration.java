@@ -10,16 +10,19 @@
  *******************************************************************************/
 package org.eclipse.koneki.ldt.parser.ast.declarations;
 
+import java.util.ArrayList;
+
+import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.declarations.Declaration;
-import org.eclipse.dltk.ast.declarations.FieldDeclaration;
 import org.eclipse.dltk.ast.references.SimpleReference;
 
 /**
  * Declaration of a local variable detected by outline and code assistance
  * 
- * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
+ * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  */
-public class LocalVariableDeclaration extends FieldDeclaration {
+public class VariableDeclaration extends Declaration implements IOccurrenceHolder {
+	private ArrayList<ASTNode> occurrences;
 
 	/**
 	 * Initialize a local variable declaration node
@@ -35,8 +38,18 @@ public class LocalVariableDeclaration extends FieldDeclaration {
 	 * @param end
 	 *            end offset of variable body
 	 */
-	public LocalVariableDeclaration(String name, int nameStart, int nameEnd, int declStart, int declEnd) {
-		super(name, nameStart, nameEnd - 1, declStart, declEnd);
+	public VariableDeclaration(String name, int nameStart, int nameEnd, int declStart, int declEnd) {
+		this(name, declStart, declEnd);
+		setNameStart(nameStart);
+		setNameEnd(nameEnd);
+	}
+
+	public VariableDeclaration(String name, int nameStart, int nameEnd) {
+		super(nameStart, nameEnd);
+		setName(name);
+		setNameStart(nameStart);
+		setNameEnd(nameEnd);
+		occurrences = new ArrayList<ASTNode>();
 	}
 
 	/**
@@ -49,12 +62,22 @@ public class LocalVariableDeclaration extends FieldDeclaration {
 	 * @param end
 	 *            end offset of variable body
 	 */
-	public LocalVariableDeclaration(SimpleReference name, int declStart, int declEnd) {
+	public VariableDeclaration(SimpleReference name, int declStart, int declEnd) {
 		this(name.getName(), name.sourceStart(), name.sourceEnd(), declStart, declEnd);
 	}
 
 	@Override
 	public int getKind() {
 		return Declaration.D_DECLARATOR;
+	}
+
+	@Override
+	public void addOccurrence(ASTNode node) {
+		occurrences.add(node);
+	}
+
+	@Override
+	public ASTNode[] getOccurrences() {
+		return occurrences.toArray(new ASTNode[occurrences.size()]);
 	}
 }

@@ -17,16 +17,19 @@
  */
 package org.eclipse.koneki.ldt.parser.ast.expressions;
 
+import org.eclipse.dltk.ast.declarations.Declaration;
 import org.eclipse.dltk.ast.references.SimpleReference;
 import org.eclipse.dltk.utils.CorePrinter;
 
-// TODO: Auto-generated Javadoc
 /**
  * Used to define variables' names.
  * 
- * @author kkinfoo
+ * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  */
 public class Identifier extends SimpleReference {
+
+	/** {@link Declaration} related to this identifier */
+	private Declaration declaration;
 
 	/**
 	 * Instantiates a new identifier.
@@ -42,8 +45,38 @@ public class Identifier extends SimpleReference {
 		super(start, end, value);
 	}
 
+	/**
+	 * Provides related {@link Declaration}. In
+	 * 
+	 * <pre>
+	 * function foo()end
+	 * foo()
+	 * </pre>
+	 * 
+	 * The <code>foo()</code> function call contains an {@link Identifier}. This {@link Identifier} is related to previous {@link Declaration}. This
+	 * {@link Declaration} is available here.
+	 * 
+	 * @return Related {@link Declaration}
+	 */
+	public Declaration getDeclaration() {
+		return declaration;
+	}
+
+	/**
+	 * Indicates if variable is related to {@link Declaration}
+	 * 
+	 * @return true is there is a related declaration, false else way
+	 */
+	public boolean hasDeclaration() {
+		return getDeclaration() != null;
+	}
+
 	public void printNode(CorePrinter output) {
 		output.formatPrintLn(getName());
+	}
+
+	public void setDeclaration(Declaration d) {
+		declaration = d;
 	}
 
 	/**

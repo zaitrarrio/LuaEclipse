@@ -132,7 +132,8 @@ local function apply(node, ...)
 		| `Call {...} ->
 			-- Load param list
 			local clist = DLTK.CallArgumentsList(0, 0)
-			for child = 2,(#node-2) do
+			for child = 2,#node do
+				table.print ( node[child], 150)
 				DLTK.appendNodeToCallArgumentList(clist, object[node[child]] )
 			end
 			object[ node ] = DLTK.Call(first, last, object[node[1]], clist )
@@ -163,26 +164,24 @@ visitor.binder = function(node, parent, ...)
 				-- Create appropriate declaration type
 				local type = mark.declaration_type (node) or 'undef'
 				local init = mark.declaration_initialization( node )
+				local name, iStart, iEnd = node[1]
+				if init then iStart, iEnd = offsets(init) end
 				print ( 'declaration spotted: '..type )
 				if type == 'Function' then
 					-- Function Declaration
-					local name, bStart, bEnd = node[1], offsets(init)
-					object[ node ] = DLTK.FunctionDeclaration(name, first, last, bStart, bEnd, mark.declaration_scope(node))
-					-- Register node for backpatch as Java object for parameters and body are still not available
-					table.insert(declaration, node)
+					object[ node ] = DLTK.FunctionDeclaration(name, first, last, iStart, iEnd, mark.declaration_scope(node))
 				elseif type == 'Table' then
 					-- Table Declaration
-					local name, iStart, iEnd = node[1], offsets(init)
 					object[ node ] = DLTK.TableDeclaration(name, first, last, iStart, iEnd, mark.declaration_scope(node))
-					-- Register node for backpatch as Java object for parameters and body are still not available
-					table.insert(declaration, node)
 				elseif type == 'Nil' or type == 'Number' or type == 'String' or type == 'Boolean' then
 					-- Scalar Declaration
-					object[ node ] = DLTK.Identifier(first, last, name)
+					object[ node ] = DLTK.ScalarVariableDeclaration(name, first, last, iStart, iEnd, mark.declaration_scope(node))
 				else
 					-- Default Declaration
-					object[ node ] = DLTK.Identifier(first, last, name)
+					object[ node ] = DLTK.VariableDeclaration(name, first, last, mark.declaration_scope(node))
 				end
+				-- Register node for backpatch as Java object for parameters and body are still not available
+				table.insert(declaration, node)
 			else
 				-- Create Java Identifier
 				object[ node ] = DLTK.Identifier(first, last, name)
@@ -326,14 +325,32 @@ end
 -- Back patch node missing Java objects at their construction, uses global table <code>declaration</code>
 local function backpatch()
 	for k, node in ipairs(declaration) do
+		local itype = type
 		local type = mark.declaration_type(node)
 		local init = mark.declaration_initialization(node)
+		local occurrences
 		if type == 'Function' then
 			local params, body = init[1], init[2]
 			-- Define function's parameters
-			DLTK.acceptArguments(object[node], statListToChunk( params ))
+			DLTK.acceptArguments(object[node], statListToChunk(params))
 			-- Define function's body
 			DLTK.acceptBody(object[node], object[ body ])
+		elseif type == 'Nil' or type == 'Number' or type == 'String' or type == 'Boolean' then
+			DLTK.setInitialization(object[node], object[init])
+		end
+		--
+		-- Match node with its occurrences
+		--
+		local occ = mark.declaration_occurrences( node )
+		print 'va passer'
+		for i, occurrence in ipairs( occ ) do
+		print 'passe'
+		print( 'Occurrence '..(itype(occurrence) == 'table' and 'valid' or 'invalid') )
+		print( 'Java '..( object[occurrence] ~=nil and 'valid' or 'invalid') )
+			-- Link occurrence to declaration
+			DLTK.setDeclaration(object[occurrence], object[node])
+			-- Add occurrence to declaration
+			DLTK.addOccurrence(object[node], object[occurrence])
 		end
 	end
 end

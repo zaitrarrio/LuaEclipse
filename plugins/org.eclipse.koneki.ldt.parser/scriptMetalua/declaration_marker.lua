@@ -48,7 +48,7 @@ mark.declaration = function ( ast )
 				end
 				-- Occurrences are index by variable names
 				local identifierName = identifier[1]
-				identifier.occurences = namesAndOccurrences[identifierName]
+				identifier.occurrences = namesAndOccurrences[identifierName]
 				-- All identifier are local with `Local and `Localrec
 				identifier.scope = 'local'
 			end
@@ -87,5 +87,14 @@ end
 -- @return String representing initialization node scope 'local' or 'global'. Nil is returned when scope is unavailable.
 mark.declaration_scope= function( node )
 	return node and node.scope or nil
+end
+---
+-- Provides declaration node occurrences
+--
+-- @param node Metalua node occurrences refer to
+-- @return Table contains occurrences of given declaration, empty table else way
+mark.declaration_occurrences= function( node )
+	if node and node.occurrences then return node.occurrences end
+	return {}
 end
 return mark

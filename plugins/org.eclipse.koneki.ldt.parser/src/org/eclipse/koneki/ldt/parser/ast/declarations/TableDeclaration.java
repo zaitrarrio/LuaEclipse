@@ -11,6 +11,9 @@
 
 package org.eclipse.koneki.ldt.parser.ast.declarations;
 
+import java.util.ArrayList;
+
+import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.declarations.TypeDeclaration;
 import org.eclipse.dltk.ast.references.SimpleReference;
 
@@ -19,7 +22,9 @@ import org.eclipse.dltk.ast.references.SimpleReference;
  * 
  * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  */
-public class TableDeclaration extends TypeDeclaration {
+public class TableDeclaration extends TypeDeclaration implements IOccurrenceHolder {
+
+	private ArrayList<ASTNode> occurrences;
 
 	/**
 	 * Initialize a table declaration node
@@ -35,9 +40,9 @@ public class TableDeclaration extends TypeDeclaration {
 	 * @param end
 	 *            end offset of table body
 	 */
-	public TableDeclaration(String name, int nameStart, int nameEnd, int start,
-			int end) {
+	public TableDeclaration(String name, int nameStart, int nameEnd, int start, int end) {
 		super(name, nameStart, nameEnd, start, end);
+		occurrences = new ArrayList<ASTNode>();
 	}
 
 	/**
@@ -52,5 +57,15 @@ public class TableDeclaration extends TypeDeclaration {
 	 */
 	public TableDeclaration(SimpleReference name, int start, int end) {
 		this(name.getName(), name.sourceStart(), name.sourceEnd(), start, end);
+	}
+
+	@Override
+	public void addOccurrence(ASTNode node) {
+		occurrences.add(node);
+	}
+
+	@Override
+	public ASTNode[] getOccurrences() {
+		return occurrences.toArray(new ASTNode[occurrences.size()]);
 	}
 }

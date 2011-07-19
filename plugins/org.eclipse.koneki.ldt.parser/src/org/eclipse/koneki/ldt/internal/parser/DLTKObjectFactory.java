@@ -10,7 +10,10 @@ import org.eclipse.dltk.ast.references.SimpleReference;
 import org.eclipse.dltk.ast.statements.Statement;
 import org.eclipse.koneki.ldt.parser.ast.LuaModuleDeclaration;
 import org.eclipse.koneki.ldt.parser.ast.declarations.FunctionDeclaration;
+import org.eclipse.koneki.ldt.parser.ast.declarations.IOccurrenceHolder;
+import org.eclipse.koneki.ldt.parser.ast.declarations.ScalarVariableDeclaration;
 import org.eclipse.koneki.ldt.parser.ast.declarations.TableDeclaration;
+import org.eclipse.koneki.ldt.parser.ast.declarations.VariableDeclaration;
 import org.eclipse.koneki.ldt.parser.ast.expressions.BinaryExpression;
 import org.eclipse.koneki.ldt.parser.ast.expressions.Boolean;
 import org.eclipse.koneki.ldt.parser.ast.expressions.Call;
@@ -701,6 +704,89 @@ public class DLTKObjectFactory {
 					@Override
 					public String getName() {
 						return "TableDeclaration"; //$NON-NLS-1$
+					}
+				}, // ScalarVariableDeclaration
+				new NamedJavaFunction() {
+					@Override
+					public int invoke(LuaState l) {
+						String name = l.checkJavaObject(1, String.class);
+						int nameStart = l.checkInteger(2);
+						int nameEnd = l.checkInteger(3);
+						int start = l.checkInteger(4);
+						int end = l.checkInteger(5);
+						ScalarVariableDeclaration declaration = new ScalarVariableDeclaration(name, nameStart, nameEnd, start, end);
+						if ("local".equals(l.checkJavaObject(6, String.class))) { //$NON-NLS-1$
+							declaration.setModifier(Declaration.AccPrivate);
+						} else {
+							declaration.setModifier(Declaration.AccPublic);
+						}
+						l.pushJavaObject(declaration);
+						return 1;
+					}
+
+					@Override
+					public String getName() {
+						return "ScalarVariableDeclaration"; //$NON-NLS-1$
+					}
+				}, // VariableDeclaration
+				new NamedJavaFunction() {
+					@Override
+					public int invoke(LuaState l) {
+						String name = l.checkJavaObject(1, String.class);
+						int nameStart = l.checkInteger(2);
+						int nameEnd = l.checkInteger(3);
+						VariableDeclaration declaration = new VariableDeclaration(name, nameStart, nameEnd);
+						if ("local".equals(l.checkJavaObject(4, String.class))) { //$NON-NLS-1$
+							declaration.setModifier(Declaration.AccPrivate);
+						} else {
+							declaration.setModifier(Declaration.AccPublic);
+						}
+						l.pushJavaObject(declaration);
+						return 1;
+					}
+
+					@Override
+					public String getName() {
+						return "VariableDeclaration"; //$NON-NLS-1$
+					}
+				}, new NamedJavaFunction() {
+					@Override
+					public int invoke(LuaState l) {
+						ScalarVariableDeclaration declaration = l.checkJavaObject(1, ScalarVariableDeclaration.class);
+						Expression init = l.checkJavaObject(2, Expression.class);
+						declaration.setInitialization(init);
+						return 1;
+					}
+
+					@Override
+					public String getName() {
+						return "setInitialization"; //$NON-NLS-1$
+					}
+				}, new NamedJavaFunction() {
+					@Override
+					public int invoke(LuaState l) {
+						IOccurrenceHolder declaration = l.checkJavaObject(1, IOccurrenceHolder.class);
+						Statement node = l.checkJavaObject(2, Statement.class);
+						declaration.addOccurrence(node);
+						return 1;
+					}
+
+					@Override
+					public String getName() {
+						return "addOccurrence"; //$NON-NLS-1$
+					}
+				}, new NamedJavaFunction() {
+					@Override
+					public int invoke(LuaState l) {
+						Identifier id = l.checkJavaObject(1, Identifier.class);
+						Declaration declaration = l.checkJavaObject(2, Declaration.class);
+						id.setDeclaration(declaration);
+						return 1;
+					}
+
+					@Override
+					public String getName() {
+						return "setDeclaration"; //$NON-NLS-1$
 					}
 				}, };
 
