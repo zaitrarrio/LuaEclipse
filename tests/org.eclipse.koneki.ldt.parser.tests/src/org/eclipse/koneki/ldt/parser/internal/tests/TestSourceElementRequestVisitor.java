@@ -20,7 +20,6 @@ package org.eclipse.koneki.ldt.parser.internal.tests;
 import junit.framework.TestCase;
 
 import org.eclipse.koneki.ldt.parser.LuaSourceElementParser;
-import org.eclipse.koneki.ldt.parser.LuaSourceParser;
 
 /**
  * The Class TestSourceElementRequestVisitor aims to provide a way to trace how AST from {@linkplain LuaSourceParser} behaves.

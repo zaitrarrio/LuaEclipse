@@ -133,7 +133,6 @@ local function apply(node, ...)
 			-- Load param list
 			local clist = DLTK.CallArgumentsList(0, 0)
 			for child = 2,#node do
-				table.print ( node[child], 150)
 				DLTK.appendNodeToCallArgumentList(clist, object[node[child]] )
 			end
 			object[ node ] = DLTK.Call(first, last, object[node[1]], clist )

@@ -23,7 +23,6 @@ import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.compiler.env.ModuleSource;
 import org.eclipse.dltk.compiler.problem.IProblemReporter;
-import org.eclipse.koneki.ldt.parser.LuaSourceParser;
 import org.eclipse.koneki.ldt.parser.LuaSourceParserFactory;
 import org.eclipse.koneki.ldt.parser.internal.tests.utils.DummyReporter;
 

@@ -13,7 +13,6 @@ package org.eclipse.koneki.ldt.parser.tests;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.eclipse.koneki.ldt.parser.LuaSourceParser;
 import org.eclipse.koneki.ldt.parser.internal.tests.TestASTValidity;
 import org.eclipse.koneki.ldt.parser.internal.tests.TestDeclarations;
 import org.eclipse.koneki.ldt.parser.internal.tests.TestExpressions;

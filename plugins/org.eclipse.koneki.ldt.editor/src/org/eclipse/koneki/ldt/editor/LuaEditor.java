@@ -27,7 +27,7 @@ import org.eclipse.ui.IEditorInput;
 /**
  * 
  * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
- *
+ * 
  */
 public class LuaEditor extends ScriptEditor {
 
@@ -73,7 +73,7 @@ public class LuaEditor extends ScriptEditor {
 	 * @return Editor's preferences
 	 */
 	@Override
-	protected IPreferenceStore getScriptPreferenceStore() {
+	public IPreferenceStore getScriptPreferenceStore() {
 		return Activator.getDefault().getPreferenceStore();
 
 	}

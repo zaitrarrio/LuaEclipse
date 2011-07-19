@@ -73,19 +73,11 @@ public class MetaluaStateFactory {
 		l.call(0, 0);
 		l.load(require, "requireContentFromPath");
 		l.call(0, 0);
-<<<<<<< HEAD
-//		switch (l.LdoString(path) + l.LdoString(require)) {
-//		default:
-//			Metalua.raise(l);
-//		case 0:
-//		}
-=======
 		// switch (l.LdoString(path) + l.LdoString(require)) {
 		// default:
 		// Metalua.raise(l);
 		// case 0:
 		// }
->>>>>>> starting full metalua parser
 
 		// State is ready
 		return l;
