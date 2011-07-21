@@ -38,52 +38,60 @@ import com.naef.jnlua.LuaState;
  * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  */
 public class AlternativeLuaSourceParser extends AbstractSourceParser {
-
-	private static String builderScriptPath = "/scriptMetalua/dltk_ast_builder.mlua";//$NON-NLS-1$
-	private static String markerScriptPath = "/scriptMetalua/declaration_marker.lua";//$NON-NLS-1$
+	private static String libPath = "/scriptMetalua/";//$NON-NLS-1$
+	private static String builderScript = "dltk_ast_builder.mlua";//$NON-NLS-1$
+	private static String markerScript = "declaration_marker.lua";//$NON-NLS-1$
 	private static Dictionary<String, IModuleDeclaration> cache = new Hashtable<String, IModuleDeclaration>();
 
 	/** Load Metalua ast parser utility module */
-	private static LuaState lua;
-	static {
-		lua = MetaluaStateFactory.newLuaState();
-		// Load module which helps avoiding reflection between Lua and Java
-		DLTKObjectFactory.register(lua);
-		// Local needed files on disk
-		URL builder = Platform.getBundle(Activator.PLUGIN_ID).getEntry(builderScriptPath);
-		URL marker = Platform.getBundle(Activator.PLUGIN_ID).getEntry(markerScriptPath);
-		// Load needed files
-		try {
-			// Module used to detect declaration
-			String path = new File(FileLocator.toFileURL(marker).getFile()).getPath();
-			lua.load(new FileInputStream(path), "Loading AST marker."); //$NON-NLS-1$
-			lua.call(0, 1);
+	private static LuaState lua = null;
 
-			// Associate module and variable name
-			lua.setGlobal("mark"); //$NON-NLS-1$
+	private synchronized static LuaState getLuaState() {
+		if (lua == null) {
+			lua = MetaluaStateFactory.newLuaState();
+			// Load module which helps avoiding reflection between Lua and Java
+			DLTKObjectFactory.register(lua);
+			// Load needed files
+			try {
+				// Ensure folder extraction on disk
+				URL folderUrl = FileLocator.toFileURL(Platform.getBundle(Activator.PLUGIN_ID).getEntry(libPath));
+				File folder = new File(folderUrl.getFile());
+				File builder = new File(folder, builderScript);
+				File marker = new File(folder, markerScript);
 
-			// Module used to generate AST
-			path = new File(FileLocator.toFileURL(builder).getFile()).getPath();
-			lua.getGlobal("mlc"); //$NON-NLS-1$
-			lua.getField(-1, "luafile_to_function"); //$NON-NLS-1$
+				// Module used to detect declaration
+				// String path = new File(FileLocator.toFileURL(marker).getFile()).getPath();
+				lua.load(new FileInputStream(marker), "Loading AST marker."); //$NON-NLS-1$
+				lua.call(0, 1);
 
-			// Remove mlc table
-			lua.remove(-2);
+				// Associate module and variable name
+				lua.setGlobal("mark"); //$NON-NLS-1$
 
-			// Provide path of module as argument
-			lua.pushString(path);
+				// Module used to generate AST
+				// path = new File(FileLocator.toFileURL(builder).getFile()).getPath();
+				lua.getGlobal("mlc"); //$NON-NLS-1$
+				lua.getField(-1, "luafile_to_function"); //$NON-NLS-1$
 
-			// Metalua code loading
-			lua.call(1, 2);
+				// Remove mlc table
+				lua.remove(-2);
 
-			// Remove nil awkward nil, returned every time
-			lua.pop(1);
+				// Provide path of module as argument
+				lua.pushString(builder.getPath());
 
-			// Metalua code compilation
-			lua.call(0, 1);
-		} catch (IOException e) {
-			Activator.logError("Unable to read metalua ast builder and marker files", e); //$NON-NLS-1$
+				// Metalua code loading
+				lua.call(1, 2);
+
+				// Remove nil awkward nil, returned every time
+				lua.pop(1);
+
+				// Metalua code compilation
+				lua.call(0, 1);
+				lua.setGlobal("parsemod"); //$NON-NLS-1$
+			} catch (IOException e) {
+				Activator.logError("Unable to read metalua ast builder and marker files", e); //$NON-NLS-1$
+			}
 		}
+		return lua;
 	}
 
 	/**
@@ -99,13 +107,14 @@ public class AlternativeLuaSourceParser extends AbstractSourceParser {
 		LuaModuleDeclaration module = new LuaModuleDeclaration(input.getSourceContents().length());
 
 		try {
-			synchronized (AlternativeLuaSourceParser.class) {
+			synchronized (getLuaState()) {
 				// Call module's parsing function
-				lua.getField(-1, "ast_builder"); //$NON-NLS-1$
-				lua.pushString(input.getSourceContents());
-				lua.call(1, 1);
-				module = lua.checkJavaObject(-1, LuaModuleDeclaration.class);
-				lua.pop(1);
+				getLuaState().getGlobal("parsemod");//$NON-NLS-1$
+				getLuaState().getField(-1, "ast_builder"); //$NON-NLS-1$
+				getLuaState().pushString(input.getSourceContents());
+				getLuaState().call(1, 1);
+				module = getLuaState().checkJavaObject(-1, LuaModuleDeclaration.class);
+				getLuaState().pop(2);
 			}
 			// Deal with errors on lua side
 			if (module.hasError()) {

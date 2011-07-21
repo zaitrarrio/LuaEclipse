@@ -165,7 +165,6 @@ visitor.binder = function(node, parent, ...)
 				local init = mark.declaration_initialization( node )
 				local name, iStart, iEnd = node[1]
 				if init then iStart, iEnd = offsets(init) end
-				print ( 'declaration spotted: '..type )
 				if type == 'Function' then
 					-- Function Declaration
 					object[ node ] = DLTK.FunctionDeclaration(name, first, last, iStart, iEnd, mark.declaration_scope(node))
@@ -341,11 +340,7 @@ local function backpatch()
 		-- Match node with its occurrences
 		--
 		local occ = mark.declaration_occurrences( node )
-		print 'va passer'
 		for i, occurrence in ipairs( occ ) do
-		print 'passe'
-		print( 'Occurrence '..(itype(occurrence) == 'table' and 'valid' or 'invalid') )
-		print( 'Java '..( object[occurrence] ~=nil and 'valid' or 'invalid') )
 			-- Link occurrence to declaration
 			DLTK.setDeclaration(object[occurrence], object[node])
 			-- Add occurrence to declaration
