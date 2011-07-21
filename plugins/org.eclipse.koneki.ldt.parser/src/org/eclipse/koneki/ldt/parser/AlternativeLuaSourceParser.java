@@ -10,9 +10,12 @@
  *******************************************************************************/
 package org.eclipse.koneki.ldt.parser;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
@@ -38,6 +41,7 @@ public class AlternativeLuaSourceParser extends AbstractSourceParser {
 
 	private static String builderScriptPath = "/scriptMetalua/dltk_ast_builder.mlua";//$NON-NLS-1$
 	private static String markerScriptPath = "/scriptMetalua/declaration_marker.lua";//$NON-NLS-1$
+	private static Dictionary<String, IModuleDeclaration> cache = new Hashtable<String, IModuleDeclaration>();
 
 	/** Load Metalua ast parser utility module */
 	private static LuaState lua;
@@ -51,7 +55,7 @@ public class AlternativeLuaSourceParser extends AbstractSourceParser {
 		// Load needed files
 		try {
 			// Module used to detect declaration
-			String path = FileLocator.toFileURL(marker).getFile();
+			String path = new File(FileLocator.toFileURL(marker).getFile()).getPath();
 			lua.load(new FileInputStream(path), "Loading AST marker."); //$NON-NLS-1$
 			lua.call(0, 1);
 
@@ -59,7 +63,7 @@ public class AlternativeLuaSourceParser extends AbstractSourceParser {
 			lua.setGlobal("mark"); //$NON-NLS-1$
 
 			// Module used to generate AST
-			path = FileLocator.toFileURL(builder).getFile();
+			path = new File(FileLocator.toFileURL(builder).getFile()).getPath();
 			lua.getGlobal("mlc"); //$NON-NLS-1$
 			lua.getField(-1, "luafile_to_function"); //$NON-NLS-1$
 
@@ -108,6 +112,12 @@ public class AlternativeLuaSourceParser extends AbstractSourceParser {
 				DefaultProblem problem = module.getProblem();
 				problem.setOriginatingFileName(input.getFileName());
 				reporter.reportProblem(problem);
+				IModuleDeclaration cached = cache.get(input.getFileName());
+				if (cached != null) {
+					return cached;
+				}
+			} else {
+				cache.put(input.getFileName(), module);
 			}
 			return module;
 		} catch (LuaException e) {
