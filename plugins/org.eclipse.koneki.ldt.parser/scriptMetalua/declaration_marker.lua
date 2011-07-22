@@ -9,7 +9,14 @@
 --       Kevin KIN-FOO <kkinfoo@sierrawireless.com>
 --           - initial API and implementation and initial documentation
 --------------------------------------------------------------------------------
-
+local print = function (string) print(string) io.flush() end
+local function positionInChunk(node, chunk)
+	if not node or not chunk then return nil end
+	for position, child in ipairs( chunk ) do
+		if child == node then return position end
+	end
+	return nil
+end 
 ---
 -- The aim of this module is to locate intersting nodes in AST then tag it with valuable information.
 local mark = {}
@@ -25,8 +32,25 @@ local mark = {}
 -- @param	ast	Metalua AST to browse for declarations
 -- @return	Given AST but with declaration flagged
 mark.declaration = function ( ast )
+	--
+	-- Compute link and free variables
+	--
+	require 'metalua.compiler'
+	require 'metalua.walk'
 	require 'metalua.walk.bindings'
 	local locals, globals = bindings( ast )
+	--
+	-- Seek for `Set parents of identifiers
+	--
+	local parentSet = {}
+	local visitor = {
+	    Id = function(node, parent, grand, ...)
+			if node.tag == 'Id' and parent and  parent.tag=='Set' then
+				parentSet[node] = parent
+			end
+		end
+	}
+	walk.block(visitor, ast)
 	--
 	-- Dealing with explicits declarations ( often called local ones )
 	--
@@ -51,6 +75,37 @@ mark.declaration = function ( ast )
 				identifier.occurrences = namesAndOccurrences[identifierName]
 				-- All identifier are local with `Local and `Localrec
 				identifier.scope = 'local'
+			end
+		end
+	end
+	--
+	-- Dealing with global declarations
+	--
+	for name, occurrences in pairs( globals ) do
+		--for k, occurrence in pairs( occurrences ) do
+	--	end
+		local firstOccurrence = occurrences[1] or nil
+		if parentSet[firstOccurrence] then
+			-- Indicate scope
+			firstOccurrence.scope = 'global'
+			-- Setting identifier occurrences
+			firstOccurrence.occurrences = {}
+			table.print(occurrences, 'nohash', 150)
+			for i, occ in pairs(occurrences) do
+				if occ ~= firstOccurrence then table.insert(firstOccurrence.occurrences, occ) end
+			end
+			-- Setting initialisation node, assuming parent is a `Set
+			local position = positionInChunk(firstOccurrence, parentSet[firstOccurrence][1])
+			local init = nil
+			if position and parentSet[firstOccurrence][2] then
+				init = parentSet[firstOccurrence][2][position] or nil
+			end
+			if init then
+				firstOccurrence.init = init
+				firstOccurrence.type = init.tag
+			else
+				firstOccurrence.init = nil
+				firstOccurrence.type = nil
 			end
 		end
 	end

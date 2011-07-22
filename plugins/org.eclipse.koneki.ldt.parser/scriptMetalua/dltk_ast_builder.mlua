@@ -189,6 +189,7 @@ visitor.binder = function(node, parent, ...)
 --			table.print(node, 'nohash',1)
 	end
 end
+visitor.Id = visitor.binder 
 ---
 -- Instanciates a Java object in <code>object</code> from the given node.
 --
@@ -301,7 +302,8 @@ visitor.expr.up = function (node, ...)
 			for k, child in ipairs( node ) do
 				DLTK.addStatement(object[ node ], object[child])
 			end
-		
+		| `Id {name} ->
+			print ('processing '..name)
 		| `Op { operator, left, right} ->
 			object[ node ] = DLTK.BinaryExpression(first, last,object[left], operator, object[right])
 		| `Op { operator, expr } ->
