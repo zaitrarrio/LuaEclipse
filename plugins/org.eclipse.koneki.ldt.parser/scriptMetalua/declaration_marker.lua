@@ -82,15 +82,12 @@ mark.declaration = function ( ast )
 	-- Dealing with global declarations
 	--
 	for name, occurrences in pairs( globals ) do
-		--for k, occurrence in pairs( occurrences ) do
-	--	end
 		local firstOccurrence = occurrences[1] or nil
 		if parentSet[firstOccurrence] then
 			-- Indicate scope
 			firstOccurrence.scope = 'global'
 			-- Setting identifier occurrences
 			firstOccurrence.occurrences = {}
-			table.print(occurrences, 'nohash', 150)
 			for i, occ in pairs(occurrences) do
 				if occ ~= firstOccurrence then table.insert(firstOccurrence.occurrences, occ) end
 			end
