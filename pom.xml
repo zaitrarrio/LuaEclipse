@@ -93,6 +93,7 @@
 				<configuration>
 					<configLocation>http://tooling.anyware/checkstyle/checkstyle.xml</configLocation>
 					<sourceDirectory>src</sourceDirectory>
+					<excludes>**/com/naef/jnlua/**/*</excludes>
 				</configuration>
 			</plugin>
 			
