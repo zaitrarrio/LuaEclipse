@@ -31,8 +31,8 @@ import org.eclipse.ui.IEditorInput;
  */
 public class LuaEditor extends ScriptEditor {
 
-	public static final String EDITOR_CONTEXT = "#LuaEditorContext";
-	public static final String EDITOR_ID = Activator.PLUGIN_ID; //$NON-NLS-1$
+	public static final String EDITOR_CONTEXT = "#LuaEditorContext"; //$NON-NLS-1$
+	public static final String EDITOR_ID = Activator.PLUGIN_ID;
 	private IFoldingStructureProvider foldingStructureProvider = null;
 
 	/**

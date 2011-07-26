@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.declarations.Declaration;
 import org.eclipse.dltk.ast.references.SimpleReference;
+import org.eclipse.koneki.ldt.internal.parser.IOccurrenceHolder;
 
 /**
  * Declaration of a local variable detected by outline and code assistance

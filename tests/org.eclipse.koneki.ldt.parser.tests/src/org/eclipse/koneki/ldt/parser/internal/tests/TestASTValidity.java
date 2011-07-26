@@ -228,6 +228,15 @@ public class TestASTValidity extends TestCase {
 		assertEquals("Wrong declaration count.", 2, visitor.typeCount(typeName));
 	}
 
+	public void testDots() {
+		String code = "first=function(...) end local second=function(...) end";
+		// Function declarations: 2
+		String typeName = _EXPRESSION + ".Dots";
+		assertTrue(code + "\n" + getError(), traverse(code));
+		assertTrue("Unable to find required type.", visitor.hasVisitedType(typeName));
+		assertEquals("Wrong declaration count.", 2, visitor.typeCount(typeName));
+	}
+
 	public void testLocalFunction() {
 		String code = "local f = function() end";
 		boolean traverseStatus = traverse(code);

@@ -23,7 +23,7 @@
       <page
             class="org.eclipse.koneki.ldt.ui.interpreter.preferences.LuaInterpreterPreferencePage"
             id="org.eclipse.koneki.ldt.ui.interpreter.preferences"
-            name="Lua interpreters">
+            name="%page.name">
       </page>
    </extension>
       <extension

@@ -23,7 +23,7 @@ import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
  * 
  * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
  */
-public class Index extends Identifier implements LeftHandSide, LuaExpressionConstants {
+public class Index extends Identifier implements LuaExpressionConstants {
 
 	private long id;
 
@@ -102,16 +102,6 @@ public class Index extends Identifier implements LeftHandSide, LuaExpressionCons
 	@Override
 	public int getKind() {
 		return E_INDEX;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.anwrt.ldt.parser.ast.expressions.LeftHandSide#isLeftHandSide()
-	 */
-	@Override
-	public boolean isLeftHandSide() {
-		return true;
 	}
 
 	public void setID(long id) {

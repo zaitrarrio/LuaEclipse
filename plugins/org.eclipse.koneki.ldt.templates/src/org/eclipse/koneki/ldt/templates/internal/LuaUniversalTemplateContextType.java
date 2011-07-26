@@ -22,23 +22,21 @@ import org.eclipse.jface.text.IDocument;
  */
 public class LuaUniversalTemplateContextType extends ScriptTemplateContextType {
 
-    public static final String CONTEXT_TYPE_ID = "LuaUniversalTemplateContextType";
+	public static final String CONTEXT_TYPE_ID = "LuaUniversalTemplateContextType"; //$NON-NLS-1$
 
-    public LuaUniversalTemplateContextType() {
-    }
+	public LuaUniversalTemplateContextType() {
+	}
 
-    public LuaUniversalTemplateContextType(String id, String name) {
-	super(id, name);
-    }
+	public LuaUniversalTemplateContextType(String id, String name) {
+		super(id, name);
+	}
 
-    public LuaUniversalTemplateContextType(String id) {
-	super(id);
-    }
+	public LuaUniversalTemplateContextType(String id) {
+		super(id);
+	}
 
-    @Override
-    public ScriptTemplateContext createContext(IDocument document,
-	    int completionPosition, int length, ISourceModule sourceModule) {
-	return new LuaTemplateContext(this, document, completionPosition,
-		length, sourceModule);
-    }
+	@Override
+	public ScriptTemplateContext createContext(IDocument document, int completionPosition, int length, ISourceModule sourceModule) {
+		return new LuaTemplateContext(this, document, completionPosition, length, sourceModule);
+	}
 }

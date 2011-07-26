@@ -9,7 +9,6 @@
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
 
-
 /**
  * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
  * @date 
@@ -27,12 +26,11 @@ public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
 	/** The Constant PLUGIN_ID. */
-	public static final String PLUGIN_ID = "org.eclipse.koneki.ldt.tests";
-	
+	public static final String PLUGIN_ID = "org.eclipse.koneki.ldt.tests"; //$NON-NLS-1$
+
 	/** The Constant EXTENSION_POINT. */
-	public static final String EXTENSION_POINT = Activator.PLUGIN_ID
-			+ ".testSuites";
-	
+	public static final String EXTENSION_POINT = Activator.PLUGIN_ID + ".testSuites"; //$NON-NLS-1$
+
 	/** The Constant EXTENSION_POINT_ID. */
 	public static final int EXTENSION_POINT_ID = 0;
 
@@ -49,9 +47,7 @@ public class Activator extends AbstractUIPlugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext )
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
@@ -61,9 +57,7 @@ public class Activator extends AbstractUIPlugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext )
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;

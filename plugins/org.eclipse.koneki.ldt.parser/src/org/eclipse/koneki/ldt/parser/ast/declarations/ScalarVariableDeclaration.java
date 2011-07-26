@@ -13,6 +13,7 @@ package org.eclipse.koneki.ldt.parser.ast.declarations;
 import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.declarations.Declaration;
 import org.eclipse.dltk.ast.expressions.Expression;
+import org.eclipse.koneki.ldt.internal.parser.IOccurrenceHolder;
 
 /**
  * {@link Declaration} of variables provided with an initialization value.

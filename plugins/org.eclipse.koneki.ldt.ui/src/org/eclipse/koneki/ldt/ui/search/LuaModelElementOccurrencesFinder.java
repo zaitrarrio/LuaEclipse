@@ -8,8 +8,8 @@ import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 import org.eclipse.dltk.ast.parser.IModuleDeclaration;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.ui.search.ModelElementOccurrencesFinder;
+import org.eclipse.koneki.ldt.internal.parser.IOccurrenceHolder;
 import org.eclipse.koneki.ldt.parser.LuaSelectionEngine;
-import org.eclipse.koneki.ldt.parser.ast.declarations.IOccurrenceHolder;
 import org.eclipse.koneki.ldt.parser.ast.expressions.Identifier;
 
 public class LuaModelElementOccurrencesFinder extends ModelElementOccurrencesFinder {

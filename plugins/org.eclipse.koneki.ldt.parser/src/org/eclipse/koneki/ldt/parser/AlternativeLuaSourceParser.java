@@ -38,9 +38,9 @@ import com.naef.jnlua.LuaState;
  * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  */
 public class AlternativeLuaSourceParser extends AbstractSourceParser {
-	private static String libPath = "/scriptMetalua/";//$NON-NLS-1$
-	private static String builderScript = "dltk_ast_builder.mlua";//$NON-NLS-1$
-	private static String markerScript = "declaration_marker.lua";//$NON-NLS-1$
+	public final static String libPath = "/scriptMetalua/";//$NON-NLS-1$
+	public final static String builderScript = "dltk_ast_builder.mlua";//$NON-NLS-1$
+	public final static String markerScript = "declaration_marker.lua";//$NON-NLS-1$
 	private static Dictionary<String, IModuleDeclaration> cache = new Hashtable<String, IModuleDeclaration>();
 
 	/** Load Metalua ast parser utility module */

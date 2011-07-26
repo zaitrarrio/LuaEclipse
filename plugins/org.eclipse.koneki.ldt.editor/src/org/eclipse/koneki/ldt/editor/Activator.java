@@ -24,7 +24,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	/** The plug-in ID */
-	public static final String PLUGIN_ID = "org.eclipse.koneki.ldt.editor";
+	public static final String PLUGIN_ID = "org.eclipse.koneki.ldt.editor";//$NON-NLS-1$
 
 	/** The shared instance */
 	private static Activator plugin;
@@ -40,9 +40,7 @@ public class Activator extends AbstractUIPlugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext )
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
@@ -52,9 +50,7 @@ public class Activator extends AbstractUIPlugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext )
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
@@ -78,15 +74,13 @@ public class Activator extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path.
+	 * Returns an image descriptor for the image file at the given plug-in relative path.
 	 * 
 	 * @param path
 	 *            the path
 	 * @return the image descriptor
 	 */
-	public static ImageDescriptor getImageDescriptor(String pluginId,
-			String path) {
+	public static ImageDescriptor getImageDescriptor(String pluginId, String path) {
 		return AbstractUIPlugin.imageDescriptorFromPlugin(pluginId, path);
 	}
 
@@ -104,8 +98,7 @@ public class Activator extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Register in the given ImageRegistry the ImageDescriptor using the Image's
-	 * path as key.
+	 * Register in the given ImageRegistry the ImageDescriptor using the Image's path as key.
 	 * 
 	 * @param registry
 	 *            ImageRegistry
@@ -114,8 +107,7 @@ public class Activator extends AbstractUIPlugin {
 	 * @param imgDesc
 	 *            ImageDescriptor
 	 */
-	public static void addImageToRegistry(ImageRegistry registry,
-			String imgPath, ImageDescriptor imgDesc) {
+	public static void addImageToRegistry(ImageRegistry registry, String imgPath, ImageDescriptor imgDesc) {
 		ImageRegistry imgRegistry = registry;
 		if (imgRegistry == null) {
 			imgRegistry = getDefault().getImageRegistry();
@@ -125,12 +117,10 @@ public class Activator extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Get an image from the local ImageRegistry. If the given Image's path is
-	 * not already registered, do it.
+	 * Get an image from the local ImageRegistry. If the given Image's path is not already registered, do it.
 	 * 
 	 * @param imagePath
-	 *            String, path and key identifying the image in the
-	 *            ImageRegistry
+	 *            String, path and key identifying the image in the ImageRegistry
 	 * 
 	 * @return Image or null if nothing corresponds to the given key
 	 */

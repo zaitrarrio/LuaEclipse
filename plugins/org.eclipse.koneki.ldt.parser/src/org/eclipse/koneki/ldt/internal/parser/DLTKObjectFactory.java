@@ -10,7 +10,6 @@ import org.eclipse.dltk.ast.references.SimpleReference;
 import org.eclipse.dltk.ast.statements.Statement;
 import org.eclipse.koneki.ldt.parser.ast.LuaModuleDeclaration;
 import org.eclipse.koneki.ldt.parser.ast.declarations.FunctionDeclaration;
-import org.eclipse.koneki.ldt.parser.ast.declarations.IOccurrenceHolder;
 import org.eclipse.koneki.ldt.parser.ast.declarations.ScalarVariableDeclaration;
 import org.eclipse.koneki.ldt.parser.ast.declarations.TableDeclaration;
 import org.eclipse.koneki.ldt.parser.ast.declarations.VariableDeclaration;

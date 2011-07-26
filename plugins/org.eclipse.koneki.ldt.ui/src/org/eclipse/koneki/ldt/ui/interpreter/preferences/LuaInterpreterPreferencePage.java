@@ -9,19 +9,14 @@
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
 
-
 package org.eclipse.koneki.ldt.ui.interpreter.preferences;
 
 import org.eclipse.dltk.internal.debug.ui.interpreters.InterpretersBlock;
 import org.eclipse.dltk.internal.debug.ui.interpreters.ScriptInterpreterPreferencePage;
-import org.eclipse.koneki.ldt.ui.interpreter.preferences.LuaInterpretersBlock;
 
+public class LuaInterpreterPreferencePage extends ScriptInterpreterPreferencePage {
 
-public class LuaInterpreterPreferencePage extends
-		ScriptInterpreterPreferencePage {
-	
-	public static final String PAGE_ID =
-			"org.eclipse.koneki.ldt.interpreter.preferences";
+	public static final String PAGE_ID = "org.eclipse.koneki.ldt.interpreter.preferences"; //$NON-NLS-1$
 
 	@Override
 	public InterpretersBlock createInterpretersBlock() {

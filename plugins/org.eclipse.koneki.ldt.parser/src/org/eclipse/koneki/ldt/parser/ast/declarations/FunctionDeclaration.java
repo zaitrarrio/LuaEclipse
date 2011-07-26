@@ -17,6 +17,7 @@ import org.eclipse.dltk.ast.declarations.Argument;
 import org.eclipse.dltk.ast.declarations.MethodDeclaration;
 import org.eclipse.dltk.ast.references.SimpleReference;
 import org.eclipse.dltk.ast.statements.Statement;
+import org.eclipse.koneki.ldt.internal.parser.IOccurrenceHolder;
 import org.eclipse.koneki.ldt.parser.ast.expressions.Identifier;
 import org.eclipse.koneki.ldt.parser.ast.statements.Chunk;
 

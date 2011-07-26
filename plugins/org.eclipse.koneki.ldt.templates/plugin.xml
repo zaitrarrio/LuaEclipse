@@ -16,7 +16,7 @@
       <contextType
             class="org.eclipse.koneki.ldt.templates.internal.LuaUniversalTemplateContextType"
             id="LuaUniversalTemplateContextType"
-            name="Lua Template content">
+            name="%contextType.name">
       </contextType>
        <include
           file="templates/templates.xml"
@@ -28,7 +28,7 @@
       <page
             class="org.eclipse.koneki.ldt.templates.internal.LuaTemplatePreferencePage"
             id="org.eclipse.koneki.ldt.editor.Template"
-            name="Lua Templates">
+            name="%page.name">
       </page>
    </extension>
    <extension

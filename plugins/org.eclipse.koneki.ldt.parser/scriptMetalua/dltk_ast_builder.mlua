@@ -73,8 +73,6 @@ end
 local function statListToChunk(list)
 	local chunk = DLTK.Chunk(0, 0)
 	for k, node in ipairs(list) do
---	print ( object[node] and 'objet defini' or 'objet indefini')
-	if not object[node] then table.print (node, 150 )end
 		DLTK.appendStatementToChunk(chunk, object[node])
 	end
 	return chunk

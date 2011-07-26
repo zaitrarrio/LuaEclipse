@@ -21,33 +21,32 @@ import org.eclipse.koneki.ldt.editor.Activator;
  * 
  */
 public class LuaTemplateAccess extends ScriptTemplateAccess {
-    private static final String CUSTOM_TEMPLATES_KEY = LuaNature.LUA_NATURE
-	    + ".Templates";
-    private static LuaTemplateAccess instance;
+	private static final String CUSTOM_TEMPLATES_KEY = LuaNature.LUA_NATURE + ".Templates"; //$NON-NLS-1$
+	private static LuaTemplateAccess instance;
 
-    public static LuaTemplateAccess getInstance() {
-	if (instance == null) {
-	    instance = new LuaTemplateAccess();
+	public static LuaTemplateAccess getInstance() {
+		if (instance == null) {
+			instance = new LuaTemplateAccess();
+		}
+
+		return instance;
 	}
 
-	return instance;
-    }
+	@Override
+	protected String getContextTypeId() {
+		// TODO Auto-generated method stub
+		return LuaUniversalTemplateContextType.CONTEXT_TYPE_ID;
+	}
 
-    @Override
-    protected String getContextTypeId() {
-	// TODO Auto-generated method stub
-	return LuaUniversalTemplateContextType.CONTEXT_TYPE_ID; 
-    }
+	@Override
+	protected String getCustomTemplatesKey() {
+		// TODO Auto-generated method stub
+		return CUSTOM_TEMPLATES_KEY;
+	}
 
-    @Override
-    protected String getCustomTemplatesKey() {
-	// TODO Auto-generated method stub
-	return CUSTOM_TEMPLATES_KEY;
-    }
-
-    @Override
-    protected IPreferenceStore getPreferenceStore() {
-	return Activator.getDefault().getPreferenceStore();
-    }
+	@Override
+	protected IPreferenceStore getPreferenceStore() {
+		return Activator.getDefault().getPreferenceStore();
+	}
 
 }

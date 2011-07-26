@@ -18,7 +18,7 @@
             default="false"
             icon="img/lua-logo.gif"
             id="org.eclipse.koneki.ldt.editor"
-            name="Lua Editor">
+            name="%editor.name">
          <contentTypeBinding
                contentTypeId="org.eclipse.koneki.ldt.content-type">
          </contentTypeBinding>
@@ -48,7 +48,7 @@
    </extension>
    <extension
          id="LuaTypeCompletionProposalComputer"
-         name="LuaEclipse code assistance"
+         name="%extension.name"
          point="org.eclipse.dltk.ui.scriptCompletionProposalComputer">
       <scriptCompletionProposalComputer
             activate="true"
