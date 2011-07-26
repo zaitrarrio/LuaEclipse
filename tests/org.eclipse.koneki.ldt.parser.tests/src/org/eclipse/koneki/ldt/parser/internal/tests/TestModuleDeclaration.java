@@ -17,6 +17,7 @@ import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 import org.eclipse.dltk.ast.parser.ISourceParser;
 import org.eclipse.dltk.compiler.env.ModuleSource;
 import org.eclipse.koneki.ldt.parser.LuaSourceParserFactory;
+import org.eclipse.koneki.ldt.parser.ast.LuaModuleDeclaration;
 import org.eclipse.koneki.ldt.parser.internal.tests.utils.DummyReporter;
 
 public class TestModuleDeclaration extends TestCase {
@@ -28,23 +29,24 @@ public class TestModuleDeclaration extends TestCase {
 
 		ISourceParser parser = new LuaSourceParserFactory().createSourceParser();
 		DummyReporter reporter = new DummyReporter();
-		ModuleDeclaration start = null;
-		ModuleDeclaration fuzzy = null;
+		LuaModuleDeclaration regular = null;
+		LuaModuleDeclaration fuzzy = null;
 
 		// Local variable declaration
-		start = (ModuleDeclaration) parser.parse(new ModuleSource("local var"), reporter); //$NON-NLS-1$
+		regular = (LuaModuleDeclaration) parser.parse(new ModuleSource("local var"), reporter); //$NON-NLS-1$
 
 		// Fuzzy state between two stables ones
-		fuzzy = (ModuleDeclaration) parser.parse(new ModuleSource("local var="), reporter); //$NON-NLS-1$
+		fuzzy = (LuaModuleDeclaration) parser.parse(new ModuleSource("local var="), reporter); //$NON-NLS-1$
 
 		// Check if faulty ASTs are ignored, the previous AST should be given
-		assertTrue("Only source of previous AST is cached, even during errors another AST is generated from previous source.", start != fuzzy);//$NON-NLS-1$
+		assertSame("While errors occur previous AST is given.", regular, fuzzy);//$NON-NLS-1$
+		assertFalse("Error at variable declaration", regular.hasError()); //$NON-NLS-1$
 
 		// Now make a valid local assignment declaration
 		ModuleDeclaration stable = (ModuleDeclaration) parser.parse(new ModuleSource("local var=1"), reporter); //$NON-NLS-1$
 
 		// Check if new valid AST is cached
-		assertNotSame("Stable AST from cache should have been replaced by a new one.", start, stable); //$NON-NLS-1$
+		assertNotSame("Stable AST from cache should have been replaced by a new one.", regular, stable); //$NON-NLS-1$
 	}
 
 	/**
@@ -54,30 +56,30 @@ public class TestModuleDeclaration extends TestCase {
 
 		ISourceParser parser = new LuaSourceParserFactory().createSourceParser();
 		DummyReporter reporter = new DummyReporter();
-		ModuleDeclaration start = null;
-		ModuleDeclaration fuzzy = null;
+		LuaModuleDeclaration regular = null;
+		LuaModuleDeclaration fuzzy = null;
 
 		// Regular local variable declaration
-		start = (ModuleDeclaration) parser.parse(new ModuleSource("local var"), reporter); //$NON-NLS-1$
+		regular = (LuaModuleDeclaration) parser.parse(new ModuleSource("local var"), reporter); //$NON-NLS-1$
 
 		// Incomplete local variable declaration with assignment
-		fuzzy = (ModuleDeclaration) parser.parse(new ModuleSource("local var="), reporter); //$NON-NLS-1$
+		fuzzy = (LuaModuleDeclaration) parser.parse(new ModuleSource("local var="), reporter); //$NON-NLS-1$
 
 		/*
 		 * Check if faulty ASTs are ignored, the source previous AST is used to generate a new one
 		 */
-		assertNotSame("AST is not regenerated from cached source.", start, fuzzy); //$NON-NLS-1$
+		assertSame("Faulty code does not return previous AST.", regular, fuzzy); //$NON-NLS-1$
 
 		// Wrong code, anything that could follow will be considered an error
-		fuzzy = (ModuleDeclaration) parser.parse(new ModuleSource("local var = = "), reporter); //$NON-NLS-1$
+		fuzzy = (LuaModuleDeclaration) parser.parse(new ModuleSource("local var = = "), reporter); //$NON-NLS-1$
 
 		// Check if faulty a new AST is generated from cached source
-		assertNotSame("AST from cache should have be provided.", start, fuzzy); //$NON-NLS-1$
+		assertSame("AST from cache should have be provided.", regular, fuzzy); //$NON-NLS-1$
 
 		// Try a deeper mistake
-		fuzzy = (ModuleDeclaration) parser.parse(new ModuleSource("local var = = 1"), reporter); //$NON-NLS-1$
+		fuzzy = (LuaModuleDeclaration) parser.parse(new ModuleSource("local var = = 1"), reporter); //$NON-NLS-1$
 
 		// Check if faulty ASTs are ignored, the fist AST should be given
-		assertNotSame("AST from cache shouldn't have been provided.", start, fuzzy); //$NON-NLS-1$
+		assertSame("AST from cache shoul have been provided as well.", regular, fuzzy); //$NON-NLS-1$
 	}
 }
