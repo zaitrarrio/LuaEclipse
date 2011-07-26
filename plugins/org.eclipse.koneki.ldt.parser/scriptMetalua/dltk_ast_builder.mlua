@@ -73,6 +73,8 @@ end
 local function statListToChunk(list)
 	local chunk = DLTK.Chunk(0, 0)
 	for k, node in ipairs(list) do
+--	print ( object[node] and 'objet defini' or 'objet indefini')
+	if not object[node] then table.print (node, 150 )end
 		DLTK.appendStatementToChunk(chunk, object[node])
 	end
 	return chunk
@@ -184,12 +186,15 @@ visitor.binder = function(node, parent, ...)
 				-- Create Java Identifier
 				object[ node ] = DLTK.Identifier(first, last, name)
 			end
+		| `Dots ->
+			object[ node ] = DLTK.Dots(first, last)
 		| _ ->
 --			print('In binder missing type `'..(node.tag))
 --			table.print(node, 'nohash',1)
 	end
 end
-visitor.Id = visitor.binder 
+visitor.Id = visitor.binder
+visitor.Dots = visitor.binder
 ---
 -- Instanciates a Java object in <code>object</code> from the given node.
 --
@@ -286,8 +291,6 @@ visitor.expr.up = function (node, ...)
 			object[ node ] = DLTK.Function(first, last, statListToChunk( param ), object[block])
 		| `Nil ->
 			object[ node ] = DLTK.Nil(first, last)
-		| `Dots ->
-			object[ node ] = DLTK.Dots(first, last)
 		| `True | `False ->
 			object[ node ] = DLTK.Boolean(first, last, node.tag == "True")
 		| `Number{number} ->
@@ -302,8 +305,6 @@ visitor.expr.up = function (node, ...)
 			for k, child in ipairs( node ) do
 				DLTK.addStatement(object[ node ], object[child])
 			end
-		| `Id {name} ->
-			print ('processing '..name)
 		| `Op { operator, left, right} ->
 			object[ node ] = DLTK.BinaryExpression(first, last,object[left], operator, object[right])
 		| `Op { operator, expr } ->
@@ -316,6 +317,10 @@ visitor.expr.up = function (node, ...)
 			object[ node ] = DLTK.Index(object[expr], object[sexpr])
 		| `Call{...} | `Invoke{...} ->
 			apply(node, ...)
+		| `Id {name} ->
+			visitor.binder(node, ...)
+		| `Dots ->
+			visitor.binder(node, ...)
 		| _ ->
 --			print('In expr.up missing type `'..(node.tag))
 --			table.print(node, 'nohash',1)

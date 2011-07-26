@@ -17,6 +17,7 @@
  */
 package org.eclipse.koneki.ldt.parser.ast.expressions;
 
+import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
 
@@ -47,4 +48,12 @@ public class Dots extends Expression implements LuaExpressionConstants {
 	public int getKind() {
 		return E_DOTS;
 	}
+
+	@Override
+	public void traverse(ASTVisitor visitor) throws Exception {
+		if (visitor.visit(this)) {
+			visitor.endvisit(this);
+		}
+	}
+
 }
