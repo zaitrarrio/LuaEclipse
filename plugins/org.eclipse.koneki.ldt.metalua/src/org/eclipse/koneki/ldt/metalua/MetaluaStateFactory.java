@@ -63,13 +63,15 @@ public class MetaluaStateFactory {
 
 		// Update path in order to be able to load Metalua
 		String metaluaPath = MetaluaStateFactory.sourcesPath();
-		String path = "package.path = package.path  .. [[;" + metaluaPath + "?.luac;" + metaluaPath + "?.lua]]";//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		StringBuilder path = new StringBuilder();
+		path.append("package.path = [[" + metaluaPath + "?.luac;" + metaluaPath + "?.lua]]");//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		path.append("package.cpath = ''");//$NON-NLS-1$
 
 		// Load Metalua's byte code
 		String require = "require 'metalua.compiler'"; //$NON-NLS-1$
 
 		// Detect problems
-		l.load(path, "pathLoading"); //$NON-NLS-1$
+		l.load(path.toString(), "pathLoading"); //$NON-NLS-1$
 		l.call(0, 0);
 		l.load(require, "requireContentFromPath");//$NON-NLS-1$
 		l.call(0, 0);
