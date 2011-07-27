@@ -38,6 +38,9 @@ public class MetaluaStateFactory {
 
 	private static String sourcePath = null;
 
+	private MetaluaStateFactory() {
+	}
+
 	/**
 	 * Provides a LuaState that can run Metalua code
 	 * 

@@ -48,6 +48,8 @@ import com.naef.jnlua.NamedJavaFunction;
  * Offers to create DLTK Java objects from a single access, avoid wasting time with reflection.
  */
 public class DLTKObjectFactory {
+	private DLTKObjectFactory() {
+	}
 
 	/**
 	 * Gives a {@link LuaState} access to a logic module named <code>DLTK</code> which enable DLTK Object creation

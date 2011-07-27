@@ -33,7 +33,6 @@ public class TestMetaluaStateFactory extends TestCase {
 		} catch (LuaException e) {
 			loaded = false;
 			message = e.getMessage();
-			e.printStackTrace();
 		}
 		assertTrue("Metalua is not loaded: " + message, loaded); //$NON-NLS-1$
 	}

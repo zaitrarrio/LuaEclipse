@@ -21,7 +21,9 @@ import org.osgi.framework.Bundle;
 /**
  * The Class SuiteProvider.
  */
-public class SuiteProvider {
+public final class SuiteProvider {
+	private SuiteProvider() {
+	}
 
 	/**
 	 * Gets the.
@@ -46,15 +48,17 @@ public class SuiteProvider {
 
 			// Load the TestSuite
 			try {
-
 				// Retrieve instance of contributor through it's plug-in
 				Object newInstance = bundle.loadClass(className).newInstance();
 				if (newInstance instanceof TestSuite) {
 					suite.addTest((TestSuite) newInstance);
 				}
-
-			} catch (Exception e) {
-				e.printStackTrace();
+			} catch (InstantiationException e) {
+				Activator.logError(e.getMessage(), e);
+			} catch (IllegalAccessException e) {
+				Activator.logError(e.getMessage(), e);
+			} catch (ClassNotFoundException e) {
+				Activator.logError(e.getMessage(), e);
 			}
 		}
 		return suite;

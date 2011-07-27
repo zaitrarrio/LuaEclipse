@@ -23,7 +23,8 @@ import org.eclipse.dltk.ast.statements.Block;
  */
 public class MatchNodeVisitor extends ASTVisitor {
 	private ASTNode result = null;
-	private final int end, start;
+	private final int end;
+	private final int start;
 
 	/**
 	 * Constructor initialized with offsets to seek for
