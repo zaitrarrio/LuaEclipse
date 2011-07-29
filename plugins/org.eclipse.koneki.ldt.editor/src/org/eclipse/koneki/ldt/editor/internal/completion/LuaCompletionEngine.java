@@ -13,8 +13,8 @@ package org.eclipse.koneki.ldt.editor.internal.completion;
 
 import org.eclipse.dltk.codeassist.ScriptCompletionEngine;
 import org.eclipse.dltk.compiler.env.IModuleSource;
+import org.eclipse.dltk.compiler.util.Util;
 import org.eclipse.dltk.core.CompletionProposal;
-import org.eclipse.dltk.core.CompletionRequestor;
 import org.eclipse.dltk.core.DLTKCore;
 import org.eclipse.dltk.core.IField;
 import org.eclipse.dltk.core.IMethod;
@@ -31,21 +31,11 @@ import org.eclipse.koneki.ldt.editor.Activator;
  */
 public class LuaCompletionEngine extends ScriptCompletionEngine {
 
-	private CompletionRequestor requestor = new CompletionRequestor() {
-
-		@Override
-		public void accept(CompletionProposal proposal) {
-			// TODO Auto-generated method stub
-
-		}
-	};
-	private int actualCompletionPosition;
-	private int offset;
-
 	@Override
 	public void complete(IModuleSource module, int position, int k) {
 		this.actualCompletionPosition = position;
-		this.offset = k;
+		String start = getWordStarting(module.getSourceContents(), position, 10);
+		this.offset = actualCompletionPosition - start.length();
 		String[] keywords = new String[] { "and", "break", "do", "else", "elseif", "end", "false", "for", "function", "if", "in", "local", "nil",
 				"not", "or", "repeat", "return", "then", "true", "until", "while" };
 		for (int j = 0; j < keywords.length; j++) {
@@ -95,13 +85,32 @@ public class LuaCompletionEngine extends ScriptCompletionEngine {
 			}
 			proposal.setName(name);
 			proposal.setCompletion(name);
-			proposal.setReplaceRange(actualCompletionPosition - offset, actualCompletionPosition - offset);
+			proposal.setReplaceRange(offset, offset + name.length());
 			proposal.setRelevance(20);
 			proposal.setModelElement(element);
 			this.requestor.accept(proposal);
 		} catch (ModelException e) {
-			Activator.logWarning("Ploblem during completion processing.", e); //$NON-NLS-1$
+			Activator.logWarning("Problem during completion processing.", e); //$NON-NLS-1$
 		}
 	}
 
+	private String getWordStarting(String content, int position, int maxLen) {
+		if (position <= 0 || position > content.length())
+			return Util.EMPTY_STRING;
+		final int original = position;
+		while (position > 0
+				&& maxLen > 0
+				&& ((content.charAt(position - 1) == ':') || (content.charAt(position - 1) == '\'') || (content.charAt(position - 1) == '"') || isLessStrictIdentifierCharacter(content
+						.charAt(position - 1)))) {
+			--position;
+			--maxLen;
+		}
+		return content.substring(position, original);
+	}
+
+	private static boolean isLessStrictIdentifierCharacter(char ch) {
+		boolean isLowercaseLetter = ch >= 'a' && ch <= 'z';
+		boolean isUppercaseLetter = ch >= 'A' && ch <= 'Z';
+		return isLowercaseLetter || isUppercaseLetter || ch == '_';
+	}
 }
