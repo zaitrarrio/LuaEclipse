@@ -8,7 +8,7 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.koneki.ldt.templates.internal;
+package org.eclipse.koneki.ldt.editor.templates;
 
 import org.eclipse.dltk.ui.templates.ScriptTemplateAccess;
 import org.eclipse.dltk.ui.templates.ScriptTemplatePreferencePage;
@@ -20,24 +20,22 @@ import org.eclipse.koneki.ldt.editor.internal.text.LuaTextTools;
 
 public class LuaTemplatePreferencePage extends ScriptTemplatePreferencePage {
 
-    @Override
-    protected ScriptSourceViewerConfiguration createSourceViewerConfiguration() {
-	return new LuaSourceViewerConfiguration(getTextTools()
-		.getColorManager(), getPreferenceStore(), null,
-		ILuaPartitions.LUA_PARTITIONING);
-    }
+	@Override
+	protected ScriptSourceViewerConfiguration createSourceViewerConfiguration() {
+		return new LuaSourceViewerConfiguration(getTextTools().getColorManager(), getPreferenceStore(), null, ILuaPartitions.LUA_PARTITIONING);
+	}
 
-    @Override
-    protected ScriptTemplateAccess getTemplateAccess() {
-	return LuaTemplateAccess.getInstance();
-    }
+	@Override
+	protected ScriptTemplateAccess getTemplateAccess() {
+		return LuaTemplateAccess.getInstance();
+	}
 
-    @Override
-    protected void setPreferenceStore() {
-	setPreferenceStore(Activator.getDefault().getPreferenceStore());
-    }
+	@Override
+	protected void setPreferenceStore() {
+		setPreferenceStore(Activator.getDefault().getPreferenceStore());
+	}
 
-    private LuaTextTools getTextTools() {
-	return Activator.getDefault().getTextTools();
-    }
+	private LuaTextTools getTextTools() {
+		return Activator.getDefault().getTextTools();
+	}
 }

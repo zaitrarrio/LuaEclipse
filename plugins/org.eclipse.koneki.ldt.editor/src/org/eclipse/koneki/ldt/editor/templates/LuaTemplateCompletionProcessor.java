@@ -8,7 +8,7 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.koneki.ldt.templates.internal;
+package org.eclipse.koneki.ldt.editor.templates;
 
 import org.eclipse.dltk.ui.templates.ScriptTemplateAccess;
 import org.eclipse.dltk.ui.templates.ScriptTemplateCompletionProcessor;
@@ -16,31 +16,31 @@ import org.eclipse.dltk.ui.text.completion.ScriptContentAssistInvocationContext;
 
 /**
  * 
- * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
+ * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  * 
  */
-public class LuaTemplateCompletionProcessor extends
-	ScriptTemplateCompletionProcessor {
+public class LuaTemplateCompletionProcessor extends ScriptTemplateCompletionProcessor {
 
-    private static char[] IGNORE = new char[] {'.',':'};
-    
-    public LuaTemplateCompletionProcessor(
-	    ScriptContentAssistInvocationContext context) {
-	super(context);
-    }
+	private static char[] IGNORE = new char[] { '.', ':' };
 
-    @Override
-    protected String getContextTypeId() {
-	// TODO Auto-generated method stub
-	return LuaUniversalTemplateContextType.CONTEXT_TYPE_ID;
-    }
-    protected char[] getIgnore() {
-	return IGNORE;
+	public LuaTemplateCompletionProcessor(ScriptContentAssistInvocationContext context) {
+		super(context);
 	}
-    @Override
-    protected ScriptTemplateAccess getTemplateAccess() {
-	// TODO Auto-generated method stub
-	return LuaTemplateAccess.getInstance();
-    }
+
+	@Override
+	protected String getContextTypeId() {
+		// TODO Auto-generated method stub
+		return LuaUniversalTemplateContextType.CONTEXT_TYPE_ID;
+	}
+
+	protected char[] getIgnore() {
+		return IGNORE;
+	}
+
+	@Override
+	protected ScriptTemplateAccess getTemplateAccess() {
+		// TODO Auto-generated method stub
+		return LuaTemplateAccess.getInstance();
+	}
 
 }

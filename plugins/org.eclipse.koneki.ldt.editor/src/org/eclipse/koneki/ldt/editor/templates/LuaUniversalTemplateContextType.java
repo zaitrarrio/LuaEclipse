@@ -8,7 +8,7 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.koneki.ldt.templates.internal;
+package org.eclipse.koneki.ldt.editor.templates;
 
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.ui.templates.ScriptTemplateContext;
@@ -17,7 +17,7 @@ import org.eclipse.jface.text.IDocument;
 
 /**
  * 
- * @author Kevin KIN-FOO <kkin-foo@sierrawireless.com>
+ * @author Kevin KIN-FOO <kkinfoo@sierrawireless.com>
  * 
  */
 public class LuaUniversalTemplateContextType extends ScriptTemplateContextType {

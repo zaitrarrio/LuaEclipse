@@ -16,6 +16,7 @@ import org.eclipse.dltk.compiler.env.IModuleSource;
 import org.eclipse.dltk.compiler.util.Util;
 import org.eclipse.dltk.core.CompletionProposal;
 import org.eclipse.dltk.core.DLTKCore;
+import org.eclipse.dltk.core.Flags;
 import org.eclipse.dltk.core.IField;
 import org.eclipse.dltk.core.IMethod;
 import org.eclipse.dltk.core.IModelElement;
@@ -33,11 +34,14 @@ public class LuaCompletionEngine extends ScriptCompletionEngine {
 
 	@Override
 	public void complete(IModuleSource module, int position, int k) {
+		this.requestor.beginReporting();
 		this.actualCompletionPosition = position;
 		String start = getWordStarting(module.getSourceContents(), position, 10);
 		this.offset = actualCompletionPosition - start.length();
-		String[] keywords = new String[] { "and", "break", "do", "else", "elseif", "end", "false", "for", "function", "if", "in", "local", "nil",
-				"not", "or", "repeat", "return", "then", "true", "until", "while" };
+		this.setSourceRange(position - start.length(), position);
+		// Some keywords are not listed hereby, they are defined in default template
+		String[] keywords = new String[] { "and", "break", "do", "else", "elseif", "end", "false", "in", "nil", "not", "or", "return", "then",
+				"true", };
 		for (int j = 0; j < keywords.length; j++) {
 			createProposal(keywords[j], null);
 		}
@@ -56,6 +60,8 @@ public class LuaCompletionEngine extends ScriptCompletionEngine {
 			if (DLTKCore.DEBUG) {
 				Activator.logError("Unable to initialize completion engine", e); //$NON-NLS-1$
 			}
+		} finally {
+			this.requestor.endReporting();
 		}
 	}
 
@@ -68,7 +74,9 @@ public class LuaCompletionEngine extends ScriptCompletionEngine {
 				switch (element.getElementType()) {
 				case IModelElement.METHOD:
 					proposal = this.createProposal(CompletionProposal.METHOD_DECLARATION, this.actualCompletionPosition);
-					proposal.setFlags(((IMethod) element).getFlags());
+					IMethod method = (IMethod) element;
+					proposal.setFlags(method.getFlags());
+					proposal.setParameterNames(method.getParameterNames());
 					break;
 				case IModelElement.FIELD:
 					proposal = this.createProposal(CompletionProposal.FIELD_REF, this.actualCompletionPosition);
@@ -78,14 +86,19 @@ public class LuaCompletionEngine extends ScriptCompletionEngine {
 					proposal = this.createProposal(CompletionProposal.TYPE_REF, this.actualCompletionPosition);
 					proposal.setFlags(((IType) element).getFlags());
 					break;
+				case IModelElement.LOCAL_VARIABLE:
+					proposal = this.createProposal(CompletionProposal.LOCAL_VARIABLE_REF, this.actualCompletionPosition);
+					proposal.setFlags(Flags.AccPrivate);
+					break;
 				default:
 					proposal = this.createProposal(CompletionProposal.KEYWORD, this.actualCompletionPosition);
+					proposal.setFlags(Flags.AccDefault);
 					break;
 				}
 			}
 			proposal.setName(name);
 			proposal.setCompletion(name);
-			proposal.setReplaceRange(offset, offset + name.length());
+			proposal.setReplaceRange(offset, offset + name.length() - 1);
 			proposal.setRelevance(20);
 			proposal.setModelElement(element);
 			this.requestor.accept(proposal);

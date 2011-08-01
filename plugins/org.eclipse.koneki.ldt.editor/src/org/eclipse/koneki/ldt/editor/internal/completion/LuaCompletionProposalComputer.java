@@ -14,22 +14,16 @@ import org.eclipse.dltk.ui.text.completion.ScriptCompletionProposalCollector;
 import org.eclipse.dltk.ui.text.completion.ScriptCompletionProposalComputer;
 import org.eclipse.dltk.ui.text.completion.ScriptContentAssistInvocationContext;
 import org.eclipse.jface.text.templates.TemplateCompletionProcessor;
+import org.eclipse.koneki.ldt.editor.templates.LuaTemplateCompletionProcessor;
 
-public class LuaCompletionProposalComputer extends
-	ScriptCompletionProposalComputer {
-    public LuaCompletionProposalComputer() {
+public class LuaCompletionProposalComputer extends ScriptCompletionProposalComputer {
 
-    }
+	@Override
+	protected TemplateCompletionProcessor createTemplateProposalComputer(ScriptContentAssistInvocationContext context) {
+		return new LuaTemplateCompletionProcessor(context);
+	}
 
-    @Override
-    protected TemplateCompletionProcessor createTemplateProposalComputer(
-	    ScriptContentAssistInvocationContext context) {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-    protected ScriptCompletionProposalCollector createCollector(
-	    ScriptContentAssistInvocationContext context) {
-	return new LuaCompletionProposalCollector(context.getSourceModule());
-    }
+	protected ScriptCompletionProposalCollector createCollector(ScriptContentAssistInvocationContext context) {
+		return new LuaCompletionProposalCollector(context.getSourceModule());
+	}
 }

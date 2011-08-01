@@ -8,7 +8,7 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.koneki.ldt.templates.internal;
+package org.eclipse.koneki.ldt.editor.templates;
 
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.ui.templates.ScriptTemplateContext;
@@ -22,10 +22,8 @@ import org.eclipse.jface.text.templates.TemplateContextType;
  */
 public class LuaTemplateContext extends ScriptTemplateContext {
 
-    protected LuaTemplateContext(TemplateContextType type, IDocument document,
-	    int completionOffset, int completionLength,
-	    ISourceModule sourceModule) {
-	super(type, document, completionOffset, completionLength, sourceModule);
-    }
+	protected LuaTemplateContext(TemplateContextType type, IDocument document, int completionOffset, int completionLength, ISourceModule sourceModule) {
+		super(type, document, completionOffset, completionLength, sourceModule);
+	}
 
 }

@@ -8,17 +8,14 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.koneki.ldt.templates.internal;
+package org.eclipse.koneki.ldt.editor.templates;
 
 import org.eclipse.dltk.ui.text.ScriptSourceViewerConfiguration;
 import org.eclipse.koneki.ldt.ui.LuaUILanguageToolkit;
 
 public class LuaTemplateUILanguageToolkit extends LuaUILanguageToolkit {
 
-    public ScriptSourceViewerConfiguration createSourceViewerConfiguration() {
-
-	return new LuaTemplateSourceViewerConfiguration(getTextTools()
-		.getColorManager(), getPreferenceStore(), null,
-		getPartitioningId(), false);
-    }
+	public ScriptSourceViewerConfiguration createSourceViewerConfiguration() {
+		return new LuaTemplateSourceViewerConfiguration(getTextTools().getColorManager(), getPreferenceStore(), null, getPartitioningId(), false);
+	}
 }

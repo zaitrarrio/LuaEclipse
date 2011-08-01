@@ -60,4 +60,32 @@
          </partition>
       </scriptCompletionProposalComputer>
    </extension>
+   <extension
+         point="org.eclipse.ui.editors.templates">
+      <contextType
+            class="org.eclipse.koneki.ldt.editor.templates.LuaUniversalTemplateContextType"
+            id="LuaUniversalTemplateContextType"
+            name="%contextType.name">
+      </contextType>
+       <include
+          file="templates/templates.xml"
+          translations="templates/templates.properties">
+       </include>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.eclipse.koneki.ldt.editor.templates.LuaTemplatePreferencePage"
+            id="org.eclipse.koneki.ldt.templates.Template"
+            name="%page.name">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.dltk.ui.language">
+      <language
+            class="org.eclipse.koneki.ldt.editor.templates.LuaTemplateUILanguageToolkit"
+            nature="org.eclipse.koneki.ldt.nature"
+            priority="1">
+      </language>
+   </extension>
 </plugin>
