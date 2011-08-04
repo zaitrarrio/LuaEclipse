@@ -9,7 +9,7 @@
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.koneki.ldt.ui.interpreter.preferences;
+package org.eclipse.koneki.ldt.ui.preferences;
 
 import org.eclipse.dltk.internal.debug.ui.interpreters.InterpretersBlock;
 import org.eclipse.dltk.internal.debug.ui.interpreters.ScriptInterpreterPreferencePage;

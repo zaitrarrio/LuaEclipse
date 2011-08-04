@@ -75,6 +75,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
+            category="org.eclipse.koneki.ldt.ui.globalpreferencepage"
             class="org.eclipse.koneki.ldt.editor.templates.LuaTemplatePreferencePage"
             id="org.eclipse.koneki.ldt.templates.Template"
             name="%page.name">

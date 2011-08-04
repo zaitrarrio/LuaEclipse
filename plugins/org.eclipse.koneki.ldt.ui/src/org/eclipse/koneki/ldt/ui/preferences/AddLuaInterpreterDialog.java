@@ -9,23 +9,19 @@
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
 
-
-package org.eclipse.koneki.ldt.ui.interpreter.preferences;
+package org.eclipse.koneki.ldt.ui.preferences;
 
 import org.eclipse.dltk.internal.debug.ui.interpreters.AbstractInterpreterLibraryBlock;
 import org.eclipse.dltk.internal.debug.ui.interpreters.AddScriptInterpreterDialog;
 import org.eclipse.dltk.internal.debug.ui.interpreters.IAddInterpreterDialogRequestor;
 import org.eclipse.dltk.launching.IInterpreterInstall;
 import org.eclipse.dltk.launching.IInterpreterInstallType;
-import org.eclipse.koneki.ldt.ui.interpreter.preferences.LuaInterpreterLibraryBlock;
 import org.eclipse.swt.widgets.Shell;
-
 
 public class AddLuaInterpreterDialog extends AddScriptInterpreterDialog {
 
-	public AddLuaInterpreterDialog(IAddInterpreterDialogRequestor requestor,
-            Shell shell, IInterpreterInstallType[] interpreterInstallTypes,
-            IInterpreterInstall editedInterpreter) {
+	public AddLuaInterpreterDialog(IAddInterpreterDialogRequestor requestor, Shell shell, IInterpreterInstallType[] interpreterInstallTypes,
+			IInterpreterInstall editedInterpreter) {
 		super(requestor, shell, interpreterInstallTypes, editedInterpreter);
 	}
 

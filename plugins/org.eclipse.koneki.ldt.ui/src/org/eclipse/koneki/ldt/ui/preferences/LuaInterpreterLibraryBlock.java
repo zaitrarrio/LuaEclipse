@@ -10,7 +10,7 @@
  *******************************************************************************/
 
 
-package org.eclipse.koneki.ldt.ui.interpreter.preferences;
+package org.eclipse.koneki.ldt.ui.preferences;
 
 import org.eclipse.dltk.internal.debug.ui.interpreters.AbstractInterpreterLibraryBlock;
 import org.eclipse.dltk.internal.debug.ui.interpreters.AddScriptInterpreterDialog;
