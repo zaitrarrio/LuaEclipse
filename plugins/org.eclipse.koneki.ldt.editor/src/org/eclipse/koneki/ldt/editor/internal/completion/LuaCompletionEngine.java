@@ -11,6 +11,10 @@
  *******************************************************************************/
 package org.eclipse.koneki.ldt.editor.internal.completion;
 
+import org.eclipse.dltk.ast.parser.ASTCacheManager;
+import org.eclipse.dltk.ast.parser.IASTCache;
+import org.eclipse.dltk.ast.parser.IASTCache.ASTCacheEntry;
+import org.eclipse.dltk.ast.parser.IModuleDeclaration;
 import org.eclipse.dltk.codeassist.ScriptCompletionEngine;
 import org.eclipse.dltk.compiler.env.IModuleSource;
 import org.eclipse.dltk.compiler.util.Util;
@@ -20,8 +24,12 @@ import org.eclipse.dltk.core.IField;
 import org.eclipse.dltk.core.IMethod;
 import org.eclipse.dltk.core.IModelElement;
 import org.eclipse.dltk.core.IModelElementVisitor;
+import org.eclipse.dltk.core.IProjectFragment;
+import org.eclipse.dltk.core.IScriptProject;
+import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.ModelException;
+import org.eclipse.koneki.ldt.core.LuaLanguageToolkit;
 import org.eclipse.koneki.ldt.editor.Activator;
 import org.eclipse.koneki.ldt.editor.lang.Messages;
 
@@ -34,23 +42,40 @@ public class LuaCompletionEngine extends ScriptCompletionEngine {
 
 	@Override
 	public void complete(IModuleSource module, int position, int k) {
-		final String start = getWordStarting(module.getSourceContents(), position, 10).toLowerCase();
-		this.actualCompletionPosition = position;
-		this.offset = actualCompletionPosition - start.length();
-		this.setSourceRange(this.offset, position);
-		this.requestor.beginReporting();
-		// Some keywords are not listed hereby, they are defined in default templates
-		String[] keywords = new String[] { "and", "break", "do", "else", "elseif", "end", "false", "in", "nil", "not", "or", "return", "then",
-				"true", };
-		for (int j = 0; j < keywords.length; j++) {
-			if (keywords[j].startsWith(start)) {
-				createProposal(keywords[j], null);
+		IModelElement modelElement = module.getModelElement();
+		if (!(modelElement instanceof ISourceModule)) {
+			// TODO log error
+		} else {
+			try {
+				final String start = getWordStarting(module.getSourceContents(), position, 10).toLowerCase();
+				this.actualCompletionPosition = position;
+				this.offset = actualCompletionPosition - start.length();
+				this.requestor.beginReporting();
+
+				ISourceModule sourceModule = (ISourceModule) modelElement;
+
+				// search local declaration in AST
+				addLocalDeclarations(sourceModule, start);
+
+				// search global declaration in DLTK model
+				addGlobalDeclarations(sourceModule, start);
+
+				// add keywords
+				addKeywords(start);
+			} catch (ModelException e) {
+				Activator.logError(Messages.LuaCompletionEngineIniTialization, e);
+			} finally {
+				this.requestor.endReporting();
 			}
 		}
+	}
 
-		// Completion for model elements.
-		try {
-			module.getModelElement().accept(new IModelElementVisitor() {
+	private void addGlobalDeclarations(ISourceModule sourceModule, final String start) throws ModelException {
+
+		IScriptProject project = sourceModule.getScriptProject();
+		IProjectFragment[] allProjectFragments = project.getAllProjectFragments();
+		for (IProjectFragment iProjectFragment : allProjectFragments) {
+			iProjectFragment.accept(new IModelElementVisitor() {
 				public boolean visit(IModelElement element) {
 					String lowerName = element.getElementName().toLowerCase();
 					if (element.getElementType() > IModelElement.SOURCE_MODULE && lowerName.startsWith(start)) {
@@ -59,10 +84,75 @@ public class LuaCompletionEngine extends ScriptCompletionEngine {
 					return true;
 				}
 			});
-		} catch (ModelException e) {
-			Activator.logError(Messages.LuaCompletionEngineIniTialization, e);
-		} finally {
-			this.requestor.endReporting();
+		}
+	}
+
+	private void addKeywords(String start) {
+		String[] keywords = new String[] { "and", "break", "do", "else", "elseif", "end", "false", "in", "nil", "not", "or", "return", "then",
+				"true", };
+		for (int j = 0; j < keywords.length; j++) {
+			if (keywords[j].startsWith(start)) {
+				createProposal(keywords[j], null);
+			}
+		}
+	}
+
+	// @Override
+	// public void complete2(IModuleSource module, int position, int k) {
+	// IASTCache[] providers = ASTCacheManager.getProviders(LuaLanguageToolkit.getDefault().getNatureId());
+	// IModuleDeclaration moduleDeclaration;
+	// if (providers != null) {
+	// for (IASTCache provider : providers) {
+	// IModelElement modelElement = module.getModelElement();
+	// // TODO check if it's a ISourceModule
+	// ASTCacheEntry cacheEntry = provider.restoreModule((ISourceModule) modelElement);
+	// moduleDeclaration = cacheEntry.module;
+	// }
+	// }
+	//
+	// final String start = getWordStarting(module.getSourceContents(), position, 10).toLowerCase();
+	// this.actualCompletionPosition = position;
+	// this.offset = actualCompletionPosition - start.length();
+	// this.setSourceRange(this.offset, position);
+	// this.requestor.beginReporting();
+	// // Some keywords are not listed hereby, they are defined in default templates
+	// String[] keywords = new String[] { "and", "break", "do", "else", "elseif", "end", "false", "in", "nil", "not", "or", "return", "then",
+	// "true", };
+	// for (int j = 0; j < keywords.length; j++) {
+	// if (keywords[j].startsWith(start)) {
+	// createProposal(keywords[j], null);
+	// }
+	// }
+	//
+	// // Completion for model elements.
+	// try {
+	// module.getModelElement().accept(new IModelElementVisitor() {
+	// public boolean visit(IModelElement element) {
+	// String lowerName = element.getElementName().toLowerCase();
+	// if (element.getElementType() > IModelElement.SOURCE_MODULE && lowerName.startsWith(start)) {
+	// createProposal(element.getElementName(), element);
+	// }
+	// return true;
+	// }
+	// });
+	// } catch (ModelException e) {
+	// Activator.logError(Messages.LuaCompletionEngineIniTialization, e);
+	// } finally {
+	// this.requestor.endReporting();
+	// }
+	// }
+
+	private void addLocalDeclarations(ISourceModule sourceModule, String start) {
+		IASTCache[] providers = ASTCacheManager.getProviders(LuaLanguageToolkit.getDefault().getNatureId());
+		if (providers != null) {
+			for (IASTCache provider : providers) {
+				ASTCacheEntry cacheEntry = provider.restoreModule(sourceModule);
+				IModuleDeclaration moduleDeclaration = cacheEntry.module;
+				if (moduleDeclaration != null) {
+					// TODO create proposal
+					break;
+				}
+			}
 		}
 	}
 
