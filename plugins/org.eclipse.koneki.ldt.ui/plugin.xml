@@ -71,9 +71,9 @@
      <extension
        point="org.eclipse.ui.propertyPages">
     <page
-          category="org.eclipse.koneki.embedded.lua.ui.luaembeddedpage"
+          category="org.eclipse.koneki.ldt.ui.luaembeddedpage"
           class="org.eclipse.koneki.ldt.ui.properties.LuaBuildPathPropertyPage"
-          id="org.eclipse.koneki.embedded.lua.ui.BuildpathProperties"
+          id="org.eclipse.koneki.ldt.ui.BuildpathProperties"
           name="%properties.page.name.buildpath">
       <enabledWhen>
         <adapt type="org.eclipse.core.resources.IProject">
@@ -84,7 +84,7 @@
     <page
       name="%properties.page.name.lua"
       class="org.eclipse.koneki.ldt.ui.properties.LuaPropertyPage"
-      id="org.eclipse.koneki.embedded.lua.ui.luaembeddedpage">
+      id="org.eclipse.koneki.ldt.ui.luaembeddedpage">
       <enabledWhen>
         <adapt type="org.eclipse.core.resources.IProject">
           <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.koneki.ldt.nature"/>
@@ -95,8 +95,8 @@
      <extension
            point="org.eclipse.dltk.ui.buildpathContainerPage">
         <buildpathContainerPage
-              class="org.eclipse.dltk.internal.ui.wizards.buildpath.BuildpathContainerDefaultPage"
-              id="org.eclipse.koneki.embedded.lua.ui.luauserlibrariespage"
+              class="org.eclipse.dltk.internal.ui.wizards.buildpath.UserLibraryWizardPage"
+              id="org.eclipse.koneki.ldt.ui.luauserlibrariespage"
               name="Lua User Libraries"
               nature="org.eclipse.koneki.ldt.nature">
         </buildpathContainerPage>

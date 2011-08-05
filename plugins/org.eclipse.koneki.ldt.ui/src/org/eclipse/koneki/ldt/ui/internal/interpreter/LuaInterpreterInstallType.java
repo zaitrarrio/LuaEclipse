@@ -8,7 +8,6 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.koneki.ldt.ui.internal.interpreter;
 
 import java.io.IOException;

@@ -8,15 +8,12 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-
-
 package org.eclipse.koneki.ldt.ui;
 
 import org.eclipse.dltk.core.IDLTKLanguageToolkit;
 import org.eclipse.dltk.ui.AbstractDLTKUILanguageToolkit;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.koneki.ldt.core.LuaLanguageToolkit;
-
 
 public class LuaUILanguageToolkit extends AbstractDLTKUILanguageToolkit {
 

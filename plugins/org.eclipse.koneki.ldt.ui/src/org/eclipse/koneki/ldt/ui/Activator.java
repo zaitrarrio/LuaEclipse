@@ -8,7 +8,6 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.koneki.ldt.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
