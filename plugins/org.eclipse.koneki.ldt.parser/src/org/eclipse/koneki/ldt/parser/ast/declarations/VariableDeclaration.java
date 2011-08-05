@@ -69,7 +69,7 @@ public class VariableDeclaration extends Declaration implements IOccurrenceHolde
 
 	@Override
 	public int getKind() {
-		return Declaration.D_DECLARATOR;
+		return Declaration.D_VAR_DECL;
 	}
 
 	@Override

@@ -15,8 +15,10 @@ import java.io.IOException;
 import org.eclipse.dltk.ast.Modifiers;
 import org.eclipse.dltk.core.IMember;
 import org.eclipse.dltk.core.IType;
+import org.eclipse.dltk.core.ModelException;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.koneki.ldt.editor.Activator;
+import org.eclipse.koneki.ldt.editor.lang.Messages;
 import org.eclipse.swt.graphics.Image;
 
 public class LuaLabelProvider extends LabelProvider {
@@ -40,9 +42,13 @@ public class LuaLabelProvider extends LabelProvider {
 					return getPrivateMethodIcon();
 				}
 			}
-		} catch (Exception e) {
+		} catch (ModelException e) {
+			Activator.logError(Messages.LuaCompletionProvidersFlags, e);
+		} catch (IOException e) {
+			Activator.logError(Messages.LuaCompletionProvidersImage, e);
 		}
-		return null; // will enter default DLTK behavior
+		// DLTK default behavior
+		return null;
 	}
 
 	private IMember getMember(Object element) {

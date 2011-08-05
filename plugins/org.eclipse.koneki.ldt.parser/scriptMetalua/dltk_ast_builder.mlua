@@ -362,10 +362,11 @@ module.ast_builder = function(source)
 	-- Build AST
 	require 'errnode'
 	local root = DLTK.LuaModuleDeclaration(#source, true)
-	local ast =getast( source )
+	local ast = getast( source )
 	if ast and ast.tag == 'Error' then
 		local line, column, offset = ast.lineinfo.first[1], ast.lineinfo.first[2], ast.lineinfo.first[3]
-		DLTK.setProblem(root, line, column, offset, ast[1])
+		local errorMessage = ast[1] or 'Unable to determine error'
+		DLTK.setProblem(root, line, column, offset, errorMessage )
 		return root
 	end
 	-- Mark intersting nodes such as declaration

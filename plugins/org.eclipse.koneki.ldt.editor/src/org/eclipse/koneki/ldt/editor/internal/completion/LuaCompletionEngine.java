@@ -15,7 +15,6 @@ import org.eclipse.dltk.codeassist.ScriptCompletionEngine;
 import org.eclipse.dltk.compiler.env.IModuleSource;
 import org.eclipse.dltk.compiler.util.Util;
 import org.eclipse.dltk.core.CompletionProposal;
-import org.eclipse.dltk.core.DLTKCore;
 import org.eclipse.dltk.core.Flags;
 import org.eclipse.dltk.core.IField;
 import org.eclipse.dltk.core.IMethod;
@@ -24,6 +23,7 @@ import org.eclipse.dltk.core.IModelElementVisitor;
 import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.ModelException;
 import org.eclipse.koneki.ldt.editor.Activator;
+import org.eclipse.koneki.ldt.editor.lang.Messages;
 
 /**
  * 
@@ -34,32 +34,33 @@ public class LuaCompletionEngine extends ScriptCompletionEngine {
 
 	@Override
 	public void complete(IModuleSource module, int position, int k) {
-		this.requestor.beginReporting();
+		final String start = getWordStarting(module.getSourceContents(), position, 10).toLowerCase();
 		this.actualCompletionPosition = position;
-		String start = getWordStarting(module.getSourceContents(), position, 10);
 		this.offset = actualCompletionPosition - start.length();
-		this.setSourceRange(position - start.length(), position);
-		// Some keywords are not listed hereby, they are defined in default template
+		this.setSourceRange(this.offset, position);
+		this.requestor.beginReporting();
+		// Some keywords are not listed hereby, they are defined in default templates
 		String[] keywords = new String[] { "and", "break", "do", "else", "elseif", "end", "false", "in", "nil", "not", "or", "return", "then",
 				"true", };
 		for (int j = 0; j < keywords.length; j++) {
-			createProposal(keywords[j], null);
+			if (keywords[j].startsWith(start)) {
+				createProposal(keywords[j], null);
+			}
 		}
 
 		// Completion for model elements.
 		try {
 			module.getModelElement().accept(new IModelElementVisitor() {
 				public boolean visit(IModelElement element) {
-					if (element.getElementType() > IModelElement.SOURCE_MODULE) {
+					String lowerName = element.getElementName().toLowerCase();
+					if (element.getElementType() > IModelElement.SOURCE_MODULE && lowerName.startsWith(start)) {
 						createProposal(element.getElementName(), element);
 					}
 					return true;
 				}
 			});
 		} catch (ModelException e) {
-			if (DLTKCore.DEBUG) {
-				Activator.logError("Unable to initialize completion engine", e); //$NON-NLS-1$
-			}
+			Activator.logError(Messages.LuaCompletionEngineIniTialization, e);
 		} finally {
 			this.requestor.endReporting();
 		}
@@ -67,16 +68,17 @@ public class LuaCompletionEngine extends ScriptCompletionEngine {
 
 	private void createProposal(String name, IModelElement element) {
 		CompletionProposal proposal = null;
+		int relevance = 2;
 		try {
 			if (element == null) {
 				proposal = this.createProposal(CompletionProposal.KEYWORD, this.actualCompletionPosition);
 			} else {
 				switch (element.getElementType()) {
 				case IModelElement.METHOD:
-					proposal = this.createProposal(CompletionProposal.METHOD_DECLARATION, this.actualCompletionPosition);
+					proposal = this.createProposal(CompletionProposal.METHOD_REF, this.actualCompletionPosition);
 					IMethod method = (IMethod) element;
-					proposal.setFlags(method.getFlags());
 					proposal.setParameterNames(method.getParameterNames());
+					proposal.setFlags(method.getFlags());
 					break;
 				case IModelElement.FIELD:
 					proposal = this.createProposal(CompletionProposal.FIELD_REF, this.actualCompletionPosition);
@@ -91,16 +93,19 @@ public class LuaCompletionEngine extends ScriptCompletionEngine {
 					proposal.setFlags(Flags.AccPrivate);
 					break;
 				default:
+					// Lower relevance for key words
+					relevance = 1;
 					proposal = this.createProposal(CompletionProposal.KEYWORD, this.actualCompletionPosition);
 					proposal.setFlags(Flags.AccDefault);
 					break;
 				}
 			}
+			proposal.setModelElement(element);
 			proposal.setName(name);
 			proposal.setCompletion(name);
-			proposal.setReplaceRange(offset, offset + name.length() - 1);
-			proposal.setRelevance(20);
-			proposal.setModelElement(element);
+			// proposal.setReplaceRange(this.startPosition - this.offset, this.endPosition - this.offset);
+			proposal.setReplaceRange(offset, offset + name.length());
+			proposal.setRelevance(relevance);
 			this.requestor.accept(proposal);
 		} catch (ModelException e) {
 			Activator.logWarning("Problem during completion processing.", e); //$NON-NLS-1$

@@ -17,10 +17,13 @@
  */
 package org.eclipse.koneki.ldt.parser.ast.expressions;
 
+import java.util.List;
+
 import org.eclipse.dltk.ast.ASTListNode;
 import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.statements.Statement;
+import org.eclipse.dltk.utils.CorePrinter;
 import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
 
 // TODO: Auto-generated Javadoc
@@ -30,7 +33,7 @@ import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
 public class Table extends Expression {
 
 	/** The statements. */
-	ASTListNode statements;
+	private ASTListNode statements;
 
 	/**
 	 * Instantiates a new table.
@@ -83,17 +86,25 @@ public class Table extends Expression {
 		return statements;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.dltk.ast.statements.Statement#traverse(org.eclipse.dltk.ast .ASTVisitor)
-	 */
+	@Override
 	public void traverse(ASTVisitor pVisitor) throws Exception {
 		if (pVisitor.visit(this)) {
 			super.traverse(pVisitor);
 			getStatements().traverse(pVisitor);
 			pVisitor.endvisit(this);
 		}
+	}
+
+	@Override
+	public void printNode(CorePrinter output) {
+		output.append('{');
+		List children = getStatements().getChilds();
+		for (int position = 0; position < children.size(); position++) {
+			if (children.get(position) instanceof Statement) {
+				((Statement) children.get(position)).printNode(output);
+			}
+		}
+		output.append('}');
 	}
 
 }

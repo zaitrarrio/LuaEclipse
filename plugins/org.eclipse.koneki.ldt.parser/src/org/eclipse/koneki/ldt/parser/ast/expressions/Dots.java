@@ -8,17 +8,11 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-
-/**
- * @author	Kevin KIN-FOO <kkinfoo@anyware-tech.com>
- * @date $Date: 2009-06-18 16:46:07 +0200 (jeu., 18 juin 2009) $
- * $Author: kkinfoo $
- * $Id: Dots.java 1887 2009-06-18 14:46:07Z kkinfoo $
- */
 package org.eclipse.koneki.ldt.parser.ast.expressions;
 
 import org.eclipse.dltk.ast.ASTVisitor;
 import org.eclipse.dltk.ast.expressions.Expression;
+import org.eclipse.dltk.utils.CorePrinter;
 import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
 
 // TODO: Auto-generated Javadoc
@@ -56,4 +50,8 @@ public class Dots extends Expression implements LuaExpressionConstants {
 		}
 	}
 
+	@Override
+	public void printNode(CorePrinter output) {
+		output.append("...");//$NON-NLS-1$
+	}
 }

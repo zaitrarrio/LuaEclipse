@@ -18,46 +18,36 @@ import org.eclipse.dltk.ui.text.completion.ScriptOverrideCompletionProposal;
 import org.eclipse.koneki.ldt.core.LuaNature;
 import org.eclipse.swt.graphics.Image;
 
-public class LuaCompletionProposalCollector extends
-	ScriptCompletionProposalCollector {
+public class LuaCompletionProposalCollector extends ScriptCompletionProposalCollector {
 
-    protected final static char[] VAR_TRIGGER = new char[] { '\t', ' ', '=',
-	    ':', '.' };
+	protected static final char[] VAR_TRIGGER = { '\t', ' ', '=', ':', '.' };
 
-    public LuaCompletionProposalCollector(ISourceModule module) {
-	super(module);
-    }
+	public LuaCompletionProposalCollector(ISourceModule module) {
+		super(module);
+	}
 
-    @Override
-    protected ScriptCompletionProposal createOverrideCompletionProposal(
-	    IScriptProject scriptProject, ISourceModule compilationUnit,
-	    String name, String[] paramTypes, int start, int length,
-	    String displayName, String completionProposal) {
-	return new ScriptOverrideCompletionProposal(scriptProject,
-		compilationUnit, name, paramTypes, start, length, displayName,
-		completionProposal);
-    }
+	@Override
+	protected ScriptCompletionProposal createOverrideCompletionProposal(IScriptProject scriptProject, ISourceModule compilationUnit, String name,
+			String[] paramTypes, int start, int length, String displayName, String completionProposal) {
+		return new ScriptOverrideCompletionProposal(scriptProject, compilationUnit, name, paramTypes, start, length, displayName, completionProposal);
+	}
 
-    @Override
-    protected ScriptCompletionProposal createScriptCompletionProposal(
-	    String completion, int replaceStart, int length, Image image,
-	    String displayString, int i) {
-	return new LuaCompletionProposal(completion, replaceStart, length,
-		image, displayString, i);
-    }
+	@Override
+	protected ScriptCompletionProposal createScriptCompletionProposal(String completion, int replaceStart, int length, Image image,
+			String displayString, int i) {
+		return new LuaCompletionProposal(completion, replaceStart, length, image, displayString, i);
+	}
 
-    @Override
-    protected ScriptCompletionProposal createScriptCompletionProposal(
-	    String completion, int replaceStart, int length, Image image,
-	    String displayString, int i, boolean isInDoc) {
-	return new LuaCompletionProposal(completion, replaceStart, length,
-		image, displayString, i, isInDoc);
-    }
+	@Override
+	protected ScriptCompletionProposal createScriptCompletionProposal(String completion, int replaceStart, int length, Image image,
+			String displayString, int i, boolean isInDoc) {
+		return new LuaCompletionProposal(completion, replaceStart, length, image, displayString, i, isInDoc);
+	}
 
-    @Override
-    protected char[] getVarTrigger() {
-	return VAR_TRIGGER;
-    }
+	@Override
+	protected char[] getVarTrigger() {
+		return VAR_TRIGGER;
+	}
 
 	@Override
 	protected String getNatureId() {

@@ -49,6 +49,13 @@
             priority="0">
       </selectionEngine>
    </extension>
+   <extension
+         point="org.eclipse.dltk.core.keywords">
+      <keywordProvider
+            class="org.eclipse.koneki.ldt.parser.KeywordProvider"
+            nature="org.eclipse.koneki.ldt.nature">
+      </keywordProvider>
+   </extension>
    <!--
    <extension
          point="org.eclipse.dltk.core.search">

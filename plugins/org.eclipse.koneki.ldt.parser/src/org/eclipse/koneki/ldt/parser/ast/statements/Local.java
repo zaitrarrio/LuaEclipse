@@ -17,6 +17,7 @@
  */
 package org.eclipse.koneki.ldt.parser.ast.statements;
 
+import org.eclipse.dltk.ast.expressions.Literal;
 import org.eclipse.dltk.ast.statements.Statement;
 import org.eclipse.dltk.ast.statements.StatementConstants;
 import org.eclipse.dltk.utils.CorePrinter;
@@ -57,28 +58,33 @@ public class Local extends BinaryStatement implements StatementConstants {
 		this(start, end, identifiers, null);
 	}
 
+	@Override
 	public void printNode(CorePrinter output) {
-		String varList = new String();
-		String valueList = new String();
+		StringBuffer varList = new StringBuffer();
+		StringBuffer valueList = new StringBuffer();
 		final String comma = ", "; //$NON-NLS-1$
 		Chunk chunk = (Chunk) getLeft();
 		for (Object var : chunk.getStatements()) {
 			Statement state = (Statement) var;
-			varList += state.toString() + comma;
-		}
-		if (varList.length() > 0) {
-			varList = varList.substring(0, varList.length() - 2);
+			varList.append(state.toString());
+			varList.append(comma);
 		}
 		if (getRight() != null) {
 			chunk = (Chunk) getRight();
 			for (Object e : chunk.getStatements()) {
 				Statement statement = (Statement) e;
-				valueList += statement.toString() + comma;
-			}
-			if (valueList.length() > 0) {
-				valueList = " = " + valueList.substring(0, valueList.length() - 2);//$NON-NLS-1$
+				if (e instanceof Literal) {
+					Literal literal = (Literal) e;
+					valueList.append(literal.getValue());
+				} else {
+					valueList.append(statement.toString());
+				}
+				valueList.append(comma);
 			}
 		}
-		output.formatPrintLn("local " + varList + "=" + valueList); //$NON-NLS-1$  //$NON-NLS-2$
+		if (valueList.length() > 0) {
+			valueList.insert(0, "= "); //$NON-NLS-1$
+		}
+		output.formatPrintLn("local " + varList + valueList); //$NON-NLS-1$  
 	}
 }

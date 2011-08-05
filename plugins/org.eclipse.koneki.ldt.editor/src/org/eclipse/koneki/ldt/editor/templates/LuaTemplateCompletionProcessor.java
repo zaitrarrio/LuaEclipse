@@ -21,7 +21,7 @@ import org.eclipse.dltk.ui.text.completion.ScriptContentAssistInvocationContext;
  */
 public class LuaTemplateCompletionProcessor extends ScriptTemplateCompletionProcessor {
 
-	private static char[] IGNORE = new char[] { '.', ':' };
+	private static final char[] IGNORE = { '.', ':' };
 
 	public LuaTemplateCompletionProcessor(ScriptContentAssistInvocationContext context) {
 		super(context);
@@ -29,7 +29,6 @@ public class LuaTemplateCompletionProcessor extends ScriptTemplateCompletionProc
 
 	@Override
 	protected String getContextTypeId() {
-		// TODO Auto-generated method stub
 		return LuaUniversalTemplateContextType.CONTEXT_TYPE_ID;
 	}
 
@@ -39,7 +38,6 @@ public class LuaTemplateCompletionProcessor extends ScriptTemplateCompletionProc
 
 	@Override
 	protected ScriptTemplateAccess getTemplateAccess() {
-		// TODO Auto-generated method stub
 		return LuaTemplateAccess.getInstance();
 	}
 

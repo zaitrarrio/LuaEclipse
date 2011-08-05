@@ -18,29 +18,31 @@ import org.eclipse.swt.graphics.Image;
 
 public class LuaCompletionProposal extends ScriptCompletionProposal {
 
-    public LuaCompletionProposal(String replacementString,
-	    int replacementOffset, int replacementLength, Image image,
-	    String displayString, int relevance) {
-	super(replacementString, replacementOffset, replacementLength, image,
-		displayString, relevance);
-    }
+	public LuaCompletionProposal(String replacementString, int replacementOffset, int replacementLength, Image image, String displayString,
+			int relevance) {
+		super(replacementString, replacementOffset, replacementLength, image, displayString, relevance);
+	}
 
-    public LuaCompletionProposal(String replacementString,
-	    int replacementOffset, int replacementLength, Image image,
-	    String displayString, int relevance, boolean isInDoc) {
-	super(replacementString, replacementOffset, replacementLength, image,
-		displayString, relevance, isInDoc);
-    }
+	public LuaCompletionProposal(String replacementString, int replacementOffset, int replacementLength, Image image, String displayString,
+			int relevance, boolean isInDoc) {
+		super(replacementString, replacementOffset, replacementLength, image, displayString, relevance, isInDoc);
+	}
 
-    @Override
-    protected boolean isSmartTrigger(char trigger) {
-	return trigger == '.';
-    }
+	@Override
+	protected boolean isSmartTrigger(final char trigger) {
+		switch (trigger) {
+		case '.':
+			return true;
+		case ':':
+			return true;
 
-    protected boolean insertCompletion() {
-	IPreferenceStore preference = Activator.getDefault()
-		.getPreferenceStore();
-	return preference
-		.getBoolean(PreferenceConstants.CODEASSIST_INSERT_COMPLETION);
-    }
+		default:
+			return false;
+		}
+	}
+
+	protected boolean insertCompletion() {
+		IPreferenceStore preference = Activator.getDefault().getPreferenceStore();
+		return preference.getBoolean(PreferenceConstants.CODEASSIST_INSERT_COMPLETION);
+	}
 }

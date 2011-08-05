@@ -23,16 +23,14 @@ import org.eclipse.koneki.ldt.parser.LuaExpressionConstants;
  */
 public class BinaryExpression extends Expression {
 
+	/** Kind of expression's operator. */
+	private int kind;
+
 	/** Left parent of the expression. */
 	private Statement left;
 
 	/** Right parent of the expression. */
 	private Statement right;
-
-	/** Kind of expression's operator. */
-	protected int kind;
-
-	protected long id;
 
 	/**
 	 * Defines a two operands expression.
@@ -57,11 +55,9 @@ public class BinaryExpression extends Expression {
 		this.right = right;
 		if (left != null) {
 			this.setStart(left.sourceStart());
-			assert left instanceof Expression;
 		}
 		if (right != null) {
 			this.setEnd(right.sourceEnd());
-			assert right instanceof Expression;
 		}
 	}
 
